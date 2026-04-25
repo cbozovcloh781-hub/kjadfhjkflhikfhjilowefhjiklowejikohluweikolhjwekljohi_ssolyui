@@ -128,17 +128,17 @@ function Dropdown:CreateElement()
     self.ArrowIcon.Font = Enum.Font.SourceSansBold
     self.ArrowIcon.Parent = self.DropdownButton
     
-    -- Options container (hidden by default) - inside button
+    -- Options container (hidden by default) - inside button with proper clipping
     self.OptionsContainer = Instance.new("Frame")
     self.OptionsContainer.Name = "Options"
-    self.OptionsContainer.Size = UDim2.new(0, 0, 0, 0)
+    self.OptionsContainer.Size = UDim2.new(1, 0, 0, 0)
     self.OptionsContainer.Position = UDim2.new(0, 0, 1, 5)
     self.OptionsContainer.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
     self.OptionsContainer.BorderSizePixel = 0
     self.OptionsContainer.ClipsDescendants = true
     self.OptionsContainer.Visible = false
     self.OptionsContainer.ZIndex = 10
-    self.OptionsContainer.Parent = self.DropdownButton
+    self.OptionsContainer.Parent = self.Container
     
     local OptionsCorner = Instance.new("UICorner")
     OptionsCorner.CornerRadius = UDim.new(0, 6)

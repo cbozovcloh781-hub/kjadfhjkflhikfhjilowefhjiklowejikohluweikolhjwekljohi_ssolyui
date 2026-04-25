@@ -380,34 +380,39 @@ function Colorpicker:Open()
     self.Opened = true
     
     self.PickerContainer.Visible = true
+    self.PickerContainer.Size = UDim2.new(1, -24, 0, 0)
     
-    TweenService:Create(self.PickerContainer, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-        Size = UDim2.new(1, -24, 0, 215)
+    -- Expand container first to make space
+    local newHeight = (self.Description and 70 or 55) + 220
+    TweenService:Create(self.Container, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        Size = UDim2.new(1, -20, 0, newHeight)
     }):Play()
     
-    -- Expand container
-    local newHeight = (self.Description and 70 or 55) + 220
-    TweenService:Create(self.Container, TweenInfo.new(0.3), {
-        Size = UDim2.new(1, -20, 0, newHeight)
+    -- Then expand picker
+    task.wait(0.05)
+    TweenService:Create(self.PickerContainer, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+        Size = UDim2.new(1, -24, 0, 215)
     }):Play()
 end
 
 function Colorpicker:Close()
     self.Opened = false
     
-    TweenService:Create(self.PickerContainer, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+    -- Close picker first
+    TweenService:Create(self.PickerContainer, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
         Size = UDim2.new(1, -24, 0, 0)
     }):Play()
     
-    task.delay(0.3, function()
-        self.PickerContainer.Visible = false
-    end)
-    
-    -- Shrink container
+    -- Then shrink container
+    task.wait(0.1)
     local newHeight = self.Description and 70 or 55
-    TweenService:Create(self.Container, TweenInfo.new(0.3), {
+    TweenService:Create(self.Container, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
         Size = UDim2.new(1, -20, 0, newHeight)
     }):Play()
+    
+    task.delay(0.25, function()
+        self.PickerContainer.Visible = false
+    end)
 end
 
 function Colorpicker:SetValue(color, silent)

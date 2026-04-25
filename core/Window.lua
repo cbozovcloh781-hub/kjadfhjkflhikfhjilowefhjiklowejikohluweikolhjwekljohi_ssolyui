@@ -194,11 +194,12 @@ function Window:CreateGUI()
     ContentPadding.PaddingRight = UDim.new(0, 10)
     ContentPadding.Parent = self.ContentContainer
     
-    -- Resize handle (bottom-right corner) - separate rounded bar outside window
+    -- Resize handle (bottom-right corner) - separate rounded bar positioned around corner
     self.ResizeHandle = Instance.new("Frame")
     self.ResizeHandle.Name = "ResizeHandle"
     self.ResizeHandle.Size = UDim2.fromOffset(6, 40)
-    self.ResizeHandle.Position = UDim2.new(1, 5, 1, -50)
+    self.ResizeHandle.Position = UDim2.new(1, 8, 1, -45)
+    self.ResizeHandle.AnchorPoint = Vector2.new(0, 0.5)
     self.ResizeHandle.BackgroundColor3 = Color3.fromRGB(74, 158, 255)
     self.ResizeHandle.BackgroundTransparency = 0.3
     self.ResizeHandle.BorderSizePixel = 0
@@ -331,8 +332,8 @@ function Window:SetupResizing()
         local containerPos = self.Container.AbsolutePosition
         local containerSize = self.Container.AbsoluteSize
         self.ResizeHandle.Position = UDim2.fromOffset(
-            containerPos.X + containerSize.X + 5,
-            containerPos.Y + containerSize.Y - 50
+            containerPos.X + containerSize.X + 8,
+            containerPos.Y + containerSize.Y - 45
         )
     end
     
