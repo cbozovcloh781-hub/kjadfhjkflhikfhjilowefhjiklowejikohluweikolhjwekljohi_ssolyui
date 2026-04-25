@@ -154,11 +154,38 @@ function Notification:Show(config)
     
     -- Slide in animation from right with bounce
     notif.Size = UDim2.new(1, 0, 0, totalHeight)
-    notif.Position = UDim2.new(1, 50, 0, 0)
+    notif.Position = UDim2.new(0, 350, 0, 0)
+    notif.BackgroundTransparency = 1
+    
+    -- Fade in all children
+    for _, child in pairs(notif:GetDescendants()) do
+        if child:IsA("GuiObject") then
+            child.BackgroundTransparency = 1
+        end
+        if child:IsA("TextLabel") then
+            child.TextTransparency = 1
+        end
+    end
     
     TweenService:Create(notif, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-        Position = UDim2.new(0, 0, 0, 0)
+        Position = UDim2.new(0, 0, 0, 0),
+        BackgroundTransparency = 0.1
     }):Play()
+    
+    -- Fade in children
+    for _, child in pairs(notif:GetDescendants()) do
+        if child:IsA("GuiObject") and child.Name ~= "Progress" then
+            local targetTrans = child:GetAttribute("OriginalTransparency") or 0
+            TweenService:Create(child, TweenInfo.new(0.5), {
+                BackgroundTransparency = targetTrans
+            }):Play()
+        end
+        if child:IsA("TextLabel") then
+            TweenService:Create(child, TweenInfo.new(0.5), {
+                TextTransparency = 0
+            }):Play()
+        end
+    end
     
     -- Progress bar animation
     TweenService:Create(progress, TweenInfo.new(duration, Enum.EasingStyle.Linear), {

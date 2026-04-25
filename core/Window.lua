@@ -84,7 +84,7 @@ function Window:CreateGUI()
     self.Container.Name = "Container"
     self.Container.Size = self.Config.Size
     self.Container.Position = self.Config.Position
-    self.Container.BackgroundColor3 = Color3.fromRGB(26, 26, 26)
+    self.Container.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
     self.Container.BackgroundTransparency = self.Config.Transparency
     self.Container.BorderSizePixel = 0
     self.Container.ClipsDescendants = true
@@ -93,67 +93,74 @@ function Window:CreateGUI()
     
     -- Rounded corners
     local UICorner = Instance.new("UICorner")
-    UICorner.CornerRadius = UDim.new(0, 12)
+    UICorner.CornerRadius = UDim.new(0, 8)
     UICorner.Parent = self.Container
     
     -- Border (stroke)
     local UIStroke = Instance.new("UIStroke")
-    UIStroke.Color = Color3.fromRGB(45, 45, 45)
-    UIStroke.Thickness = 2
+    UIStroke.Color = Color3.fromRGB(60, 60, 60)
+    UIStroke.Thickness = 1
     UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
     UIStroke.Parent = self.Container
     
     -- Title bar
     self.TitleBar = Instance.new("Frame")
     self.TitleBar.Name = "TitleBar"
-    self.TitleBar.Size = UDim2.new(1, 0, 0, 40)
-    self.TitleBar.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-    self.TitleBar.BackgroundTransparency = 0.3
+    self.TitleBar.Size = UDim2.new(1, 0, 0, 35)
+    self.TitleBar.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+    self.TitleBar.BackgroundTransparency = 0
     self.TitleBar.BorderSizePixel = 0
     self.TitleBar.Parent = self.Container
     
     local TitleCorner = Instance.new("UICorner")
-    TitleCorner.CornerRadius = UDim.new(0, 12)
+    TitleCorner.CornerRadius = UDim.new(0, 8)
     TitleCorner.Parent = self.TitleBar
+    
+    -- Divider line
+    local Divider = Instance.new("Frame")
+    Divider.Size = UDim2.new(1, 0, 0, 1)
+    Divider.Position = UDim2.new(0, 0, 1, 0)
+    Divider.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    Divider.BorderSizePixel = 0
+    Divider.Parent = self.TitleBar
     
     -- Title text
     self.TitleLabel = Instance.new("TextLabel")
     self.TitleLabel.Name = "Title"
     self.TitleLabel.Size = UDim2.new(1, -100, 1, 0)
-    self.TitleLabel.Position = UDim2.fromOffset(15, 0)
+    self.TitleLabel.Position = UDim2.fromOffset(12, 0)
     self.TitleLabel.BackgroundTransparency = 1
     self.TitleLabel.Text = self.Config.Title
     self.TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    self.TitleLabel.TextSize = 15
-    self.TitleLabel.Font = Enum.Font.SourceSansBold
+    self.TitleLabel.TextSize = 13
+    self.TitleLabel.Font = Enum.Font.GothamBold
     self.TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
-    self.TitleLabel.TextStrokeTransparency = 0.8
     self.TitleLabel.Parent = self.TitleBar
     
     -- Minimize button
     self.MinimizeButton = Instance.new("TextButton")
     self.MinimizeButton.Name = "Minimize"
-    self.MinimizeButton.Size = UDim2.fromOffset(30, 30)
-    self.MinimizeButton.Position = UDim2.new(1, -40, 0.5, -15)
-    self.MinimizeButton.BackgroundColor3 = Color3.fromRGB(74, 158, 255)
-    self.MinimizeButton.BackgroundTransparency = 0.2
+    self.MinimizeButton.Size = UDim2.fromOffset(25, 25)
+    self.MinimizeButton.Position = UDim2.new(1, -32, 0.5, -12.5)
+    self.MinimizeButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    self.MinimizeButton.BackgroundTransparency = 0
     self.MinimizeButton.BorderSizePixel = 0
     self.MinimizeButton.Text = "−"
-    self.MinimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    self.MinimizeButton.TextSize = 20
-    self.MinimizeButton.Font = Enum.Font.SourceSansBold
+    self.MinimizeButton.TextColor3 = Color3.fromRGB(200, 200, 200)
+    self.MinimizeButton.TextSize = 16
+    self.MinimizeButton.Font = Enum.Font.GothamBold
     self.MinimizeButton.AutoButtonColor = false
     self.MinimizeButton.Parent = self.TitleBar
     
     local MinCorner = Instance.new("UICorner")
-    MinCorner.CornerRadius = UDim.new(0, 8)
+    MinCorner.CornerRadius = UDim.new(0, 4)
     MinCorner.Parent = self.MinimizeButton
     
     -- Tab container (left side)
     self.TabContainer = Instance.new("Frame")
     self.TabContainer.Name = "TabContainer"
-    self.TabContainer.Size = UDim2.new(0, 150, 1, -50)
-    self.TabContainer.Position = UDim2.fromOffset(10, 45)
+    self.TabContainer.Size = UDim2.new(0, 140, 1, -45)
+    self.TabContainer.Position = UDim2.fromOffset(8, 40)
     self.TabContainer.BackgroundTransparency = 1
     self.TabContainer.Parent = self.Container
     
@@ -165,19 +172,19 @@ function Window:CreateGUI()
     -- Content container (right side) - with visible scrollbar
     self.ContentContainer = Instance.new("ScrollingFrame")
     self.ContentContainer.Name = "ContentContainer"
-    self.ContentContainer.Size = UDim2.new(1, -175, 1, -50)
-    self.ContentContainer.Position = UDim2.fromOffset(165, 45)
-    self.ContentContainer.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-    self.ContentContainer.BackgroundTransparency = 0.5
+    self.ContentContainer.Size = UDim2.new(1, -160, 1, -45)
+    self.ContentContainer.Position = UDim2.fromOffset(152, 40)
+    self.ContentContainer.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+    self.ContentContainer.BackgroundTransparency = 0
     self.ContentContainer.BorderSizePixel = 0
-    self.ContentContainer.ScrollBarThickness = 6
-    self.ContentContainer.ScrollBarImageColor3 = Color3.fromRGB(74, 158, 255)
+    self.ContentContainer.ScrollBarThickness = 4
+    self.ContentContainer.ScrollBarImageColor3 = Color3.fromRGB(60, 60, 60)
     self.ContentContainer.ScrollBarImageTransparency = 0
     self.ContentContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
     self.ContentContainer.Parent = self.Container
     
     local ContentCorner = Instance.new("UICorner")
-    ContentCorner.CornerRadius = UDim.new(0, 10)
+    ContentCorner.CornerRadius = UDim.new(0, 6)
     ContentCorner.Parent = self.ContentContainer
     
     local ContentLayout = Instance.new("UIListLayout")
@@ -197,21 +204,47 @@ function Window:CreateGUI()
     ContentPadding.PaddingRight = UDim.new(0, 10)
     ContentPadding.Parent = self.ContentContainer
     
-    -- Resize handle (bottom-right corner) - rounded bar around corner
+    -- Resize handle (curved bar around bottom-right corner)
     self.ResizeHandle = Instance.new("Frame")
     self.ResizeHandle.Name = "ResizeHandle"
-    self.ResizeHandle.Size = UDim2.fromOffset(6, 40)
-    self.ResizeHandle.Position = UDim2.new(1, -3, 1, -20)
+    self.ResizeHandle.Size = UDim2.fromOffset(50, 50)
+    self.ResizeHandle.Position = UDim2.new(1, -25, 1, -25)
     self.ResizeHandle.AnchorPoint = Vector2.new(0.5, 0.5)
-    self.ResizeHandle.BackgroundColor3 = Color3.fromRGB(74, 158, 255)
-    self.ResizeHandle.BackgroundTransparency = 0.3
-    self.ResizeHandle.BorderSizePixel = 0
+    self.ResizeHandle.BackgroundTransparency = 1
+    self.ResizeHandle.ClipsDescendants = false
     self.ResizeHandle.ZIndex = 5
     self.ResizeHandle.Parent = self.Container
     
-    local ResizeCorner = Instance.new("UICorner")
-    ResizeCorner.CornerRadius = UDim.new(1, 0)
-    ResizeCorner.Parent = self.ResizeHandle
+    -- Create curved resize indicator using multiple small bars
+    local resizeBar1 = Instance.new("Frame")
+    resizeBar1.Size = UDim2.fromOffset(3, 20)
+    resizeBar1.Position = UDim2.new(1, -8, 1, -15)
+    resizeBar1.AnchorPoint = Vector2.new(0.5, 1)
+    resizeBar1.BackgroundColor3 = Color3.fromRGB(74, 158, 255)
+    resizeBar1.BackgroundTransparency = 0.3
+    resizeBar1.BorderSizePixel = 0
+    resizeBar1.Rotation = 0
+    resizeBar1.Parent = self.ResizeHandle
+    
+    local bar1Corner = Instance.new("UICorner")
+    bar1Corner.CornerRadius = UDim.new(1, 0)
+    bar1Corner.Parent = resizeBar1
+    
+    local resizeBar2 = Instance.new("Frame")
+    resizeBar2.Size = UDim2.fromOffset(3, 15)
+    resizeBar2.Position = UDim2.new(1, -15, 1, -8)
+    resizeBar2.AnchorPoint = Vector2.new(0.5, 1)
+    resizeBar2.BackgroundColor3 = Color3.fromRGB(74, 158, 255)
+    resizeBar2.BackgroundTransparency = 0.3
+    resizeBar2.BorderSizePixel = 0
+    resizeBar2.Rotation = 90
+    resizeBar2.Parent = self.ResizeHandle
+    
+    local bar2Corner = Instance.new("UICorner")
+    bar2Corner.CornerRadius = UDim.new(1, 0)
+    bar2Corner.Parent = resizeBar2
+    
+    self.ResizeBars = {resizeBar1, resizeBar2}
     
     -- Minimized indicator (hidden by default) - small icon that follows window
     self.MinimizedIndicator = Instance.new("Frame")
@@ -290,37 +323,7 @@ function Window:SetupDragging()
     
     self.MinimizedIndicator.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            local currentTime = tick()
-            if currentTime - lastClickTime < 0.3 then
-                self:ToggleMinimize()
-                lastClickTime = 0
-                return
-            end
-            lastClickTime = currentTime
-            
-            minDragging = true
-            minDragStart = input.Position
-            minStartPos = self.MinimizedIndicator.Position
-        end
-    end)
-    
-    UserInputService.InputChanged:Connect(function(input)
-        if minDragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-            local delta = input.Position - minDragStart
-            self.MinimizedIndicator.Position = UDim2.new(
-                minStartPos.X.Scale,
-                minStartPos.X.Offset + delta.X,
-                minStartPos.Y.Scale,
-                minStartPos.Y.Offset + delta.Y
-            )
-            -- Update config position for restore
-            self.Config.Position = self.MinimizedIndicator.Position
-        end
-    end)
-    
-    UserInputService.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            minDragging = false
+            self:ToggleMinimize()
         end
     end)
 end
@@ -358,18 +361,20 @@ function Window:SetupResizing()
     
     -- Hover effect
     self.ResizeHandle.MouseEnter:Connect(function()
-        TweenService:Create(self.ResizeHandle, TweenInfo.new(0.2), {
-            BackgroundTransparency = 0,
-            Size = UDim2.fromOffset(8, 45)
-        }):Play()
+        for _, bar in ipairs(self.ResizeBars) do
+            TweenService:Create(bar, TweenInfo.new(0.2), {
+                BackgroundTransparency = 0
+            }):Play()
+        end
     end)
     
     self.ResizeHandle.MouseLeave:Connect(function()
         if not resizing then
-            TweenService:Create(self.ResizeHandle, TweenInfo.new(0.2), {
-                BackgroundTransparency = 0.3,
-                Size = UDim2.fromOffset(6, 40)
-            }):Play()
+            for _, bar in ipairs(self.ResizeBars) do
+                TweenService:Create(bar, TweenInfo.new(0.2), {
+                    BackgroundTransparency = 0.3
+                }):Play()
+            end
         end
     end)
 end
@@ -389,14 +394,14 @@ function Window:SetupMinimize()
     
     -- Hover effect
     self.MinimizeButton.MouseEnter:Connect(function()
-        TweenService:Create(self.MinimizeButton, TweenInfo.new(0.2), {
-            BackgroundTransparency = 0
+        TweenService:Create(self.MinimizeButton, TweenInfo.new(0.15), {
+            BackgroundColor3 = Color3.fromRGB(60, 60, 60)
         }):Play()
     end)
     
     self.MinimizeButton.MouseLeave:Connect(function()
-        TweenService:Create(self.MinimizeButton, TweenInfo.new(0.2), {
-            BackgroundTransparency = 0.2
+        TweenService:Create(self.MinimizeButton, TweenInfo.new(0.15), {
+            BackgroundColor3 = Color3.fromRGB(40, 40, 40)
         }):Play()
     end)
 end

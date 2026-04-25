@@ -210,6 +210,7 @@ function Dropdown:CreateOptions()
         optionButton.BorderSizePixel = 0
         optionButton.Text = ""
         optionButton.AutoButtonColor = false
+        optionButton.SelectionImageObject = nil
         optionButton.Parent = self.OptionsScroll
         
         local optionCorner = Instance.new("UICorner")

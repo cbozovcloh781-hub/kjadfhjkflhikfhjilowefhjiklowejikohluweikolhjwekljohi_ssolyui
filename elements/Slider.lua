@@ -99,6 +99,7 @@ function Slider:CreateElement()
     self.SliderTrack.Position = UDim2.fromOffset(12, sliderY)
     self.SliderTrack.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     self.SliderTrack.BorderSizePixel = 0
+    self.SliderTrack.Active = true
     self.SliderTrack.Parent = self.Container
     
     local TrackCorner = Instance.new("UICorner")
@@ -117,25 +118,39 @@ function Slider:CreateElement()
     FillCorner.CornerRadius = UDim.new(1, 0)
     FillCorner.Parent = self.SliderFill
     
-    -- Slider handle (circle) - properly centered on track
-    self.SliderHandle = Instance.new("Frame")
+    -- Slider handle (circle) - properly centered on track with larger hitbox
+    self.SliderHandle = Instance.new("TextButton")
     self.SliderHandle.Name = "Handle"
-    self.SliderHandle.Size = UDim2.fromOffset(18, 18)
+    self.SliderHandle.Size = UDim2.fromOffset(30, 30)
     self.SliderHandle.Position = UDim2.new(0, 0, 0.5, 0)
     self.SliderHandle.AnchorPoint = Vector2.new(0.5, 0.5)
-    self.SliderHandle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    self.SliderHandle.BorderSizePixel = 0
-    self.SliderHandle.ZIndex = 2
+    self.SliderHandle.BackgroundTransparency = 1
+    self.SliderHandle.Text = ""
+    self.SliderHandle.AutoButtonColor = false
+    self.SliderHandle.SelectionImageObject = nil
+    self.SliderHandle.ZIndex = 3
     self.SliderHandle.Parent = self.SliderTrack
+    
+    -- Visual circle inside button
+    local handleCircle = Instance.new("Frame")
+    handleCircle.Name = "Circle"
+    handleCircle.Size = UDim2.fromOffset(18, 18)
+    handleCircle.Position = UDim2.new(0.5, 0, 0.5, 0)
+    handleCircle.AnchorPoint = Vector2.new(0.5, 0.5)
+    handleCircle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    handleCircle.BorderSizePixel = 0
+    handleCircle.Parent = self.SliderHandle
     
     local HandleCorner = Instance.new("UICorner")
     HandleCorner.CornerRadius = UDim.new(1, 0)
-    HandleCorner.Parent = self.SliderHandle
+    HandleCorner.Parent = handleCircle
+    
+    self.HandleCircle = handleCircle
     
     -- Min/Max labels
     self.MinLabel = Instance.new("TextLabel")
     self.MinLabel.Size = UDim2.fromOffset(40, 15)
-    self.MinLabel.Position = UDim2.fromOffset(12, sliderY + 8)
+    self.MinLabel.Position = UDim2.fromOffset(12, sliderY + 12)
     self.MinLabel.BackgroundTransparency = 1
     self.MinLabel.Text = tostring(self.Min)
     self.MinLabel.TextColor3 = Color3.fromRGB(120, 120, 120)
@@ -146,7 +161,7 @@ function Slider:CreateElement()
     
     self.MaxLabel = Instance.new("TextLabel")
     self.MaxLabel.Size = UDim2.fromOffset(40, 15)
-    self.MaxLabel.Position = UDim2.new(1, -52, 0, sliderY + 8)
+    self.MaxLabel.Position = UDim2.new(1, -52, 0, sliderY + 12)
     self.MaxLabel.BackgroundTransparency = 1
     self.MaxLabel.Text = tostring(self.Max)
     self.MaxLabel.TextColor3 = Color3.fromRGB(120, 120, 120)
@@ -157,6 +172,13 @@ function Slider:CreateElement()
     
     -- Dragging logic
     local dragging = false
+    
+    self.SliderHandle.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            self:UpdateSlider(input.Position.X)
+        end
+    end)
     
     self.SliderTrack.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -198,14 +220,14 @@ function Slider:CreateElement()
     
     -- Hover effects
     self.SliderTrack.MouseEnter:Connect(function()
-        TweenService:Create(self.SliderHandle, TweenInfo.new(0.2), {
+        TweenService:Create(self.HandleCircle, TweenInfo.new(0.2), {
             Size = UDim2.fromOffset(22, 22)
         }):Play()
     end)
     
     self.SliderTrack.MouseLeave:Connect(function()
         if not dragging then
-            TweenService:Create(self.SliderHandle, TweenInfo.new(0.2), {
+            TweenService:Create(self.HandleCircle, TweenInfo.new(0.2), {
                 Size = UDim2.fromOffset(18, 18)
             }):Play()
         end

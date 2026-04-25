@@ -256,7 +256,19 @@ function Colorpicker:CreateElement()
             local g = tonumber(self.RGBInputs.G.Text) or 0
             local b = tonumber(self.RGBInputs.B.Text) or 0
             
-            self:SetValue(Color3.fromRGB(r, g, b))
+            local color = Color3.fromRGB(r, g, b)
+            local h, s, v = color:ToHSV()
+            
+            -- Update palette cursor position
+            self.PaletteCursor.Position = UDim2.new(s, 0, 1 - v, 0)
+            
+            -- Update hue cursor
+            self.HueCursor.Position = UDim2.new(0, -2, h, 0)
+            
+            -- Update palette background color
+            self.Palette.BackgroundColor3 = Color3.fromHSV(h, 1, 1)
+            
+            self:SetValue(color)
         end)
     end
     
