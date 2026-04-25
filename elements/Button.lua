@@ -39,13 +39,17 @@ function Button:CreateElement()
     self.Button.Name = "Button"
     self.Button.Size = UDim2.new(1, -24, 0, 30)
     self.Button.Position = UDim2.fromOffset(12, 8)
-    self.Button.BackgroundColor3 = Color3.fromRGB(74, 158, 255)
+    self.Button.BackgroundColor3 = self.Tab.Window.AccentColor or Color3.fromRGB(74, 158, 255)
     self.Button.BackgroundTransparency = 0.2
     self.Button.BorderSizePixel = 0
     self.Button.Text = ""
     self.Button.AutoButtonColor = false
     self.Button.SelectionImageObject = nil
     self.Button.Parent = self.Container
+    
+    if self.Tab.Window.AccentElements then
+        table.insert(self.Tab.Window.AccentElements, self.Button)
+    end
     
     local ButtonCorner = Instance.new("UICorner")
     ButtonCorner.CornerRadius = UDim.new(0, 6)

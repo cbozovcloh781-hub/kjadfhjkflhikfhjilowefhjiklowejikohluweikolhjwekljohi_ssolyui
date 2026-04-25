@@ -139,32 +139,15 @@ Ssoly.Elements = {
     Keybind = Keybind,
 }
 
-task.wait(1.5)
-
--- Remove loading screen
-local TweenService = game:GetService("TweenService")
-local container = loadingGui:FindFirstChild("Frame") or loadingGui:GetChildren()[1]
-if container then
-    TweenService:Create(container, TweenInfo.new(0.3), {
-        BackgroundTransparency = 1
-    }):Play()
-end
-
--- Remove blur
-if loadingBlur then
-    TweenService:Create(loadingBlur, TweenInfo.new(0.3), {Size = 0}):Play()
-end
-
-task.wait(0.3)
-loadingGui:Destroy()
-if loadingBlur then
-    loadingBlur:Destroy()
-end
+-- Don't close loading screen automatically
+-- User must call Window:Show() to close it
 
 -- Create window
 function Ssoly:CreateWindow(config)
     config = config or {}
     config._delayShow = true
+    config._loadingGui = loadingGui
+    config._loadingBlur = loadingBlur
     return self.Window.new(config)
 end
 

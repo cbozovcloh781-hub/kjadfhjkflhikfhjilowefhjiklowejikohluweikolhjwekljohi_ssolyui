@@ -247,27 +247,34 @@ function Dropdown:CreateOptions()
         optionCorner.Parent = optionButton
         
         -- Checkmark (for multi-select)
-        local checkmark = Instance.new("TextLabel")
+        local checkmark = Instance.new("Frame")
         checkmark.Name = "Check"
-        checkmark.Size = UDim2.fromOffset(16, 16)
-        checkmark.Position = UDim2.fromOffset(8, 6)
-        checkmark.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+        checkmark.Size = UDim2.fromOffset(18, 18)
+        checkmark.Position = UDim2.fromOffset(7, 5)
+        checkmark.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
         checkmark.BackgroundTransparency = 0
         checkmark.BorderSizePixel = 0
-        checkmark.Text = ""
-        checkmark.TextColor3 = Color3.fromRGB(74, 158, 255)
-        checkmark.TextSize = 12
-        checkmark.Font = Enum.Font.GothamBold
         checkmark.Parent = optionButton
         
         local checkCorner = Instance.new("UICorner")
-        checkCorner.CornerRadius = UDim.new(0, 3)
+        checkCorner.CornerRadius = UDim.new(0, 4)
         checkCorner.Parent = checkmark
         
         local checkStroke = Instance.new("UIStroke")
-        checkStroke.Color = Color3.fromRGB(60, 60, 60)
-        checkStroke.Thickness = 1
+        checkStroke.Color = Color3.fromRGB(70, 70, 70)
+        checkStroke.Thickness = 1.5
         checkStroke.Parent = checkmark
+        
+        -- Checkmark icon
+        local checkIcon = Instance.new("TextLabel")
+        checkIcon.Name = "Icon"
+        checkIcon.Size = UDim2.new(1, 0, 1, 0)
+        checkIcon.BackgroundTransparency = 1
+        checkIcon.Text = ""
+        checkIcon.TextColor3 = Color3.fromRGB(255, 255, 255)
+        checkIcon.TextSize = 14
+        checkIcon.Font = Enum.Font.GothamBold
+        checkIcon.Parent = checkmark
         
         if not self.Multi then
             checkmark.Visible = false
@@ -276,8 +283,8 @@ function Dropdown:CreateOptions()
         -- Option text
         local optionLabel = Instance.new("TextLabel")
         optionLabel.Name = "Label"
-        optionLabel.Size = UDim2.new(1, self.Multi and -34 or -16, 1, 0)
-        optionLabel.Position = UDim2.fromOffset(self.Multi and 30 or 8, 0)
+        optionLabel.Size = UDim2.new(1, self.Multi and -36 or -16, 1, 0)
+        optionLabel.Position = UDim2.fromOffset(self.Multi and 32 or 8, 0)
         optionLabel.BackgroundTransparency = 1
         optionLabel.Text = value
         optionLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
@@ -310,7 +317,7 @@ function Dropdown:CreateOptions()
             }):Play()
         end)
         
-        self.OptionButtons[value] = {Button = optionButton, Check = checkmark, Label = optionLabel}
+        self.OptionButtons[value] = {Button = optionButton, Check = checkmark, CheckIcon = checkIcon, Label = optionLabel}
     end
 end
 
@@ -418,12 +425,12 @@ function Dropdown:ToggleValue(value)
     if option then
         if self.Value[value] then
             option.Check.BackgroundColor3 = accentColor
-            option.Check.Text = "✓"
+            option.CheckIcon.Text = "✓"
             option.Check:FindFirstChildOfClass("UIStroke").Color = accentColor
         else
-            option.Check.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-            option.Check.Text = ""
-            option.Check:FindFirstChildOfClass("UIStroke").Color = Color3.fromRGB(60, 60, 60)
+            option.Check.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+            option.CheckIcon.Text = ""
+            option.Check:FindFirstChildOfClass("UIStroke").Color = Color3.fromRGB(70, 70, 70)
         end
     end
     
@@ -457,12 +464,12 @@ function Dropdown:UpdateDisplay()
         for value, option in pairs(self.OptionButtons) do
             if self.Value[value] then
                 option.Check.BackgroundColor3 = accentColor
-                option.Check.Text = "✓"
+                option.CheckIcon.Text = "✓"
                 option.Check:FindFirstChildOfClass("UIStroke").Color = accentColor
             else
-                option.Check.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-                option.Check.Text = ""
-                option.Check:FindFirstChildOfClass("UIStroke").Color = Color3.fromRGB(60, 60, 60)
+                option.Check.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+                option.CheckIcon.Text = ""
+                option.Check:FindFirstChildOfClass("UIStroke").Color = Color3.fromRGB(70, 70, 70)
             end
         end
     else

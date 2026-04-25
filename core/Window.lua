@@ -831,7 +831,7 @@ function Window:SetAccentColor(color)
                 TweenService:Create(element, TweenInfo.new(0.3), {
                     ScrollBarImageColor3 = color
                 }):Play()
-            else
+            elseif element:IsA("Frame") or element:IsA("TextButton") then
                 TweenService:Create(element, TweenInfo.new(0.3), {
                     BackgroundColor3 = color
                 }):Play()
@@ -894,6 +894,28 @@ end
 function Window:Show()
     if not self._delayShow then return end
     
+    -- Close loading screen first
+    if self.Config._loadingGui then
+        local TweenService = game:GetService("TweenService")
+        local container = self.Config._loadingGui:FindFirstChild("Frame") or self.Config._loadingGui:GetChildren()[1]
+        if container then
+            TweenService:Create(container, TweenInfo.new(0.3), {
+                BackgroundTransparency = 1
+            }):Play()
+        end
+        
+        if self.Config._loadingBlur then
+            TweenService:Create(self.Config._loadingBlur, TweenInfo.new(0.3), {Size = 0}):Play()
+        end
+        
+        task.wait(0.3)
+        self.Config._loadingGui:Destroy()
+        if self.Config._loadingBlur then
+            self.Config._loadingBlur:Destroy()
+        end
+    end
+    
+    -- Show window
     self.Container.Visible = true
     self.Container.Size = UDim2.fromOffset(0, 0)
     
