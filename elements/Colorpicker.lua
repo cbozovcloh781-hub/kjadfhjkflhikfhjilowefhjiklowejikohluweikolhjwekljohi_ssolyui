@@ -29,7 +29,7 @@ function Colorpicker:CreateElement()
     -- Main container
     self.Container = Instance.new("Frame")
     self.Container.Name = "Colorpicker"
-    self.Container.Size = UDim2.new(1, -20, 0, self.Description and 70 or 55)
+    self.Container.Size = UDim2.new(1, -20, 0, self.Description and 60 or 45)
     self.Container.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     self.Container.BackgroundTransparency = 0.5
     self.Container.BorderSizePixel = 0
@@ -97,7 +97,7 @@ function Colorpicker:CreateElement()
     self.PickerContainer = Instance.new("Frame")
     self.PickerContainer.Name = "Picker"
     self.PickerContainer.Size = UDim2.new(1, -24, 0, 0)
-    self.PickerContainer.Position = UDim2.fromOffset(12, self.Description and 70 or 55)
+    self.PickerContainer.Position = UDim2.fromOffset(12, self.Description and 60 or 45)
     self.PickerContainer.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
     self.PickerContainer.BorderSizePixel = 0
     self.PickerContainer.ClipsDescendants = true
@@ -397,7 +397,7 @@ function Colorpicker:Open()
     self.PickerContainer.Size = UDim2.new(1, -24, 0, 0)
     
     -- Expand container first
-    local newHeight = (self.Description and 70 or 55) + 220
+    local newHeight = (self.Description and 60 or 45) + 220
     TweenService:Create(self.Container, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
         Size = UDim2.new(1, -20, 0, newHeight)
     }):Play()
@@ -417,7 +417,7 @@ function Colorpicker:Close()
     })
     closeTween1:Play()
     
-    local newHeight = self.Description and 70 or 55
+    local newHeight = self.Description and 60 or 45
     local closeTween2 = TweenService:Create(self.Container, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
         Size = UDim2.new(1, -20, 0, newHeight)
     })

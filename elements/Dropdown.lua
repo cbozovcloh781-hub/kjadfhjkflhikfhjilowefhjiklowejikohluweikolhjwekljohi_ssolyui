@@ -89,7 +89,7 @@ function Dropdown:CreateElement()
     -- Dropdown button
     self.DropdownButton = Instance.new("TextButton")
     self.DropdownButton.Name = "Button"
-    self.DropdownButton.Size = UDim2.new(1, -24, 0, 24)
+    self.DropdownButton.Size = UDim2.new(1, -24, 0, 30)
     self.DropdownButton.Position = UDim2.fromOffset(12, dropdownY)
     self.DropdownButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
     self.DropdownButton.BackgroundTransparency = 0.3
@@ -109,7 +109,7 @@ function Dropdown:CreateElement()
     self.DisplayLabel.Size = UDim2.new(1, -30, 1, 0)
     self.DisplayLabel.Position = UDim2.fromOffset(8, 0)
     self.DisplayLabel.BackgroundTransparency = 1
-    self.DisplayLabel.Text = self.Multi and "None" or "None"
+    self.DisplayLabel.Text = "--"
     self.DisplayLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
     self.DisplayLabel.TextSize = 11
     self.DisplayLabel.Font = Enum.Font.Gotham
@@ -303,7 +303,7 @@ end
 function Dropdown:Open()
     self.Opened = true
     
-    local optionCount = math.min(#self.Values, 5)
+    local optionCount = math.min(#self.Values, 6)
     local targetHeight = (optionCount * 30) + 10
     
     -- Update position on every frame while open
@@ -413,7 +413,7 @@ function Dropdown:UpdateDisplay()
         end
         
         if #selected == 0 then
-            self.DisplayLabel.Text = "None"
+            self.DisplayLabel.Text = "--"
         elseif #selected == 1 then
             self.DisplayLabel.Text = selected[1]
         else
@@ -426,7 +426,7 @@ function Dropdown:UpdateDisplay()
             option.Check.TextColor3 = self.Value[value] and Color3.fromRGB(74, 158, 255) or Color3.fromRGB(150, 150, 150)
         end
     else
-        self.DisplayLabel.Text = self.Value and tostring(self.Value) or "None"
+        self.DisplayLabel.Text = self.Value and tostring(self.Value) or "--"
     end
 end
 

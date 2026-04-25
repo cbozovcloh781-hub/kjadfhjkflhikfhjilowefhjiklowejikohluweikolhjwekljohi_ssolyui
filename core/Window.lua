@@ -308,7 +308,7 @@ function Window:CreateGUI()
         local radius = 12
         
         local bar = Instance.new("Frame")
-        bar.Size = UDim2.fromOffset(2, 6)
+        bar.Size = UDim2.fromOffset(6, 6)
         bar.Position = UDim2.fromOffset(
             15 + math.cos(rad) * radius,
             15 + math.sin(rad) * radius

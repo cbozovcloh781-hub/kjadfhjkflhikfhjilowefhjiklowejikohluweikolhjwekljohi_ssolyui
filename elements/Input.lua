@@ -28,7 +28,7 @@ function Input:CreateElement()
     -- Main container
     self.Container = Instance.new("Frame")
     self.Container.Name = "Input"
-    self.Container.Size = UDim2.new(1, -20, 0, self.Description and 75 or 60)
+    self.Container.Size = UDim2.new(1, -20, 0, self.Description and 90 or 70)
     self.Container.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     self.Container.BackgroundTransparency = 0.5
     self.Container.BorderSizePixel = 0
@@ -73,7 +73,7 @@ function Input:CreateElement()
     -- Input box
     self.InputBox = Instance.new("TextBox")
     self.InputBox.Name = "InputBox"
-    self.InputBox.Size = UDim2.new(1, -24, 0, 30)
+    self.InputBox.Size = UDim2.new(1, -24, 0, 35)
     self.InputBox.Position = UDim2.fromOffset(12, inputY)
     self.InputBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
     self.InputBox.BackgroundTransparency = 0.3

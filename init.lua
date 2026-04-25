@@ -91,41 +91,42 @@ end
 
 local loadingGui, statusLabel, progressBar, loadingBlur = createLoadingScreen()
 
-local function updateProgress(text, progress)
-    statusLabel.Text = text
+local function updateProgress(progress)
     local TweenService = game:GetService("TweenService")
     TweenService:Create(progressBar, TweenInfo.new(0.3), {
         Size = UDim2.new(progress, 0, 1, 0)
     }):Play()
+    
+    statusLabel.Text = string.format("Loading... %d%%", math.floor(progress * 100))
 end
 
 -- Load core modules
-updateProgress("Loading Window module...", 0.1)
+updateProgress(0.1)
 Ssoly.Window = loadstring(game:HttpGet(baseUrl .. "core/Window.lua"))()
 
-updateProgress("Loading Tab module...", 0.2)
+updateProgress(0.2)
 Ssoly.Tab = loadstring(game:HttpGet(baseUrl .. "core/Tab.lua"))()
 
 -- Load elements
-updateProgress("Loading Toggle element...", 0.3)
+updateProgress(0.3)
 local Toggle = loadstring(game:HttpGet(baseUrl .. "elements/Toggle.lua"))()
 
-updateProgress("Loading Slider element...", 0.4)
+updateProgress(0.4)
 local Slider = loadstring(game:HttpGet(baseUrl .. "elements/Slider.lua"))()
 
-updateProgress("Loading Dropdown element...", 0.5)
+updateProgress(0.5)
 local Dropdown = loadstring(game:HttpGet(baseUrl .. "elements/Dropdown.lua"))()
 
-updateProgress("Loading Button element...", 0.6)
+updateProgress(0.6)
 local Button = loadstring(game:HttpGet(baseUrl .. "elements/Button.lua"))()
 
-updateProgress("Loading Input element...", 0.7)
+updateProgress(0.7)
 local Input = loadstring(game:HttpGet(baseUrl .. "elements/Input.lua"))()
 
-updateProgress("Loading Colorpicker element...", 0.8)
+updateProgress(0.8)
 local Colorpicker = loadstring(game:HttpGet(baseUrl .. "elements/Colorpicker.lua"))()
 
-updateProgress("Loading Keybind element...", 0.9)
+updateProgress(0.9)
 local Keybind = loadstring(game:HttpGet(baseUrl .. "elements/Keybind.lua"))()
 
 Ssoly.Elements = {
@@ -138,7 +139,7 @@ Ssoly.Elements = {
     Keybind = Keybind,
 }
 
-updateProgress("Finalizing...", 1.0)
+updateProgress(1.0)
 task.wait(0.5)
 
 -- Remove loading screen

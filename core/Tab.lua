@@ -241,6 +241,7 @@ local baseUrl = "https://raw.githubusercontent.com/cbozovcloh781-hub/kjadfhjkflh
 function Tab:AddToggle(config)
     local Toggle = loadstring(game:HttpGet(baseUrl .. "elements/Toggle.lua"))()
     local toggle = Toggle.new(self, config)
+    toggle.Container.Visible = false
     table.insert(self.Elements, toggle.Container)
     return toggle
 end
@@ -248,6 +249,7 @@ end
 function Tab:AddSlider(config)
     local Slider = loadstring(game:HttpGet(baseUrl .. "elements/Slider.lua"))()
     local slider = Slider.new(self, config)
+    slider.Container.Visible = false
     table.insert(self.Elements, slider.Container)
     return slider
 end
@@ -255,6 +257,7 @@ end
 function Tab:AddDropdown(config)
     local Dropdown = loadstring(game:HttpGet(baseUrl .. "elements/Dropdown.lua"))()
     local dropdown = Dropdown.new(self, config)
+    dropdown.Container.Visible = false
     table.insert(self.Elements, dropdown.Container)
     return dropdown
 end
@@ -262,6 +265,7 @@ end
 function Tab:AddButton(config)
     local Button = loadstring(game:HttpGet(baseUrl .. "elements/Button.lua"))()
     local button = Button.new(self, config)
+    button.Container.Visible = false
     table.insert(self.Elements, button.Container)
     return button
 end
@@ -269,6 +273,7 @@ end
 function Tab:AddInput(config)
     local Input = loadstring(game:HttpGet(baseUrl .. "elements/Input.lua"))()
     local input = Input.new(self, config)
+    input.Container.Visible = false
     table.insert(self.Elements, input.Container)
     return input
 end
@@ -276,6 +281,7 @@ end
 function Tab:AddColorpicker(config)
     local Colorpicker = loadstring(game:HttpGet(baseUrl .. "elements/Colorpicker.lua"))()
     local colorpicker = Colorpicker.new(self, config)
+    colorpicker.Container.Visible = false
     table.insert(self.Elements, colorpicker.Container)
     return colorpicker
 end
@@ -283,6 +289,7 @@ end
 function Tab:AddKeybind(config)
     local Keybind = loadstring(game:HttpGet(baseUrl .. "elements/Keybind.lua"))()
     local keybind = Keybind.new(self, config)
+    keybind.Container.Visible = false
     table.insert(self.Elements, keybind.Container)
     return keybind
 end
