@@ -41,7 +41,7 @@ function Dropdown:CreateElement()
     -- Main container
     self.Container = Instance.new("Frame")
     self.Container.Name = "Dropdown"
-    self.Container.Size = UDim2.new(1, -20, 0, self.Description and 65 or 50)
+    self.Container.Size = UDim2.new(1, -20, 0, self.Description and 60 or 45)
     self.Container.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     self.Container.BackgroundTransparency = 0.5
     self.Container.BorderSizePixel = 0
@@ -68,27 +68,27 @@ function Dropdown:CreateElement()
     self.TitleLabel.Parent = self.Container
     
     -- Description (optional)
-    local dropdownY = 32
+    local dropdownY = 28
     if self.Description then
         self.DescLabel = Instance.new("TextLabel")
         self.DescLabel.Name = "Description"
-        self.DescLabel.Size = UDim2.new(1, -20, 0, 15)
-        self.DescLabel.Position = UDim2.fromOffset(12, 32)
+        self.DescLabel.Size = UDim2.new(1, -20, 0, 12)
+        self.DescLabel.Position = UDim2.fromOffset(12, 28)
         self.DescLabel.BackgroundTransparency = 1
         self.DescLabel.Text = self.Description
         self.DescLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
-        self.DescLabel.TextSize = 11
-        self.DescLabel.Font = Enum.Font.SourceSans
+        self.DescLabel.TextSize = 10
+        self.DescLabel.Font = Enum.Font.Gotham
         self.DescLabel.TextXAlignment = Enum.TextXAlignment.Left
         self.DescLabel.TextWrapped = true
         self.DescLabel.Parent = self.Container
-        dropdownY = 50
+        dropdownY = 42
     end
     
     -- Dropdown button
     self.DropdownButton = Instance.new("TextButton")
     self.DropdownButton.Name = "Button"
-    self.DropdownButton.Size = UDim2.new(1, -24, 0, 30)
+    self.DropdownButton.Size = UDim2.new(1, -24, 0, 26)
     self.DropdownButton.Position = UDim2.fromOffset(12, dropdownY)
     self.DropdownButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
     self.DropdownButton.BackgroundTransparency = 0.3
@@ -105,28 +105,27 @@ function Dropdown:CreateElement()
     -- Display text
     self.DisplayLabel = Instance.new("TextLabel")
     self.DisplayLabel.Name = "Display"
-    self.DisplayLabel.Size = UDim2.new(1, -35, 1, 0)
-    self.DisplayLabel.Position = UDim2.fromOffset(10, 0)
+    self.DisplayLabel.Size = UDim2.new(1, -30, 1, 0)
+    self.DisplayLabel.Position = UDim2.fromOffset(8, 0)
     self.DisplayLabel.BackgroundTransparency = 1
-    self.DisplayLabel.Text = self.Multi and "None" or "Select..."
+    self.DisplayLabel.Text = self.Multi and "None" or "None"
     self.DisplayLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
-    self.DisplayLabel.TextSize = 13
-    self.DisplayLabel.Font = Enum.Font.SourceSans
+    self.DisplayLabel.TextSize = 11
+    self.DisplayLabel.Font = Enum.Font.Gotham
     self.DisplayLabel.TextXAlignment = Enum.TextXAlignment.Left
     self.DisplayLabel.TextTruncate = Enum.TextTruncate.AtEnd
-    self.DisplayLabel.TextStrokeTransparency = 0.9
     self.DisplayLabel.Parent = self.DropdownButton
     
     -- Arrow icon
     self.ArrowIcon = Instance.new("TextLabel")
     self.ArrowIcon.Name = "Arrow"
-    self.ArrowIcon.Size = UDim2.fromOffset(20, 20)
-    self.ArrowIcon.Position = UDim2.new(1, -25, 0.5, -10)
+    self.ArrowIcon.Size = UDim2.fromOffset(16, 16)
+    self.ArrowIcon.Position = UDim2.new(1, -20, 0.5, -8)
     self.ArrowIcon.BackgroundTransparency = 1
     self.ArrowIcon.Text = "▼"
     self.ArrowIcon.TextColor3 = Color3.fromRGB(150, 150, 150)
-    self.ArrowIcon.TextSize = 12
-    self.ArrowIcon.Font = Enum.Font.SourceSansBold
+    self.ArrowIcon.TextSize = 10
+    self.ArrowIcon.Font = Enum.Font.GothamBold
     self.ArrowIcon.Parent = self.DropdownButton
     
     -- Options container (hidden by default) - positioned below button with ZIndex
@@ -426,7 +425,7 @@ function Dropdown:UpdateDisplay()
             option.Check.TextColor3 = self.Value[value] and Color3.fromRGB(74, 158, 255) or Color3.fromRGB(150, 150, 150)
         end
     else
-        self.DisplayLabel.Text = tostring(self.Value or "Select...")
+        self.DisplayLabel.Text = self.Value and tostring(self.Value) or "None"
     end
 end
 

@@ -60,7 +60,7 @@ function Notification:Show(config)
     Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
     Stroke.Parent = notif
     
-    -- Type indicator (colored bar) - full height from edge
+    -- Type colors
     local typeColors = {
         Info = Color3.fromRGB(74, 158, 255),
         Success = Color3.fromRGB(80, 255, 120),
@@ -68,17 +68,18 @@ function Notification:Show(config)
         Error = Color3.fromRGB(255, 80, 80)
     }
     
+    -- Type indicator dot (top-left corner)
     local indicator = Instance.new("Frame")
     indicator.Name = "Indicator"
-    indicator.Size = UDim2.new(0, 4, 1, 0)
-    indicator.Position = UDim2.fromOffset(0, 0)
+    indicator.Size = UDim2.fromOffset(10, 10)
+    indicator.Position = UDim2.fromOffset(10, 10)
     indicator.BackgroundColor3 = typeColors[type] or typeColors.Info
     indicator.BorderSizePixel = 0
-    indicator.ZIndex = 2
+    indicator.ZIndex = 3
     indicator.Parent = notif
     
     local IndCorner = Instance.new("UICorner")
-    IndCorner.CornerRadius = UDim.new(0, 12)
+    IndCorner.CornerRadius = UDim.new(1, 0)
     IndCorner.Parent = indicator
     
     -- Icon
@@ -92,10 +93,10 @@ function Notification:Show(config)
     local icon = Instance.new("TextLabel")
     icon.Name = "Icon"
     icon.Size = UDim2.fromOffset(24, 24)
-    icon.Position = UDim2.fromOffset(18, 12)
+    icon.Position = UDim2.fromOffset(26, 12)
     icon.BackgroundTransparency = 1
     icon.Text = typeIcons[type] or typeIcons.Info
-    icon.TextColor3 = typeColors[type] or typeColors.Info
+    icon.TextColor3 = Color3.fromRGB(200, 200, 200)
     icon.TextSize = 16
     icon.Font = Enum.Font.GothamBold
     icon.Parent = notif
@@ -104,7 +105,7 @@ function Notification:Show(config)
     local titleLabel = Instance.new("TextLabel")
     titleLabel.Name = "Title"
     titleLabel.Size = UDim2.new(1, -70, 0, 18)
-    titleLabel.Position = UDim2.fromOffset(48, 12)
+    titleLabel.Position = UDim2.fromOffset(56, 12)
     titleLabel.BackgroundTransparency = 1
     titleLabel.Text = title
     titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -118,7 +119,7 @@ function Notification:Show(config)
     local contentLabel = Instance.new("TextLabel")
     contentLabel.Name = "Content"
     contentLabel.Size = UDim2.new(1, -70, 0, 0)
-    contentLabel.Position = UDim2.fromOffset(48, 32)
+    contentLabel.Position = UDim2.fromOffset(56, 32)
     contentLabel.BackgroundTransparency = 1
     contentLabel.Text = content
     contentLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
@@ -143,38 +144,38 @@ function Notification:Show(config)
     
     local totalHeight = 50 + contentHeight
     
-    -- Progress bar (full width at bottom edge)
+    -- Progress bar (inside bottom edge, respecting rounded corners)
     local progress = Instance.new("Frame")
     progress.Name = "Progress"
-    progress.Size = UDim2.new(1, 0, 0, 4)
-    progress.Position = UDim2.new(0, 0, 1, -4)
+    progress.Size = UDim2.new(1, -16, 0, 3)
+    progress.Position = UDim2.new(0, 8, 1, -8)
     progress.BackgroundColor3 = typeColors[type] or typeColors.Info
     progress.BorderSizePixel = 0
     progress.ZIndex = 2
     progress.Parent = notif
     
     local ProgressCorner = Instance.new("UICorner")
-    ProgressCorner.CornerRadius = UDim.new(0, 12)
+    ProgressCorner.CornerRadius = UDim.new(1, 0)
     ProgressCorner.Parent = progress
     
-    -- Slide in animation from right
+    -- Slide in animation from right edge of screen
     notif.Size = UDim2.new(1, 0, 0, totalHeight)
-    notif.Position = UDim2.new(0, 350, 0, 0)
+    notif.Position = UDim2.new(1, 50, 0, 0)
     notif.BackgroundTransparency = 1
     
-    local slideTween = TweenService:Create(notif, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+    local slideTween = TweenService:Create(notif, TweenInfo.new(0.6, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
         Position = UDim2.new(0, 0, 0, 0)
     })
     slideTween:Play()
     
-    local fadeTween = TweenService:Create(notif, TweenInfo.new(0.3), {
+    local fadeTween = TweenService:Create(notif, TweenInfo.new(0.4), {
         BackgroundTransparency = 0
     })
     fadeTween:Play()
     
     -- Progress bar animation
     TweenService:Create(progress, TweenInfo.new(duration, Enum.EasingStyle.Linear), {
-        Size = UDim2.new(0, 0, 0, 4)
+        Size = UDim2.new(0, 0, 0, 3)
     }):Play()
     
     -- Auto-dismiss
