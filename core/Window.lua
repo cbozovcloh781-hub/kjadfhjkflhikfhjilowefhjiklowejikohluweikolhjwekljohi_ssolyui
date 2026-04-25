@@ -881,37 +881,37 @@ function Window:Show()
     if not self._delayShow then return end
     
     -- Close loading screen first
-    if self.Config._loadingGui then
+    if self.Config._loadingGui and self.Config._loadingGui.Parent then
         local TweenService = game:GetService("TweenService")
         
-        -- Find container properly
-        for _, child in pairs(self.Config._loadingGui:GetChildren()) do
-            if child:IsA("Frame") then
-                TweenService:Create(child, TweenInfo.new(0.3), {
+        -- Fade out blur immediately
+        if self.Config._loadingBlur and self.Config._loadingBlur.Parent then
+            TweenService:Create(self.Config._loadingBlur, TweenInfo.new(0.2), {Size = 0}):Play()
+        end
+        
+        -- Fade out loading GUI
+        for _, child in pairs(self.Config._loadingGui:GetDescendants()) do
+            if child:IsA("GuiObject") then
+                if child:IsA("TextLabel") or child:IsA("TextButton") then
+                    TweenService:Create(child, TweenInfo.new(0.2), {
+                        TextTransparency = 1
+                    }):Play()
+                end
+                TweenService:Create(child, TweenInfo.new(0.2), {
                     BackgroundTransparency = 1
                 }):Play()
-                
-                -- Fade out all children
-                for _, subChild in pairs(child:GetDescendants()) do
-                    if subChild:IsA("GuiObject") then
-                        TweenService:Create(subChild, TweenInfo.new(0.3), {
-                            BackgroundTransparency = 1,
-                            TextTransparency = 1
-                        }):Play()
-                    end
-                end
             end
         end
         
-        if self.Config._loadingBlur then
-            TweenService:Create(self.Config._loadingBlur, TweenInfo.new(0.3), {Size = 0}):Play()
-        end
-        
-        task.wait(0.35)
-        self.Config._loadingGui:Destroy()
-        if self.Config._loadingBlur then
-            self.Config._loadingBlur:Destroy()
-        end
+        -- Destroy after fade
+        task.delay(0.25, function()
+            if self.Config._loadingGui and self.Config._loadingGui.Parent then
+                self.Config._loadingGui:Destroy()
+            end
+            if self.Config._loadingBlur and self.Config._loadingBlur.Parent then
+                self.Config._loadingBlur:Destroy()
+            end
+        end)
     end
     
     -- Show window
