@@ -186,6 +186,28 @@ function Dropdown:CreateElement()
         self:Toggle()
     end)
     
+    -- Close on click outside
+    local UserInputService = game:GetService("UserInputService")
+    UserInputService.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 and self.Opened then
+            local mousePos = input.Position
+            local buttonPos = self.DropdownButton.AbsolutePosition
+            local buttonSize = self.DropdownButton.AbsoluteSize
+            local optionsPos = self.OptionsContainer.AbsolutePosition
+            local optionsSize = self.OptionsContainer.AbsoluteSize
+            
+            -- Check if click is outside both button and options
+            local inButton = mousePos.X >= buttonPos.X and mousePos.X <= buttonPos.X + buttonSize.X and
+                           mousePos.Y >= buttonPos.Y and mousePos.Y <= buttonPos.Y + buttonSize.Y
+            local inOptions = mousePos.X >= optionsPos.X and mousePos.X <= optionsPos.X + optionsSize.X and
+                            mousePos.Y >= optionsPos.Y and mousePos.Y <= optionsPos.Y + optionsSize.Y
+            
+            if not inButton and not inOptions then
+                self:Close()
+            end
+        end
+    end)
+    
     -- Hover effects
     self.DropdownButton.MouseEnter:Connect(function()
         TweenService:Create(self.DropdownButton, TweenInfo.new(0.2), {
@@ -386,7 +408,7 @@ function Dropdown:UpdateDisplay()
         local selected = {}
         for value, enabled in pairs(self.Value) do
             if enabled then
-                table.insert(selected, value)
+                table.insert(selected, tostring(value))
             end
         end
         
@@ -404,7 +426,7 @@ function Dropdown:UpdateDisplay()
             option.Check.TextColor3 = self.Value[value] and Color3.fromRGB(74, 158, 255) or Color3.fromRGB(150, 150, 150)
         end
     else
-        self.DisplayLabel.Text = self.Value or "Select..."
+        self.DisplayLabel.Text = tostring(self.Value or "Select...")
     end
 end
 

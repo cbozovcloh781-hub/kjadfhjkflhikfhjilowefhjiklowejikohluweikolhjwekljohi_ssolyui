@@ -47,7 +47,7 @@ function Notification:Show(config)
     notif.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     notif.BackgroundTransparency = 0.1
     notif.BorderSizePixel = 0
-    notif.ClipsDescendants = false
+    notif.ClipsDescendants = true
     notif.Parent = self.Container
     
     local Corner = Instance.new("UICorner")
@@ -60,7 +60,7 @@ function Notification:Show(config)
     Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
     Stroke.Parent = notif
     
-    -- Type indicator (colored bar) - inside with proper clipping, full height
+    -- Type indicator (colored bar) - inside left edge
     local typeColors = {
         Info = Color3.fromRGB(74, 158, 255),
         Success = Color3.fromRGB(80, 255, 120),
@@ -70,15 +70,15 @@ function Notification:Show(config)
     
     local indicator = Instance.new("Frame")
     indicator.Name = "Indicator"
-    indicator.Size = UDim2.new(0, 3, 1, 0)
-    indicator.Position = UDim2.fromOffset(0, 0)
+    indicator.Size = UDim2.new(0, 3, 1, -6)
+    indicator.Position = UDim2.fromOffset(3, 3)
     indicator.BackgroundColor3 = typeColors[type] or typeColors.Info
     indicator.BorderSizePixel = 0
     indicator.ZIndex = 2
     indicator.Parent = notif
     
     local IndCorner = Instance.new("UICorner")
-    IndCorner.CornerRadius = UDim.new(0, 10)
+    IndCorner.CornerRadius = UDim.new(1, 0)
     IndCorner.Parent = indicator
     
     -- Icon
@@ -144,18 +144,18 @@ function Notification:Show(config)
     
     local totalHeight = 50 + contentHeight
     
-    -- Progress bar (full width at bottom)
+    -- Progress bar (inside bottom edge)
     local progress = Instance.new("Frame")
     progress.Name = "Progress"
-    progress.Size = UDim2.new(1, 0, 0, 3)
-    progress.Position = UDim2.new(0, 0, 1, -3)
+    progress.Size = UDim2.new(1, -6, 0, 3)
+    progress.Position = UDim2.new(0, 3, 1, -6)
     progress.BackgroundColor3 = typeColors[type] or typeColors.Info
     progress.BorderSizePixel = 0
     progress.ZIndex = 2
     progress.Parent = notif
     
     local ProgressCorner = Instance.new("UICorner")
-    ProgressCorner.CornerRadius = UDim.new(0, 10)
+    ProgressCorner.CornerRadius = UDim.new(1, 0)
     ProgressCorner.Parent = progress
     
     -- Slide in animation from right with bounce

@@ -287,49 +287,42 @@ function Window:CreateGUI()
     -- Resize handle (curved bar around bottom-right corner) - OUTSIDE container
     self.ResizeHandle = Instance.new("Frame")
     self.ResizeHandle.Name = "ResizeHandle"
-    self.ResizeHandle.Size = UDim2.fromOffset(60, 60)
+    self.ResizeHandle.Size = UDim2.fromOffset(30, 30)
     self.ResizeHandle.Position = UDim2.new(0, 0, 0, 0)
     self.ResizeHandle.AnchorPoint = Vector2.new(0, 0)
     self.ResizeHandle.BackgroundTransparency = 1
     self.ResizeHandle.ClipsDescendants = false
     self.ResizeHandle.ZIndex = 5
+    self.ResizeHandle.Visible = true
     self.ResizeHandle.Parent = self.ScreenGui
     
-    -- Create curved resize indicator using arc shape
-    local resizeArc = Instance.new("Frame")
-    resizeArc.Size = UDim2.fromOffset(40, 40)
-    resizeArc.Position = UDim2.fromOffset(20, 20)
-    resizeArc.AnchorPoint = Vector2.new(0, 0)
-    resizeArc.BackgroundTransparency = 1
-    resizeArc.Parent = self.ResizeHandle
+    self.ResizeBars = {}
     
-    -- Create arc using multiple small bars
-    for i = 0, 8 do
-        local angle = (i / 8) * 90
+    -- Create arc using multiple small bars matching window corner radius (8px)
+    for i = 0, 6 do
+        local angle = (i / 6) * 90
         local rad = math.rad(angle)
-        local radius = 32
+        local radius = 12 -- Radius to match 8px corner
         
         local bar = Instance.new("Frame")
-        bar.Size = UDim2.fromOffset(3, 8)
+        bar.Size = UDim2.fromOffset(2, 6)
         bar.Position = UDim2.fromOffset(
-            math.cos(rad) * radius,
-            math.sin(rad) * radius
+            15 + math.cos(rad) * radius,
+            15 + math.sin(rad) * radius
         )
         bar.AnchorPoint = Vector2.new(0.5, 0.5)
         bar.BackgroundColor3 = Color3.fromRGB(74, 158, 255)
         bar.BackgroundTransparency = 0.3
         bar.BorderSizePixel = 0
         bar.Rotation = angle
-        bar.Parent = resizeArc
+        bar.Parent = self.ResizeHandle
         
         local barCorner = Instance.new("UICorner")
         barCorner.CornerRadius = UDim.new(1, 0)
         barCorner.Parent = bar
         
-        table.insert(self.ResizeBars or {}, bar)
+        table.insert(self.ResizeBars, bar)
     end
-    
-    self.ResizeBars = self.ResizeBars or {}
     
     -- Minimized indicator (hidden by default) - small icon that follows window
     self.MinimizedIndicator = Instance.new("Frame")
@@ -410,10 +403,12 @@ function Window:SetupDragging()
     local minDragging = false
     local minDragStart = nil
     local minStartPos = nil
+    local hasMoved = false
     
     self.MinimizedIndicator.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             minDragging = true
+            hasMoved = false
             minDragStart = input.Position
             minStartPos = self.MinimizedIndicator.Position
         end
@@ -422,22 +417,24 @@ function Window:SetupDragging()
     UserInputService.InputChanged:Connect(function(input)
         if minDragging and input.UserInputType == Enum.UserInputType.MouseMovement then
             local delta = input.Position - minDragStart
-            self.MinimizedIndicator.Position = UDim2.new(
-                minStartPos.X.Scale,
-                minStartPos.X.Offset + delta.X,
-                minStartPos.Y.Scale,
-                minStartPos.Y.Offset + delta.Y
-            )
-            -- Update config position for restore
-            self.Config.Position = self.MinimizedIndicator.Position
+            if math.abs(delta.X) > 5 or math.abs(delta.Y) > 5 then
+                hasMoved = true
+                self.MinimizedIndicator.Position = UDim2.new(
+                    minStartPos.X.Scale,
+                    minStartPos.X.Offset + delta.X,
+                    minStartPos.Y.Scale,
+                    minStartPos.Y.Offset + delta.Y
+                )
+                -- Update config position for restore
+                self.Config.Position = self.MinimizedIndicator.Position
+            end
         end
     end)
     
     UserInputService.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            if minDragging then
-                minDragging = false
-            else
+        if input.UserInputType == Enum.UserInputType.MouseButton1 and minDragging then
+            minDragging = false
+            if not hasMoved then
                 -- Click without drag = restore
                 self:ToggleMinimize()
             end
@@ -457,10 +454,17 @@ function Window:SetupResizing()
         local containerPos = self.Container.AbsolutePosition
         local containerSize = self.Container.AbsoluteSize
         self.ResizeHandle.Position = UDim2.fromOffset(
-            containerPos.X + containerSize.X - 40,
-            containerPos.Y + containerSize.Y - 40
+            containerPos.X + containerSize.X - 20,
+            containerPos.Y + containerSize.Y - 20
         )
     end
+    
+    -- Hide initially, show after small delay
+    self.ResizeHandle.Visible = false
+    task.delay(0.1, function()
+        self.ResizeHandle.Visible = true
+        updateResizePosition()
+    end)
     
     self.Container:GetPropertyChangedSignal("AbsolutePosition"):Connect(updateResizePosition)
     self.Container:GetPropertyChangedSignal("AbsoluteSize"):Connect(updateResizePosition)
