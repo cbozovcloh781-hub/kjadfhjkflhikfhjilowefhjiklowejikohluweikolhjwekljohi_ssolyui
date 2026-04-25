@@ -97,9 +97,9 @@ function Input:CreateElement()
     InputPadding.PaddingRight = UDim.new(0, 10)
     InputPadding.Parent = self.InputBox
     
-    -- Border (focus indicator)
+    -- Border (focus indicator) - subtle gray instead of blue
     self.Border = Instance.new("UIStroke")
-    self.Border.Color = Color3.fromRGB(74, 158, 255)
+    self.Border.Color = Color3.fromRGB(80, 80, 80)
     self.Border.Thickness = 0
     self.Border.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
     self.Border.Parent = self.InputBox
@@ -107,7 +107,8 @@ function Input:CreateElement()
     -- Focus events
     self.InputBox.Focused:Connect(function()
         TweenService:Create(self.Border, TweenInfo.new(0.2), {
-            Thickness = 2
+            Thickness = 1,
+            Color = Color3.fromRGB(100, 100, 100)
         }):Play()
         TweenService:Create(self.InputBox, TweenInfo.new(0.2), {
             BackgroundTransparency = 0.1

@@ -44,23 +44,23 @@ function Notification:Show(config)
     local notif = Instance.new("Frame")
     notif.Name = "Notification"
     notif.Size = UDim2.new(1, 0, 0, 0)
-    notif.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    notif.BackgroundTransparency = 0.1
+    notif.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    notif.BackgroundTransparency = 0
     notif.BorderSizePixel = 0
     notif.ClipsDescendants = true
     notif.Parent = self.Container
     
     local Corner = Instance.new("UICorner")
-    Corner.CornerRadius = UDim.new(0, 10)
+    Corner.CornerRadius = UDim.new(0, 12)
     Corner.Parent = notif
     
     local Stroke = Instance.new("UIStroke")
-    Stroke.Color = Color3.fromRGB(45, 45, 45)
+    Stroke.Color = Color3.fromRGB(50, 50, 50)
     Stroke.Thickness = 1
     Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
     Stroke.Parent = notif
     
-    -- Type indicator (colored bar) - inside left edge
+    -- Type indicator (colored bar) - inside left edge with proper padding
     local typeColors = {
         Info = Color3.fromRGB(74, 158, 255),
         Success = Color3.fromRGB(80, 255, 120),
@@ -70,8 +70,8 @@ function Notification:Show(config)
     
     local indicator = Instance.new("Frame")
     indicator.Name = "Indicator"
-    indicator.Size = UDim2.new(0, 3, 1, -6)
-    indicator.Position = UDim2.fromOffset(3, 3)
+    indicator.Size = UDim2.new(0, 4, 1, -16)
+    indicator.Position = UDim2.fromOffset(8, 8)
     indicator.BackgroundColor3 = typeColors[type] or typeColors.Info
     indicator.BorderSizePixel = 0
     indicator.ZIndex = 2
@@ -83,48 +83,47 @@ function Notification:Show(config)
     
     -- Icon
     local typeIcons = {
-        Info = "ℹ️",
-        Success = "✅",
-        Warning = "⚠️",
-        Error = "❌"
+        Info = "ⓘ",
+        Success = "✓",
+        Warning = "⚠",
+        Error = "✕"
     }
     
     local icon = Instance.new("TextLabel")
     icon.Name = "Icon"
-    icon.Size = UDim2.fromOffset(30, 30)
-    icon.Position = UDim2.fromOffset(12, 10)
+    icon.Size = UDim2.fromOffset(24, 24)
+    icon.Position = UDim2.fromOffset(18, 12)
     icon.BackgroundTransparency = 1
     icon.Text = typeIcons[type] or typeIcons.Info
-    icon.TextColor3 = Color3.fromRGB(255, 255, 255)
-    icon.TextSize = 18
-    icon.Font = Enum.Font.SourceSansBold
+    icon.TextColor3 = typeColors[type] or typeColors.Info
+    icon.TextSize = 16
+    icon.Font = Enum.Font.GothamBold
     icon.Parent = notif
     
     -- Title
     local titleLabel = Instance.new("TextLabel")
     titleLabel.Name = "Title"
-    titleLabel.Size = UDim2.new(1, -60, 0, 20)
-    titleLabel.Position = UDim2.fromOffset(48, 10)
+    titleLabel.Size = UDim2.new(1, -70, 0, 18)
+    titleLabel.Position = UDim2.fromOffset(48, 12)
     titleLabel.BackgroundTransparency = 1
     titleLabel.Text = title
     titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    titleLabel.TextSize = 14
-    titleLabel.Font = Enum.Font.SourceSansBold
+    titleLabel.TextSize = 13
+    titleLabel.Font = Enum.Font.GothamBold
     titleLabel.TextXAlignment = Enum.TextXAlignment.Left
     titleLabel.TextTruncate = Enum.TextTruncate.AtEnd
-    titleLabel.TextStrokeTransparency = 0.8
     titleLabel.Parent = notif
     
     -- Content
     local contentLabel = Instance.new("TextLabel")
     contentLabel.Name = "Content"
-    contentLabel.Size = UDim2.new(1, -60, 0, 0)
+    contentLabel.Size = UDim2.new(1, -70, 0, 0)
     contentLabel.Position = UDim2.fromOffset(48, 32)
     contentLabel.BackgroundTransparency = 1
     contentLabel.Text = content
-    contentLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
-    contentLabel.TextSize = 12
-    contentLabel.Font = Enum.Font.SourceSans
+    contentLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
+    contentLabel.TextSize = 11
+    contentLabel.Font = Enum.Font.Gotham
     contentLabel.TextXAlignment = Enum.TextXAlignment.Left
     contentLabel.TextYAlignment = Enum.TextYAlignment.Top
     contentLabel.TextWrapped = true
@@ -144,11 +143,11 @@ function Notification:Show(config)
     
     local totalHeight = 50 + contentHeight
     
-    -- Progress bar (inside bottom edge)
+    -- Progress bar (inside bottom edge with proper padding)
     local progress = Instance.new("Frame")
     progress.Name = "Progress"
-    progress.Size = UDim2.new(1, -6, 0, 3)
-    progress.Position = UDim2.new(0, 3, 1, -6)
+    progress.Size = UDim2.new(1, -16, 0, 4)
+    progress.Position = UDim2.new(0, 8, 1, -12)
     progress.BackgroundColor3 = typeColors[type] or typeColors.Info
     progress.BorderSizePixel = 0
     progress.ZIndex = 2
@@ -168,7 +167,7 @@ function Notification:Show(config)
     
     -- Progress bar animation
     TweenService:Create(progress, TweenInfo.new(duration, Enum.EasingStyle.Linear), {
-        Size = UDim2.new(0, 0, 0, 3)
+        Size = UDim2.new(0, 0, 0, 4)
     }):Play()
     
     -- Auto-dismiss

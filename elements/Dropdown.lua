@@ -243,24 +243,24 @@ function Dropdown:CreateOptions()
         local checkmark = Instance.new("TextLabel")
         checkmark.Name = "Check"
         checkmark.Size = UDim2.fromOffset(20, 20)
-        checkmark.Position = UDim2.fromOffset(5, 4)
+        checkmark.Position = UDim2.fromOffset(8, 4)
         checkmark.BackgroundTransparency = 1
         checkmark.Text = self.Multi and "☐" or ""
         checkmark.TextColor3 = Color3.fromRGB(150, 150, 150)
-        checkmark.TextSize = 16
-        checkmark.Font = Enum.Font.SourceSansBold
+        checkmark.TextSize = 14
+        checkmark.Font = Enum.Font.GothamBold
         checkmark.Parent = optionButton
         
         -- Option text
         local optionLabel = Instance.new("TextLabel")
         optionLabel.Name = "Label"
-        optionLabel.Size = UDim2.new(1, self.Multi and -35 or -10, 1, 0)
-        optionLabel.Position = UDim2.fromOffset(self.Multi and 30 or 8, 0)
+        optionLabel.Size = UDim2.new(1, self.Multi and -38 or -16, 1, 0)
+        optionLabel.Position = UDim2.fromOffset(self.Multi and 32 or 8, 0)
         optionLabel.BackgroundTransparency = 1
         optionLabel.Text = value
         optionLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
-        optionLabel.TextSize = 12
-        optionLabel.Font = Enum.Font.SourceSans
+        optionLabel.TextSize = 11
+        optionLabel.Font = Enum.Font.Gotham
         optionLabel.TextXAlignment = Enum.TextXAlignment.Left
         optionLabel.TextTruncate = Enum.TextTruncate.AtEnd
         optionLabel.Parent = optionButton

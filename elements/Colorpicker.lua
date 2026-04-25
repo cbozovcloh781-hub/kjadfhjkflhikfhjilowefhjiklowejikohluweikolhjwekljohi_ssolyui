@@ -411,16 +411,18 @@ function Colorpicker:Close()
     self.Opened = false
     
     -- Close picker and container simultaneously
-    TweenService:Create(self.PickerContainer, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+    local closeTween1 = TweenService:Create(self.PickerContainer, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
         Size = UDim2.new(1, -24, 0, 0)
-    }):Play()
+    })
+    closeTween1:Play()
     
     local newHeight = self.Description and 70 or 55
-    TweenService:Create(self.Container, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+    local closeTween2 = TweenService:Create(self.Container, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
         Size = UDim2.new(1, -20, 0, newHeight)
-    }):Play()
+    })
+    closeTween2:Play()
     
-    task.delay(0.25, function()
+    closeTween1.Completed:Connect(function()
         self.PickerContainer.Visible = false
     end)
 end
