@@ -4,7 +4,7 @@
 
 local Ssoly = loadstring(game:HttpGet("https://raw.githubusercontent.com/cbozovcloh781-hub/kjadfhjkflhikfhjilowefhjiklowejikohluweikolhjwekljohi_ssolyui/main/init.lua"))()
 
--- Create window
+-- Create window (hidden during loading)
 local Window = Ssoly:CreateWindow({
     Title = "Ssoly UI Demo",
     Size = UDim2.fromOffset(700, 500),
@@ -276,13 +276,22 @@ SettingsTab:AddSlider({
 })
 
 -- Theme Settings
+SettingsTab:AddDropdown({
+    Title = "Theme",
+    Description = "Choose a color theme",
+    Values = {"Blue", "Purple", "Pink", "Red", "Orange", "Green", "Cyan", "Yellow"},
+    Default = "Blue",
+    Callback = function(Value)
+        Window:SetTheme(Value)
+    end
+})
+
 SettingsTab:AddColorpicker({
     Title = "Accent Color",
     Description = "Main UI accent color",
     Default = Color3.fromRGB(74, 158, 255),
     Callback = function(Color)
-        print("Accent Color:", Color)
-        -- You can apply this to all UI elements
+        Window:SetAccentColor(Color)
     end
 })
 
@@ -326,9 +335,16 @@ SettingsTab:AddButton({
 })
 
 print("Ssoly UI Demo loaded! Press RightControl to minimize/restore.")
-Window:Notify({
-    Title = "Welcome!",
-    Content = "Ssoly UI v1.0 loaded successfully",
-    Type = "Success",
-    Duration = 5
-})
+
+-- Show window after all elements are created
+Window:Show()
+
+-- Send notification after window is shown
+task.delay(0.5, function()
+    Window:Notify({
+        Title = "Welcome!",
+        Content = "Ssoly UI v1.0 loaded successfully",
+        Type = "Success",
+        Duration = 5
+    })
+end)

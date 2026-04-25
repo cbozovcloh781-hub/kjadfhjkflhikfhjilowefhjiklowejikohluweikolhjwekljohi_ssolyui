@@ -163,6 +163,8 @@ end
 
 -- Create window
 function Ssoly:CreateWindow(config)
+    config = config or {}
+    config._delayShow = true
     return self.Window.new(config)
 end
 

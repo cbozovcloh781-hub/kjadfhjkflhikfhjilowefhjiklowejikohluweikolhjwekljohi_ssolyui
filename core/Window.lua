@@ -36,12 +36,23 @@ function Window.new(config)
     self.Tabs = {}
     self.CurrentTab = nil
     self.Elements = {}
+    self.AccentColor = Color3.fromRGB(74, 158, 255)
+    self.AccentElements = {}
+    self._delayShow = config._delayShow or false
     
     -- Create GUI
     self:CreateGUI()
     self:SetupDragging()
     self:SetupResizing()
     self:SetupMinimize()
+    
+    -- Hide if delayed
+    if self._delayShow then
+        self.Container.Visible = false
+        self.ResizeHandle.Visible = false
+        self.ResizeHandleV.Visible = false
+        self.ResizeHandleH.Visible = false
+    end
     
     -- Initialize notification system (will be loaded separately)
     self.Notification = nil
@@ -308,13 +319,13 @@ function Window:CreateGUI()
         local radius = 12
         
         local bar = Instance.new("Frame")
-        bar.Size = UDim2.fromOffset(10, 10)
+        bar.Size = UDim2.fromOffset(6, 6)
         bar.Position = UDim2.fromOffset(
             15 + math.cos(rad) * radius,
             15 + math.sin(rad) * radius
         )
         bar.AnchorPoint = Vector2.new(0.5, 0.5)
-        bar.BackgroundColor3 = Color3.fromRGB(74, 158, 255)
+        bar.BackgroundColor3 = self.AccentColor
         bar.BackgroundTransparency = 0.3
         bar.BorderSizePixel = 0
         bar.Rotation = angle
@@ -325,6 +336,7 @@ function Window:CreateGUI()
         barCorner.Parent = bar
         
         table.insert(self.ResizeBars, bar)
+        table.insert(self.AccentElements, bar)
     end
     
     -- Vertical resize handle (bottom center)
@@ -333,12 +345,14 @@ function Window:CreateGUI()
     self.ResizeHandleV.Size = UDim2.fromOffset(30, 6)
     self.ResizeHandleV.Position = UDim2.new(0, 0, 0, 0)
     self.ResizeHandleV.AnchorPoint = Vector2.new(0.5, 0.5)
-    self.ResizeHandleV.BackgroundColor3 = Color3.fromRGB(74, 158, 255)
+    self.ResizeHandleV.BackgroundColor3 = self.AccentColor
     self.ResizeHandleV.BackgroundTransparency = 0.3
     self.ResizeHandleV.BorderSizePixel = 0
     self.ResizeHandleV.ZIndex = 5
     self.ResizeHandleV.Visible = true
     self.ResizeHandleV.Parent = self.ScreenGui
+    
+    table.insert(self.AccentElements, self.ResizeHandleV)
     
     local ResizeVCorner = Instance.new("UICorner")
     ResizeVCorner.CornerRadius = UDim.new(1, 0)
@@ -350,12 +364,14 @@ function Window:CreateGUI()
     self.ResizeHandleH.Size = UDim2.fromOffset(6, 30)
     self.ResizeHandleH.Position = UDim2.new(0, 0, 0, 0)
     self.ResizeHandleH.AnchorPoint = Vector2.new(0.5, 0.5)
-    self.ResizeHandleH.BackgroundColor3 = Color3.fromRGB(74, 158, 255)
+    self.ResizeHandleH.BackgroundColor3 = self.AccentColor
     self.ResizeHandleH.BackgroundTransparency = 0.3
     self.ResizeHandleH.BorderSizePixel = 0
     self.ResizeHandleH.ZIndex = 5
     self.ResizeHandleH.Visible = true
     self.ResizeHandleH.Parent = self.ScreenGui
+    
+    table.insert(self.AccentElements, self.ResizeHandleH)
     
     local ResizeHCorner = Instance.new("UICorner")
     ResizeHCorner.CornerRadius = UDim.new(1, 0)
@@ -378,9 +394,11 @@ function Window:CreateGUI()
     MinIndCorner.Parent = self.MinimizedIndicator
     
     local MinIndStroke = Instance.new("UIStroke")
-    MinIndStroke.Color = Color3.fromRGB(74, 158, 255)
+    MinIndStroke.Color = self.AccentColor
     MinIndStroke.Thickness = 2
     MinIndStroke.Parent = self.MinimizedIndicator
+    
+    table.insert(self.AccentElements, MinIndStroke)
     
     local MinIndLabel = Instance.new("TextLabel")
     MinIndLabel.Size = UDim2.new(1, 0, 1, 0)
@@ -793,6 +811,61 @@ function Window:SetBlurSize(size)
     if self.Blur and not self.Minimized then
         TweenService:Create(self.Blur, TweenInfo.new(0.2), {Size = size}):Play()
     end
+end
+
+function Window:SetAccentColor(color)
+    self.AccentColor = color
+    
+    -- Update all accent elements
+    for _, element in pairs(self.AccentElements) do
+        if element and element.Parent then
+            TweenService:Create(element, TweenInfo.new(0.3), {
+                BackgroundColor3 = color
+            }):Play()
+        end
+    end
+    
+    -- Update image colors
+    for _, element in pairs(self.AccentElements) do
+        if element and element:IsA("ImageLabel") then
+            TweenService:Create(element, TweenInfo.new(0.3), {
+                ImageColor3 = color
+            }):Play()
+        end
+    end
+end
+
+function Window:SetTheme(themeName)
+    local themes = {
+        Blue = Color3.fromRGB(74, 158, 255),
+        Purple = Color3.fromRGB(138, 43, 226),
+        Pink = Color3.fromRGB(255, 105, 180),
+        Red = Color3.fromRGB(255, 69, 58),
+        Orange = Color3.fromRGB(255, 149, 0),
+        Green = Color3.fromRGB(52, 199, 89),
+        Cyan = Color3.fromRGB(90, 200, 250),
+        Yellow = Color3.fromRGB(255, 214, 10),
+    }
+    
+    local color = themes[themeName] or themes.Blue
+    self:SetAccentColor(color)
+end
+
+function Window:Show()
+    if not self._delayShow then return end
+    
+    self.Container.Visible = true
+    self.Container.Size = UDim2.fromOffset(0, 0)
+    
+    TweenService:Create(self.Container, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+        Size = self.Config.Size
+    }):Play()
+    
+    task.delay(0.4, function()
+        self.ResizeHandle.Visible = true
+        self.ResizeHandleV.Visible = true
+        self.ResizeHandleH.Visible = true
+    end)
 end
 
 function Window:Destroy()

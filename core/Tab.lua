@@ -94,9 +94,11 @@ function Tab:CreateButton()
     self.Indicator.Size = UDim2.new(0, 3, 0, 0)
     self.Indicator.Position = UDim2.new(0, 0, 0.5, 0)
     self.Indicator.AnchorPoint = Vector2.new(0, 0.5)
-    self.Indicator.BackgroundColor3 = Color3.fromRGB(74, 158, 255)
+    self.Indicator.BackgroundColor3 = self.Window.AccentColor or Color3.fromRGB(74, 158, 255)
     self.Indicator.BorderSizePixel = 0
     self.Indicator.Parent = self.Button
+    
+    table.insert(self.Window.AccentElements, self.Indicator)
     
     local IndCorner = Instance.new("UICorner")
     IndCorner.CornerRadius = UDim.new(1, 0)
@@ -140,9 +142,11 @@ end
 function Tab:Select()
     self.Selected = true
     
+    local accentColor = self.Window.AccentColor or Color3.fromRGB(74, 158, 255)
+    
     -- Animate selection
     TweenService:Create(self.Button, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-        BackgroundColor3 = Color3.fromRGB(74, 158, 255),
+        BackgroundColor3 = accentColor,
         BackgroundTransparency = 0.8
     }):Play()
     

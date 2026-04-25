@@ -110,10 +110,12 @@ function Colorpicker:CreateElement()
     PickerCorner.Parent = self.PickerContainer
     
     local PickerStroke = Instance.new("UIStroke")
-    PickerStroke.Color = Color3.fromRGB(74, 158, 255)
+    PickerStroke.Color = self.Tab.Window.AccentColor or Color3.fromRGB(74, 158, 255)
     PickerStroke.Thickness = 1
     PickerStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
     PickerStroke.Parent = self.PickerContainer
+    
+    table.insert(self.Tab.Window.AccentElements, PickerStroke)
     
     -- HSV Palette
     self.Palette = Instance.new("ImageButton")

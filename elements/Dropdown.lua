@@ -42,7 +42,7 @@ function Dropdown:CreateElement()
     -- Main container
     self.Container = Instance.new("Frame")
     self.Container.Name = "Dropdown"
-    self.Container.Size = UDim2.new(1, -20, 0, self.Description and 80 or 65)
+    self.Container.Size = UDim2.new(1, -20, 0, self.Description and 85 or 70)
     self.Container.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     self.Container.BackgroundTransparency = 0.5
     self.Container.BorderSizePixel = 0
@@ -69,7 +69,7 @@ function Dropdown:CreateElement()
     self.TitleLabel.Parent = self.Container
     
     -- Description (optional)
-    local dropdownY = 35
+    local dropdownY = 38
     if self.Description then
         self.DescLabel = Instance.new("TextLabel")
         self.DescLabel.Name = "Description"
@@ -83,7 +83,7 @@ function Dropdown:CreateElement()
         self.DescLabel.TextXAlignment = Enum.TextXAlignment.Left
         self.DescLabel.TextWrapped = true
         self.DescLabel.Parent = self.Container
-        dropdownY = 45
+        dropdownY = 48
     end
     
     -- Dropdown button
@@ -146,10 +146,12 @@ function Dropdown:CreateElement()
     OptionsCorner.Parent = self.OptionsContainer
     
     local OptionsStroke = Instance.new("UIStroke")
-    OptionsStroke.Color = Color3.fromRGB(74, 158, 255)
+    OptionsStroke.Color = self.Tab.Window.AccentColor or Color3.fromRGB(74, 158, 255)
     OptionsStroke.Thickness = 1
     OptionsStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
     OptionsStroke.Parent = self.OptionsContainer
+    
+    table.insert(self.Tab.Window.AccentElements, OptionsStroke)
     
     -- Scrolling frame for options
     self.OptionsScroll = Instance.new("ScrollingFrame")
@@ -157,7 +159,7 @@ function Dropdown:CreateElement()
     self.OptionsScroll.BackgroundTransparency = 1
     self.OptionsScroll.BorderSizePixel = 0
     self.OptionsScroll.ScrollBarThickness = 4
-    self.OptionsScroll.ScrollBarImageColor3 = Color3.fromRGB(74, 158, 255)
+    self.OptionsScroll.ScrollBarImageColor3 = self.Tab.Window.AccentColor or Color3.fromRGB(74, 158, 255)
     self.OptionsScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
     self.OptionsScroll.Parent = self.OptionsContainer
     
@@ -405,12 +407,14 @@ function Dropdown:ToggleValue(value)
     
     self.Value[value] = not self.Value[value] or nil
     
+    local accentColor = self.Tab.Window.AccentColor or Color3.fromRGB(74, 158, 255)
+    
     local option = self.OptionButtons[value]
     if option then
         if self.Value[value] then
-            option.Check.BackgroundColor3 = Color3.fromRGB(74, 158, 255)
+            option.Check.BackgroundColor3 = accentColor
             option.Check.Text = "✓"
-            option.Check:FindFirstChildOfClass("UIStroke").Color = Color3.fromRGB(74, 158, 255)
+            option.Check:FindFirstChildOfClass("UIStroke").Color = accentColor
         else
             option.Check.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
             option.Check.Text = ""
@@ -442,12 +446,14 @@ function Dropdown:UpdateDisplay()
             self.DisplayLabel.Text = selected[1] .. " (+" .. (#selected - 1) .. ")"
         end
         
+        local accentColor = self.Tab.Window.AccentColor or Color3.fromRGB(74, 158, 255)
+        
         -- Update checkmarks
         for value, option in pairs(self.OptionButtons) do
             if self.Value[value] then
-                option.Check.BackgroundColor3 = Color3.fromRGB(74, 158, 255)
+                option.Check.BackgroundColor3 = accentColor
                 option.Check.Text = "✓"
-                option.Check:FindFirstChildOfClass("UIStroke").Color = Color3.fromRGB(74, 158, 255)
+                option.Check:FindFirstChildOfClass("UIStroke").Color = accentColor
             else
                 option.Check.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
                 option.Check.Text = ""

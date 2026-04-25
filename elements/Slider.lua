@@ -111,9 +111,11 @@ function Slider:CreateElement()
     self.SliderFill = Instance.new("Frame")
     self.SliderFill.Name = "Fill"
     self.SliderFill.Size = UDim2.new(0, 0, 1, 0)
-    self.SliderFill.BackgroundColor3 = Color3.fromRGB(74, 158, 255)
+    self.SliderFill.BackgroundColor3 = self.Tab.Window.AccentColor or Color3.fromRGB(74, 158, 255)
     self.SliderFill.BorderSizePixel = 0
     self.SliderFill.Parent = self.SliderTrack
+    
+    table.insert(self.Tab.Window.AccentElements, self.SliderFill)
     
     local FillCorner = Instance.new("UICorner")
     FillCorner.CornerRadius = UDim.new(1, 0)

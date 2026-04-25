@@ -133,10 +133,12 @@ end
 function Toggle:SetValue(value, silent)
     self.Value = value
     
+    local accentColor = self.Tab.Window.AccentColor or Color3.fromRGB(74, 158, 255)
+    
     if value then
         -- ON state
         TweenService:Create(self.SwitchBg, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-            BackgroundColor3 = Color3.fromRGB(74, 158, 255)
+            BackgroundColor3 = accentColor
         }):Play()
         
         TweenService:Create(self.SwitchCircle, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
