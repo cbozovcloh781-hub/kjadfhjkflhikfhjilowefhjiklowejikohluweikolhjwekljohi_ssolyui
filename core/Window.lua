@@ -79,6 +79,8 @@ function Window:CreateGUI()
         self.Blur.Parent = lighting
     end
     
+    self.BlurSize = 10
+    
     -- Main container (rounded)
     self.Container = Instance.new("Frame")
     self.Container.Name = "Container"
@@ -698,7 +700,7 @@ function Window:ToggleMinimize()
     else
         -- Show blur
         if self.Blur then
-            TweenService:Create(self.Blur, TweenInfo.new(0.3), {Size = 10}):Play()
+            TweenService:Create(self.Blur, TweenInfo.new(0.3), {Size = self.BlurSize}):Play()
         end
         
         -- Show resize handles
@@ -778,6 +780,13 @@ function Window:Notify(config)
     end
     
     self.Notification:Show(config)
+end
+
+function Window:SetBlurSize(size)
+    self.BlurSize = size
+    if self.Blur and not self.Minimized then
+        TweenService:Create(self.Blur, TweenInfo.new(0.2), {Size = size}):Play()
+    end
 end
 
 function Window:Destroy()

@@ -58,14 +58,14 @@ function Slider:CreateElement()
     -- Value display / input
     self.ValueBox = Instance.new("TextBox")
     self.ValueBox.Name = "ValueBox"
-    self.ValueBox.Size = UDim2.fromOffset(80, 25)
-    self.ValueBox.Position = UDim2.new(1, -90, 0, 8)
+    self.ValueBox.Size = UDim2.fromOffset(70, 25)
+    self.ValueBox.Position = UDim2.new(1, -78, 0, 8)
     self.ValueBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
     self.ValueBox.BackgroundTransparency = 0.3
     self.ValueBox.BorderSizePixel = 0
     self.ValueBox.Text = tostring(self.Value) .. self.Suffix
     self.ValueBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-    self.ValueBox.TextSize = 13
+    self.ValueBox.TextSize = 12
     self.ValueBox.Font = Enum.Font.SourceSansBold
     self.ValueBox.ClearTextOnFocus = false
     self.ValueBox.TextStrokeTransparency = 0.9

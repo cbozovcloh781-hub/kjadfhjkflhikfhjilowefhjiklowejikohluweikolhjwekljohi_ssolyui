@@ -41,7 +41,7 @@ function Dropdown:CreateElement()
     -- Main container
     self.Container = Instance.new("Frame")
     self.Container.Name = "Dropdown"
-    self.Container.Size = UDim2.new(1, -20, 0, self.Description and 60 or 45)
+    self.Container.Size = UDim2.new(1, -20, 0, self.Description and 55 or 40)
     self.Container.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     self.Container.BackgroundTransparency = 0.5
     self.Container.BorderSizePixel = 0
@@ -68,27 +68,27 @@ function Dropdown:CreateElement()
     self.TitleLabel.Parent = self.Container
     
     -- Description (optional)
-    local dropdownY = 28
+    local dropdownY = 26
     if self.Description then
         self.DescLabel = Instance.new("TextLabel")
         self.DescLabel.Name = "Description"
-        self.DescLabel.Size = UDim2.new(1, -20, 0, 12)
-        self.DescLabel.Position = UDim2.fromOffset(12, 28)
+        self.DescLabel.Size = UDim2.new(1, -20, 0, 10)
+        self.DescLabel.Position = UDim2.fromOffset(12, 24)
         self.DescLabel.BackgroundTransparency = 1
         self.DescLabel.Text = self.Description
         self.DescLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
-        self.DescLabel.TextSize = 10
+        self.DescLabel.TextSize = 9
         self.DescLabel.Font = Enum.Font.Gotham
         self.DescLabel.TextXAlignment = Enum.TextXAlignment.Left
         self.DescLabel.TextWrapped = true
         self.DescLabel.Parent = self.Container
-        dropdownY = 42
+        dropdownY = 36
     end
     
     -- Dropdown button
     self.DropdownButton = Instance.new("TextButton")
     self.DropdownButton.Name = "Button"
-    self.DropdownButton.Size = UDim2.new(1, -24, 0, 26)
+    self.DropdownButton.Size = UDim2.new(1, -24, 0, 24)
     self.DropdownButton.Position = UDim2.fromOffset(12, dropdownY)
     self.DropdownButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
     self.DropdownButton.BackgroundTransparency = 0.3
