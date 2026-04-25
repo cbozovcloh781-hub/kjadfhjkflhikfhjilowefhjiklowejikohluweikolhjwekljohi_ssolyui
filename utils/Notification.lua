@@ -60,7 +60,7 @@ function Notification:Show(config)
     Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
     Stroke.Parent = notif
     
-    -- Type indicator (colored bar) - inside with proper clipping
+    -- Type indicator (colored bar) - inside with proper clipping, full height
     local typeColors = {
         Info = Color3.fromRGB(74, 158, 255),
         Success = Color3.fromRGB(80, 255, 120),
@@ -70,14 +70,15 @@ function Notification:Show(config)
     
     local indicator = Instance.new("Frame")
     indicator.Name = "Indicator"
-    indicator.Size = UDim2.new(0, 4, 1, -8)
-    indicator.Position = UDim2.fromOffset(4, 4)
+    indicator.Size = UDim2.new(0, 3, 1, 0)
+    indicator.Position = UDim2.fromOffset(0, 0)
     indicator.BackgroundColor3 = typeColors[type] or typeColors.Info
     indicator.BorderSizePixel = 0
+    indicator.ZIndex = 2
     indicator.Parent = notif
     
     local IndCorner = Instance.new("UICorner")
-    IndCorner.CornerRadius = UDim.new(1, 0)
+    IndCorner.CornerRadius = UDim.new(0, 10)
     IndCorner.Parent = indicator
     
     -- Icon
@@ -143,14 +144,19 @@ function Notification:Show(config)
     
     local totalHeight = 50 + contentHeight
     
-    -- Progress bar
+    -- Progress bar (full width at bottom)
     local progress = Instance.new("Frame")
     progress.Name = "Progress"
-    progress.Size = UDim2.new(1, 0, 0, 2)
-    progress.Position = UDim2.new(0, 0, 1, -2)
+    progress.Size = UDim2.new(1, 0, 0, 3)
+    progress.Position = UDim2.new(0, 0, 1, -3)
     progress.BackgroundColor3 = typeColors[type] or typeColors.Info
     progress.BorderSizePixel = 0
+    progress.ZIndex = 2
     progress.Parent = notif
+    
+    local ProgressCorner = Instance.new("UICorner")
+    ProgressCorner.CornerRadius = UDim.new(0, 10)
+    ProgressCorner.Parent = progress
     
     -- Slide in animation from right with bounce
     notif.Size = UDim2.new(1, 0, 0, totalHeight)
@@ -189,7 +195,7 @@ function Notification:Show(config)
     
     -- Progress bar animation
     TweenService:Create(progress, TweenInfo.new(duration, Enum.EasingStyle.Linear), {
-        Size = UDim2.new(0, 0, 0, 2)
+        Size = UDim2.new(0, 0, 0, 3)
     }):Play()
     
     -- Auto-dismiss

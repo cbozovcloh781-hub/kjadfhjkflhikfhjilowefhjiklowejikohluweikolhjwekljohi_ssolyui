@@ -159,7 +159,7 @@ function Window:CreateGUI()
     -- Tab container (left side)
     self.TabContainer = Instance.new("Frame")
     self.TabContainer.Name = "TabContainer"
-    self.TabContainer.Size = UDim2.new(0, 140, 1, -45)
+    self.TabContainer.Size = UDim2.new(0, 140, 1, -105)
     self.TabContainer.Position = UDim2.fromOffset(8, 40)
     self.TabContainer.BackgroundTransparency = 1
     self.TabContainer.Parent = self.Container
@@ -203,6 +203,86 @@ function Window:CreateGUI()
     ContentPadding.PaddingLeft = UDim.new(0, 10)
     ContentPadding.PaddingRight = UDim.new(0, 10)
     ContentPadding.Parent = self.ContentContainer
+    
+    -- Player profile (bottom-left corner)
+    self.ProfileContainer = Instance.new("Frame")
+    self.ProfileContainer.Name = "Profile"
+    self.ProfileContainer.Size = UDim2.new(0, 140, 0, 50)
+    self.ProfileContainer.Position = UDim2.new(0, 8, 1, -58)
+    self.ProfileContainer.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+    self.ProfileContainer.BackgroundTransparency = 0
+    self.ProfileContainer.BorderSizePixel = 0
+    self.ProfileContainer.Parent = self.Container
+    
+    local ProfileCorner = Instance.new("UICorner")
+    ProfileCorner.CornerRadius = UDim.new(0, 6)
+    ProfileCorner.Parent = self.ProfileContainer
+    
+    local ProfileStroke = Instance.new("UIStroke")
+    ProfileStroke.Color = Color3.fromRGB(60, 60, 60)
+    ProfileStroke.Thickness = 1
+    ProfileStroke.Parent = self.ProfileContainer
+    
+    -- Get player info
+    local Players = game:GetService("Players")
+    local player = Players.LocalPlayer
+    
+    -- Avatar circle
+    self.AvatarFrame = Instance.new("Frame")
+    self.AvatarFrame.Name = "Avatar"
+    self.AvatarFrame.Size = UDim2.fromOffset(36, 36)
+    self.AvatarFrame.Position = UDim2.fromOffset(7, 7)
+    self.AvatarFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    self.AvatarFrame.BorderSizePixel = 0
+    self.AvatarFrame.Parent = self.ProfileContainer
+    
+    local AvatarCorner = Instance.new("UICorner")
+    AvatarCorner.CornerRadius = UDim.new(1, 0)
+    AvatarCorner.Parent = self.AvatarFrame
+    
+    -- Avatar image
+    local avatarImage = Instance.new("ImageLabel")
+    avatarImage.Size = UDim2.new(1, 0, 1, 0)
+    avatarImage.BackgroundTransparency = 1
+    avatarImage.Image = Players:GetUserThumbnailAsync(player.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size150x150)
+    avatarImage.Parent = self.AvatarFrame
+    
+    local AvatarImgCorner = Instance.new("UICorner")
+    AvatarImgCorner.CornerRadius = UDim.new(1, 0)
+    AvatarImgCorner.Parent = avatarImage
+    
+    -- Username
+    self.UsernameLabel = Instance.new("TextLabel")
+    self.UsernameLabel.Name = "Username"
+    self.UsernameLabel.Size = UDim2.new(1, -52, 0, 16)
+    self.UsernameLabel.Position = UDim2.fromOffset(48, 10)
+    self.UsernameLabel.BackgroundTransparency = 1
+    self.UsernameLabel.Text = player.Name
+    self.UsernameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    self.UsernameLabel.TextSize = 12
+    self.UsernameLabel.Font = Enum.Font.GothamBold
+    self.UsernameLabel.TextXAlignment = Enum.TextXAlignment.Left
+    self.UsernameLabel.TextTruncate = Enum.TextTruncate.AtEnd
+    self.UsernameLabel.Parent = self.ProfileContainer
+    
+    -- Display name (if different)
+    if player.DisplayName ~= player.Name then
+        self.DisplayNameLabel = Instance.new("TextLabel")
+        self.DisplayNameLabel.Name = "DisplayName"
+        self.DisplayNameLabel.Size = UDim2.new(1, -52, 0, 14)
+        self.DisplayNameLabel.Position = UDim2.fromOffset(48, 26)
+        self.DisplayNameLabel.BackgroundTransparency = 1
+        self.DisplayNameLabel.Text = "@" .. player.Name
+        self.DisplayNameLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
+        self.DisplayNameLabel.TextSize = 10
+        self.DisplayNameLabel.Font = Enum.Font.Gotham
+        self.DisplayNameLabel.TextXAlignment = Enum.TextXAlignment.Left
+        self.DisplayNameLabel.TextTruncate = Enum.TextTruncate.AtEnd
+        self.DisplayNameLabel.Parent = self.ProfileContainer
+        
+        -- Update username to show display name
+        self.UsernameLabel.Text = player.DisplayName
+    end
     
     -- Resize handle (curved bar around bottom-right corner)
     self.ResizeHandle = Instance.new("Frame")
@@ -418,6 +498,9 @@ function Window:ToggleMinimize()
         -- Hide resize handle
         self.ResizeHandle.Visible = false
         
+        -- Hide profile
+        self.ProfileContainer.Visible = false
+        
         -- Store current position
         local currentPos = self.Container.Position
         local currentSize = self.Container.Size
@@ -449,6 +532,9 @@ function Window:ToggleMinimize()
         
         -- Show resize handle
         self.ResizeHandle.Visible = true
+        
+        -- Show profile
+        self.ProfileContainer.Visible = true
         
         -- Get indicator position
         local indPos = self.MinimizedIndicator.Position
