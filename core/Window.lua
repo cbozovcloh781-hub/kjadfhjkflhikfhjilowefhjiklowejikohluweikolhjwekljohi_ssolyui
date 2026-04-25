@@ -703,11 +703,6 @@ function Window:ToggleMinimize()
             TweenService:Create(self.Blur, TweenInfo.new(0.3), {Size = self.BlurSize}):Play()
         end
         
-        -- Show resize handles
-        self.ResizeHandle.Visible = true
-        self.ResizeHandleV.Visible = true
-        self.ResizeHandleH.Visible = true
-        
         -- Show profile
         self.ProfileContainer.Visible = true
         
@@ -731,6 +726,13 @@ function Window:ToggleMinimize()
             Size = self.Config.Size,
             Position = UDim2.new(indPos.X.Scale, indPos.X.Offset - self.Config.Size.X.Offset/2, indPos.Y.Scale, indPos.Y.Offset - self.Config.Size.Y.Offset/2)
         }):Play()
+        
+        -- Show resize handles AFTER animation completes
+        task.delay(0.3, function()
+            self.ResizeHandle.Visible = true
+            self.ResizeHandleV.Visible = true
+            self.ResizeHandleH.Visible = true
+        end)
     end
 end
 

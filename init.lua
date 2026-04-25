@@ -8,6 +8,16 @@ local baseUrl = "https://raw.githubusercontent.com/cbozovcloh781-hub/kjadfhjkflh
 -- Create loading screen
 local function createLoadingScreen()
     local coreGui = game:GetService("CoreGui")
+    local lighting = game:GetService("Lighting")
+    
+    -- Create blur effect
+    local blur = Instance.new("BlurEffect")
+    blur.Name = "SsolyLoadingBlur"
+    blur.Size = 0
+    blur.Parent = lighting
+    
+    local TweenService = game:GetService("TweenService")
+    TweenService:Create(blur, TweenInfo.new(0.3), {Size = 15}):Play()
     
     local loadingGui = Instance.new("ScreenGui")
     loadingGui.Name = "SsolyLoading"
@@ -16,22 +26,22 @@ local function createLoadingScreen()
     loadingGui.IgnoreGuiInset = true
     loadingGui.Parent = coreGui
     
-    local bg = Instance.new("Frame")
-    bg.Size = UDim2.new(1, 0, 1, 0)
-    bg.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-    bg.BorderSizePixel = 0
-    bg.Parent = loadingGui
-    
     local container = Instance.new("Frame")
     container.Size = UDim2.fromOffset(300, 150)
     container.Position = UDim2.new(0.5, -150, 0.5, -75)
     container.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    container.BackgroundTransparency = 0.1
     container.BorderSizePixel = 0
-    container.Parent = bg
+    container.Parent = loadingGui
     
     local corner = Instance.new("UICorner")
     corner.CornerRadius = UDim.new(0, 8)
     corner.Parent = container
+    
+    local stroke = Instance.new("UIStroke")
+    stroke.Color = Color3.fromRGB(60, 60, 60)
+    stroke.Thickness = 1
+    stroke.Parent = container
     
     local title = Instance.new("TextLabel")
     title.Size = UDim2.new(1, 0, 0, 40)
@@ -75,10 +85,10 @@ local function createLoadingScreen()
     barCorner.CornerRadius = UDim.new(1, 0)
     barCorner.Parent = progressBar
     
-    return loadingGui, status, progressBar
+    return loadingGui, status, progressBar, blur
 end
 
-local loadingGui, statusLabel, progressBar = createLoadingScreen()
+local loadingGui, statusLabel, progressBar, loadingBlur = createLoadingScreen()
 
 local function updateProgress(text, progress)
     statusLabel.Text = text
@@ -132,11 +142,23 @@ task.wait(0.5)
 
 -- Remove loading screen
 local TweenService = game:GetService("TweenService")
-TweenService:Create(loadingGui, TweenInfo.new(0.3), {
-    BackgroundTransparency = 1
-}):Play()
+local container = loadingGui:FindFirstChild("Frame") or loadingGui:GetChildren()[1]
+if container then
+    TweenService:Create(container, TweenInfo.new(0.3), {
+        BackgroundTransparency = 1
+    }):Play()
+end
+
+-- Remove blur
+if loadingBlur then
+    TweenService:Create(loadingBlur, TweenInfo.new(0.3), {Size = 0}):Play()
+end
+
 task.wait(0.3)
 loadingGui:Destroy()
+if loadingBlur then
+    loadingBlur:Destroy()
+end
 
 -- Create window
 function Ssoly:CreateWindow(config)
