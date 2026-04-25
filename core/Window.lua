@@ -301,14 +301,14 @@ function Window:CreateGUI()
     
     self.ResizeBars = {}
     
-    -- Create arc using more bars for smoother appearance
-    for i = 0, 12 do
-        local angle = (i / 12) * 90
+    -- Create arc using many bars for smooth appearance
+    for i = 0, 20 do
+        local angle = (i / 20) * 90
         local rad = math.rad(angle)
         local radius = 12
         
         local bar = Instance.new("Frame")
-        bar.Size = UDim2.fromOffset(8, 8)
+        bar.Size = UDim2.fromOffset(10, 10)
         bar.Position = UDim2.fromOffset(
             15 + math.cos(rad) * radius,
             15 + math.sin(rad) * radius
@@ -676,9 +676,11 @@ function Window:ToggleMinimize()
         -- Hide profile
         self.ProfileContainer.Visible = false
         
-        -- Store current position
+        -- Store current position and size
         local currentPos = self.Container.Position
         local currentSize = self.Container.Size
+        self.Config.Size = currentSize
+        self.Config.Position = UDim2.new(currentPos.X.Scale, currentPos.X.Offset, currentPos.Y.Scale, currentPos.Y.Offset)
         
         -- Minimize animation to center
         local tween = TweenService:Create(self.Container, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
@@ -719,7 +721,7 @@ function Window:ToggleMinimize()
         task.wait(0.2)
         self.MinimizedIndicator.Visible = false
         
-        -- Restore window from indicator position
+        -- Restore window from indicator position with saved size
         self.Container.Visible = true
         self.Container.Size = UDim2.fromOffset(0, 0)
         self.Container.Position = indPos

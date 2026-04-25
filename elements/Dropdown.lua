@@ -42,7 +42,7 @@ function Dropdown:CreateElement()
     -- Main container
     self.Container = Instance.new("Frame")
     self.Container.Name = "Dropdown"
-    self.Container.Size = UDim2.new(1, -20, 0, self.Description and 75 or 60)
+    self.Container.Size = UDim2.new(1, -20, 0, self.Description and 80 or 65)
     self.Container.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     self.Container.BackgroundTransparency = 0.5
     self.Container.BorderSizePixel = 0
@@ -69,7 +69,7 @@ function Dropdown:CreateElement()
     self.TitleLabel.Parent = self.Container
     
     -- Description (optional)
-    local dropdownY = 32
+    local dropdownY = 35
     if self.Description then
         self.DescLabel = Instance.new("TextLabel")
         self.DescLabel.Name = "Description"
@@ -83,7 +83,7 @@ function Dropdown:CreateElement()
         self.DescLabel.TextXAlignment = Enum.TextXAlignment.Left
         self.DescLabel.TextWrapped = true
         self.DescLabel.Parent = self.Container
-        dropdownY = 40
+        dropdownY = 45
     end
     
     -- Dropdown button
@@ -242,20 +242,35 @@ function Dropdown:CreateOptions()
         -- Checkmark (for multi-select)
         local checkmark = Instance.new("TextLabel")
         checkmark.Name = "Check"
-        checkmark.Size = UDim2.fromOffset(20, 20)
-        checkmark.Position = UDim2.fromOffset(8, 4)
-        checkmark.BackgroundTransparency = 1
-        checkmark.Text = self.Multi and "☐" or ""
-        checkmark.TextColor3 = Color3.fromRGB(150, 150, 150)
-        checkmark.TextSize = 14
+        checkmark.Size = UDim2.fromOffset(16, 16)
+        checkmark.Position = UDim2.fromOffset(8, 6)
+        checkmark.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+        checkmark.BackgroundTransparency = 0
+        checkmark.BorderSizePixel = 0
+        checkmark.Text = ""
+        checkmark.TextColor3 = Color3.fromRGB(74, 158, 255)
+        checkmark.TextSize = 12
         checkmark.Font = Enum.Font.GothamBold
         checkmark.Parent = optionButton
+        
+        local checkCorner = Instance.new("UICorner")
+        checkCorner.CornerRadius = UDim.new(0, 3)
+        checkCorner.Parent = checkmark
+        
+        local checkStroke = Instance.new("UIStroke")
+        checkStroke.Color = Color3.fromRGB(60, 60, 60)
+        checkStroke.Thickness = 1
+        checkStroke.Parent = checkmark
+        
+        if not self.Multi then
+            checkmark.Visible = false
+        end
         
         -- Option text
         local optionLabel = Instance.new("TextLabel")
         optionLabel.Name = "Label"
-        optionLabel.Size = UDim2.new(1, self.Multi and -38 or -16, 1, 0)
-        optionLabel.Position = UDim2.fromOffset(self.Multi and 32 or 8, 0)
+        optionLabel.Size = UDim2.new(1, self.Multi and -34 or -16, 1, 0)
+        optionLabel.Position = UDim2.fromOffset(self.Multi and 30 or 8, 0)
         optionLabel.BackgroundTransparency = 1
         optionLabel.Text = value
         optionLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
@@ -392,8 +407,15 @@ function Dropdown:ToggleValue(value)
     
     local option = self.OptionButtons[value]
     if option then
-        option.Check.Text = self.Value[value] and "☑" or "☐"
-        option.Check.TextColor3 = self.Value[value] and Color3.fromRGB(74, 158, 255) or Color3.fromRGB(150, 150, 150)
+        if self.Value[value] then
+            option.Check.BackgroundColor3 = Color3.fromRGB(74, 158, 255)
+            option.Check.Text = "✓"
+            option.Check:FindFirstChildOfClass("UIStroke").Color = Color3.fromRGB(74, 158, 255)
+        else
+            option.Check.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+            option.Check.Text = ""
+            option.Check:FindFirstChildOfClass("UIStroke").Color = Color3.fromRGB(60, 60, 60)
+        end
     end
     
     self:UpdateDisplay()
@@ -422,8 +444,15 @@ function Dropdown:UpdateDisplay()
         
         -- Update checkmarks
         for value, option in pairs(self.OptionButtons) do
-            option.Check.Text = self.Value[value] and "☑" or "☐"
-            option.Check.TextColor3 = self.Value[value] and Color3.fromRGB(74, 158, 255) or Color3.fromRGB(150, 150, 150)
+            if self.Value[value] then
+                option.Check.BackgroundColor3 = Color3.fromRGB(74, 158, 255)
+                option.Check.Text = "✓"
+                option.Check:FindFirstChildOfClass("UIStroke").Color = Color3.fromRGB(74, 158, 255)
+            else
+                option.Check.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+                option.Check.Text = ""
+                option.Check:FindFirstChildOfClass("UIStroke").Color = Color3.fromRGB(60, 60, 60)
+            end
         end
     else
         self.DisplayLabel.Text = self.Value and tostring(self.Value) or "--"

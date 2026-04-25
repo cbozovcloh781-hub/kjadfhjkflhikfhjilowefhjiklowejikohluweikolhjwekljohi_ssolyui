@@ -101,32 +101,32 @@ local function updateProgress(progress)
 end
 
 -- Load core modules
-updateProgress(0.1)
+updateProgress(0.2)
 Ssoly.Window = loadstring(game:HttpGet(baseUrl .. "core/Window.lua"))()
 
-updateProgress(0.2)
+updateProgress(0.3)
 Ssoly.Tab = loadstring(game:HttpGet(baseUrl .. "core/Tab.lua"))()
 
 -- Load elements
-updateProgress(0.3)
+updateProgress(0.4)
 local Toggle = loadstring(game:HttpGet(baseUrl .. "elements/Toggle.lua"))()
 
-updateProgress(0.4)
+updateProgress(0.5)
 local Slider = loadstring(game:HttpGet(baseUrl .. "elements/Slider.lua"))()
 
-updateProgress(0.5)
+updateProgress(0.6)
 local Dropdown = loadstring(game:HttpGet(baseUrl .. "elements/Dropdown.lua"))()
 
-updateProgress(0.6)
+updateProgress(0.7)
 local Button = loadstring(game:HttpGet(baseUrl .. "elements/Button.lua"))()
 
-updateProgress(0.7)
+updateProgress(0.8)
 local Input = loadstring(game:HttpGet(baseUrl .. "elements/Input.lua"))()
 
-updateProgress(0.8)
+updateProgress(0.9)
 local Colorpicker = loadstring(game:HttpGet(baseUrl .. "elements/Colorpicker.lua"))()
 
-updateProgress(0.9)
+updateProgress(1.0)
 local Keybind = loadstring(game:HttpGet(baseUrl .. "elements/Keybind.lua"))()
 
 Ssoly.Elements = {
@@ -139,8 +139,7 @@ Ssoly.Elements = {
     Keybind = Keybind,
 }
 
-updateProgress(1.0)
-task.wait(0.3)
+task.wait(0.2)
 
 -- Remove loading screen
 local TweenService = game:GetService("TweenService")
