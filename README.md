@@ -254,4 +254,4 @@ Free to use for personal projects.
 
 ## 👤 Author
 
-Created by Ssoly Team for YBA Enhanced Script
+Created by Sosalkin Hub.
