@@ -37,30 +37,61 @@ function Tab:CreateButton()
     Corner.CornerRadius = UDim.new(0, 8)
     Corner.Parent = self.Button
     
-    -- Icon
+    -- Icon (using Lucide-style minimal icons)
+    local iconMap = {
+        -- Movement icons
+        ["⚡"] = "▲",  -- Arrow up
+        ["movement"] = "▲",
+        ["fly"] = "▲",
+        
+        -- Vision/ESP icons  
+        ["👁️"] = "◉",  -- Circle with dot
+        ["esp"] = "◉",
+        ["eye"] = "◉",
+        
+        -- Autofarm icons
+        ["🤖"] = "▣",  -- Square with lines
+        ["autofarm"] = "▣",
+        ["farm"] = "▣",
+        
+        -- Settings icons
+        ["⚙️"] = "◎",  -- Gear symbol
+        ["settings"] = "◎",
+        ["config"] = "◎",
+        
+        -- Teleport icons
+        ["teleport"] = "◆",  -- Diamond
+        ["tp"] = "◆",
+        
+        -- Combat icons
+        ["combat"] = "◇",  -- Diamond outline
+        ["fight"] = "◇",
+    }
+    
+    local displayIcon = iconMap[self.Icon:lower()] or iconMap[self.Title:lower()] or self.Icon
+    
     self.IconLabel = Instance.new("TextLabel")
     self.IconLabel.Name = "Icon"
-    self.IconLabel.Size = UDim2.fromOffset(30, 30)
-    self.IconLabel.Position = UDim2.fromOffset(10, 5)
+    self.IconLabel.Size = UDim2.fromOffset(20, 20)
+    self.IconLabel.Position = UDim2.fromOffset(12, 10)
     self.IconLabel.BackgroundTransparency = 1
-    self.IconLabel.Text = self.Icon
+    self.IconLabel.Text = displayIcon
     self.IconLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
-    self.IconLabel.TextSize = 18
-    self.IconLabel.Font = Enum.Font.SourceSansBold
+    self.IconLabel.TextSize = 16
+    self.IconLabel.Font = Enum.Font.GothamBold
     self.IconLabel.Parent = self.Button
     
     -- Title
     self.TitleLabel = Instance.new("TextLabel")
     self.TitleLabel.Name = "Title"
-    self.TitleLabel.Size = UDim2.new(1, -50, 1, 0)
-    self.TitleLabel.Position = UDim2.fromOffset(45, 0)
+    self.TitleLabel.Size = UDim2.new(1, -45, 1, 0)
+    self.TitleLabel.Position = UDim2.fromOffset(38, 0)
     self.TitleLabel.BackgroundTransparency = 1
     self.TitleLabel.Text = self.Title
     self.TitleLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
-    self.TitleLabel.TextSize = 14
-    self.TitleLabel.Font = Enum.Font.SourceSansBold
+    self.TitleLabel.TextSize = 12
+    self.TitleLabel.Font = Enum.Font.GothamBold
     self.TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
-    self.TitleLabel.TextStrokeTransparency = 0.8
     self.TitleLabel.Parent = self.Button
     
     -- Selection indicator
