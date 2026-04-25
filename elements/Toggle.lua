@@ -51,6 +51,7 @@ function Toggle:CreateElement()
     self.TitleLabel.TextSize = 14
     self.TitleLabel.Font = Enum.Font.SourceSans
     self.TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    self.TitleLabel.TextStrokeTransparency = 0.8
     self.TitleLabel.Parent = self.Container
     
     -- Description (optional)

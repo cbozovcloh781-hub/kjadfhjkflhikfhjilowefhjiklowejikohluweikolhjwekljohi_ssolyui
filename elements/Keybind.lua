@@ -49,6 +49,7 @@ function Keybind:CreateElement()
     self.TitleLabel.TextSize = 14
     self.TitleLabel.Font = Enum.Font.SourceSans
     self.TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    self.TitleLabel.TextStrokeTransparency = 0.8
     self.TitleLabel.Parent = self.Container
     
     -- Description (optional)
@@ -80,6 +81,7 @@ function Keybind:CreateElement()
     self.KeybindButton.TextSize = 12
     self.KeybindButton.Font = Enum.Font.SourceSansBold
     self.KeybindButton.AutoButtonColor = false
+    self.KeybindButton.TextStrokeTransparency = 0.9
     self.KeybindButton.Parent = self.Container
     
     local ButtonCorner = Instance.new("UICorner")

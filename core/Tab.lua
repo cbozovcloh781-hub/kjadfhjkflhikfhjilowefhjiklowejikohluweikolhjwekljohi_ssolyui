@@ -59,6 +59,7 @@ function Tab:CreateButton()
     self.TitleLabel.TextSize = 14
     self.TitleLabel.Font = Enum.Font.SourceSansBold
     self.TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    self.TitleLabel.TextStrokeTransparency = 0.8
     self.TitleLabel.Parent = self.Button
     
     -- Selection indicator

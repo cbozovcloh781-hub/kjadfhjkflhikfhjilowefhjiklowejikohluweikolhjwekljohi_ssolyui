@@ -48,6 +48,7 @@ function Input:CreateElement()
     self.TitleLabel.TextSize = 14
     self.TitleLabel.Font = Enum.Font.SourceSans
     self.TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    self.TitleLabel.TextStrokeTransparency = 0.8
     self.TitleLabel.Parent = self.Container
     
     -- Description (optional)
@@ -84,6 +85,7 @@ function Input:CreateElement()
     self.InputBox.Font = Enum.Font.SourceSans
     self.InputBox.TextXAlignment = Enum.TextXAlignment.Left
     self.InputBox.ClearTextOnFocus = false
+    self.InputBox.TextStrokeTransparency = 0.9
     self.InputBox.Parent = self.Container
     
     local InputCorner = Instance.new("UICorner")

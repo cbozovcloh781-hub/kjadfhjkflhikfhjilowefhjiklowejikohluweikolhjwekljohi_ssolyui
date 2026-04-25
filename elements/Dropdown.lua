@@ -64,6 +64,7 @@ function Dropdown:CreateElement()
     self.TitleLabel.TextSize = 14
     self.TitleLabel.Font = Enum.Font.SourceSans
     self.TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    self.TitleLabel.TextStrokeTransparency = 0.8
     self.TitleLabel.Parent = self.Container
     
     -- Description (optional)
@@ -112,6 +113,7 @@ function Dropdown:CreateElement()
     self.DisplayLabel.Font = Enum.Font.SourceSans
     self.DisplayLabel.TextXAlignment = Enum.TextXAlignment.Left
     self.DisplayLabel.TextTruncate = Enum.TextTruncate.AtEnd
+    self.DisplayLabel.TextStrokeTransparency = 0.9
     self.DisplayLabel.Parent = self.DropdownButton
     
     -- Arrow icon
@@ -281,42 +283,47 @@ function Dropdown:Open()
     local targetHeight = (optionCount * 30) + 10
     
     self.OptionsContainer.Visible = true
+    self.OptionsContainer.Size = UDim2.new(1, -24, 0, 0)
     
-    TweenService:Create(self.OptionsContainer, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+    -- Expand container first
+    local newHeight = (self.Description and 70 or 55) + targetHeight + 5
+    TweenService:Create(self.Container, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        Size = UDim2.new(1, -20, 0, newHeight)
+    }):Play()
+    
+    -- Then expand options with slight delay
+    task.wait(0.05)
+    TweenService:Create(self.OptionsContainer, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
         Size = UDim2.new(1, -24, 0, targetHeight)
     }):Play()
     
-    TweenService:Create(self.ArrowIcon, TweenInfo.new(0.3), {
+    TweenService:Create(self.ArrowIcon, TweenInfo.new(0.25), {
         Rotation = 180
-    }):Play()
-    
-    -- Expand container
-    local newHeight = (self.Description and 70 or 55) + targetHeight + 5
-    TweenService:Create(self.Container, TweenInfo.new(0.3), {
-        Size = UDim2.new(1, -20, 0, newHeight)
     }):Play()
 end
 
 function Dropdown:Close()
     self.Opened = false
     
-    TweenService:Create(self.OptionsContainer, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+    -- Close options first
+    TweenService:Create(self.OptionsContainer, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
         Size = UDim2.new(1, -24, 0, 0)
     }):Play()
     
-    TweenService:Create(self.ArrowIcon, TweenInfo.new(0.3), {
+    TweenService:Create(self.ArrowIcon, TweenInfo.new(0.2), {
         Rotation = 0
     }):Play()
     
-    task.delay(0.3, function()
-        self.OptionsContainer.Visible = false
-    end)
-    
-    -- Shrink container
+    -- Then shrink container
+    task.wait(0.1)
     local newHeight = self.Description and 70 or 55
-    TweenService:Create(self.Container, TweenInfo.new(0.3), {
+    TweenService:Create(self.Container, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
         Size = UDim2.new(1, -20, 0, newHeight)
     }):Play()
+    
+    task.delay(0.2, function()
+        self.OptionsContainer.Visible = false
+    end)
 end
 
 function Dropdown:SetValue(value, silent)

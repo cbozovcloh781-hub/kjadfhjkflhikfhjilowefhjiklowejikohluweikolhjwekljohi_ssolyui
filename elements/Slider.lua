@@ -52,6 +52,7 @@ function Slider:CreateElement()
     self.TitleLabel.TextSize = 14
     self.TitleLabel.Font = Enum.Font.SourceSans
     self.TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    self.TitleLabel.TextStrokeTransparency = 0.8
     self.TitleLabel.Parent = self.Container
     
     -- Value display / input
@@ -67,6 +68,7 @@ function Slider:CreateElement()
     self.ValueBox.TextSize = 13
     self.ValueBox.Font = Enum.Font.SourceSansBold
     self.ValueBox.ClearTextOnFocus = false
+    self.ValueBox.TextStrokeTransparency = 0.9
     self.ValueBox.Parent = self.Container
     
     local ValueCorner = Instance.new("UICorner")
@@ -93,7 +95,7 @@ function Slider:CreateElement()
     local sliderY = self.Description and 52 or 38
     self.SliderTrack = Instance.new("Frame")
     self.SliderTrack.Name = "Track"
-    self.SliderTrack.Size = UDim2.new(1, -24, 0, 6)
+    self.SliderTrack.Size = UDim2.new(1, -24, 0, 4)
     self.SliderTrack.Position = UDim2.fromOffset(12, sliderY)
     self.SliderTrack.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     self.SliderTrack.BorderSizePixel = 0
@@ -115,14 +117,15 @@ function Slider:CreateElement()
     FillCorner.CornerRadius = UDim.new(1, 0)
     FillCorner.Parent = self.SliderFill
     
-    -- Slider handle (circle) - positioned on track
+    -- Slider handle (circle) - positioned on track center
     self.SliderHandle = Instance.new("Frame")
     self.SliderHandle.Name = "Handle"
-    self.SliderHandle.Size = UDim2.fromOffset(16, 16)
-    self.SliderHandle.Position = UDim2.new(0, -8, 0.5, -8)
+    self.SliderHandle.Size = UDim2.fromOffset(14, 14)
+    self.SliderHandle.Position = UDim2.new(0, -7, 0.5, -7)
     self.SliderHandle.AnchorPoint = Vector2.new(0, 0.5)
     self.SliderHandle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     self.SliderHandle.BorderSizePixel = 0
+    self.SliderHandle.ZIndex = 2
     self.SliderHandle.Parent = self.SliderTrack
     
     local HandleCorner = Instance.new("UICorner")
@@ -196,16 +199,16 @@ function Slider:CreateElement()
     -- Hover effects
     self.SliderTrack.MouseEnter:Connect(function()
         TweenService:Create(self.SliderHandle, TweenInfo.new(0.2), {
-            Size = UDim2.fromOffset(20, 20),
-            Position = UDim2.new(0, -10, 0.5, -10)
+            Size = UDim2.fromOffset(18, 18),
+            Position = UDim2.new(self.SliderHandle.Position.X.Scale, self.SliderHandle.Position.X.Offset, 0.5, -9)
         }):Play()
     end)
     
     self.SliderTrack.MouseLeave:Connect(function()
         if not dragging then
             TweenService:Create(self.SliderHandle, TweenInfo.new(0.2), {
-                Size = UDim2.fromOffset(16, 16),
-                Position = UDim2.new(0, -8, 0.5, -8)
+                Size = UDim2.fromOffset(14, 14),
+                Position = UDim2.new(self.SliderHandle.Position.X.Scale, self.SliderHandle.Position.X.Offset, 0.5, -7)
             }):Play()
         end
     end)
@@ -240,10 +243,11 @@ function Slider:SetValue(value, silent)
         Size = UDim2.new(percentage, 0, 1, 0)
     }):Play()
     
-    -- Move handle smoothly on track
+    -- Move handle smoothly on track (centered)
     local trackWidth = self.SliderTrack.AbsoluteSize.X
+    local handleOffset = (trackWidth * percentage) - 7
     TweenService:Create(self.SliderHandle, TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-        Position = UDim2.new(0, (trackWidth * percentage) - 8, 0.5, -8)
+        Position = UDim2.new(0, handleOffset, 0.5, -7)
     }):Play()
     
     self.ValueBox.Text = tostring(value) .. self.Suffix

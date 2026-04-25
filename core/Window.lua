@@ -122,9 +122,10 @@ function Window:CreateGUI()
     self.TitleLabel.BackgroundTransparency = 1
     self.TitleLabel.Text = self.Config.Title
     self.TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    self.TitleLabel.TextSize = 16
+    self.TitleLabel.TextSize = 15
     self.TitleLabel.Font = Enum.Font.SourceSansBold
     self.TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    self.TitleLabel.TextStrokeTransparency = 0.8
     self.TitleLabel.Parent = self.TitleBar
     
     -- Minimize button
@@ -193,19 +194,37 @@ function Window:CreateGUI()
     ContentPadding.PaddingRight = UDim.new(0, 10)
     ContentPadding.Parent = self.ContentContainer
     
-    -- Resize handle (bottom-right corner) - sleek bar
+    -- Resize handle (bottom-right corner) - outside the window
     self.ResizeHandle = Instance.new("Frame")
     self.ResizeHandle.Name = "ResizeHandle"
-    self.ResizeHandle.Size = UDim2.fromOffset(50, 6)
-    self.ResizeHandle.Position = UDim2.new(1, -55, 1, -10)
+    self.ResizeHandle.Size = UDim2.fromOffset(40, 40)
+    self.ResizeHandle.Position = UDim2.new(1, -5, 1, -5)
+    self.ResizeHandle.AnchorPoint = Vector2.new(1, 1)
     self.ResizeHandle.BackgroundColor3 = Color3.fromRGB(74, 158, 255)
-    self.ResizeHandle.BackgroundTransparency = 0.6
+    self.ResizeHandle.BackgroundTransparency = 0.3
     self.ResizeHandle.BorderSizePixel = 0
+    self.ResizeHandle.ZIndex = 0
     self.ResizeHandle.Parent = self.Container
     
     local ResizeCorner = Instance.new("UICorner")
-    ResizeCorner.CornerRadius = UDim.new(1, 0)
+    ResizeCorner.CornerRadius = UDim.new(0, 20)
     ResizeCorner.Parent = self.ResizeHandle
+    
+    -- Resize icon (diagonal lines)
+    for i = 1, 3 do
+        local line = Instance.new("Frame")
+        line.Size = UDim2.new(0, 2, 0, 12 + (i * 2))
+        line.Position = UDim2.new(0, 8 + (i * 5), 1, -8 - (12 + (i * 2)))
+        line.Rotation = 45
+        line.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+        line.BackgroundTransparency = 0.3
+        line.BorderSizePixel = 0
+        line.Parent = self.ResizeHandle
+        
+        local lineCorner = Instance.new("UICorner")
+        lineCorner.CornerRadius = UDim.new(1, 0)
+        lineCorner.Parent = line
+    end
     
     -- Minimized indicator (hidden by default)
     self.MinimizedIndicator = Instance.new("Frame")
@@ -351,16 +370,16 @@ function Window:SetupResizing()
     -- Hover effect
     self.ResizeHandle.MouseEnter:Connect(function()
         TweenService:Create(self.ResizeHandle, TweenInfo.new(0.2), {
-            BackgroundTransparency = 0.2,
-            Size = UDim2.fromOffset(60, 8)
+            BackgroundTransparency = 0,
+            Size = UDim2.fromOffset(45, 45)
         }):Play()
     end)
     
     self.ResizeHandle.MouseLeave:Connect(function()
         if not resizing then
             TweenService:Create(self.ResizeHandle, TweenInfo.new(0.2), {
-                BackgroundTransparency = 0.6,
-                Size = UDim2.fromOffset(50, 6)
+                BackgroundTransparency = 0.3,
+                Size = UDim2.fromOffset(40, 40)
             }):Play()
         end
     end)

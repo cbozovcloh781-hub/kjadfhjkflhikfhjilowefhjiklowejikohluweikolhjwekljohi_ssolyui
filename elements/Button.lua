@@ -58,6 +58,7 @@ function Button:CreateElement()
     self.TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
     self.TitleLabel.TextSize = 14
     self.TitleLabel.Font = Enum.Font.SourceSansBold
+    self.TitleLabel.TextStrokeTransparency = 0.8
     self.TitleLabel.Parent = self.Button
     
     -- Description (optional)

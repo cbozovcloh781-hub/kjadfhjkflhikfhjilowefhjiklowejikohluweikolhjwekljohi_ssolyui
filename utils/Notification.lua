@@ -104,6 +104,7 @@ function Notification:Show(config)
     titleLabel.Font = Enum.Font.SourceSansBold
     titleLabel.TextXAlignment = Enum.TextXAlignment.Left
     titleLabel.TextTruncate = Enum.TextTruncate.AtEnd
+    titleLabel.TextStrokeTransparency = 0.8
     titleLabel.Parent = notif
     
     -- Content
