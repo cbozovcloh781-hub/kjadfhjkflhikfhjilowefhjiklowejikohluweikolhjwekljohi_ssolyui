@@ -106,7 +106,7 @@ function Dropdown:CreateElement()
     self.DisplayLabel = Instance.new("TextLabel")
     self.DisplayLabel.Name = "Display"
     self.DisplayLabel.Size = UDim2.new(1, -30, 1, 0)
-    self.DisplayLabel.Position = UDim2.fromOffset(8, 0)
+    self.DisplayLabel.Position = UDim2.fromOffset(10, 0)
     self.DisplayLabel.BackgroundTransparency = 1
     self.DisplayLabel.Text = "--"
     self.DisplayLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
