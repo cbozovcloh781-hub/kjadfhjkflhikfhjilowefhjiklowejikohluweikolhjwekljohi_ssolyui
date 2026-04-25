@@ -135,12 +135,42 @@ function Tab:Select()
     -- Show elements with fade-in animation
     for i, element in pairs(self.Elements) do
         element.Visible = true
-        element.GroupTransparency = 1
+        element.BackgroundTransparency = 1
+        
+        -- Fade in each child
+        for _, child in pairs(element:GetDescendants()) do
+            if child:IsA("GuiObject") then
+                child.BackgroundTransparency = math.min(child.BackgroundTransparency + 0.5, 1)
+                if child:IsA("TextLabel") or child:IsA("TextButton") or child:IsA("TextBox") then
+                    child.TextTransparency = 1
+                end
+                if child:IsA("ImageLabel") or child:IsA("ImageButton") then
+                    child.ImageTransparency = 1
+                end
+            end
+        end
         
         task.delay(i * 0.03, function()
-            TweenService:Create(element, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-                GroupTransparency = 0
-            }):Play()
+            -- Restore transparency
+            for _, child in pairs(element:GetDescendants()) do
+                if child:IsA("GuiObject") then
+                    local targetBg = child:GetAttribute("OriginalTransparency") or 0.5
+                    TweenService:Create(child, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                        BackgroundTransparency = targetBg
+                    }):Play()
+                    
+                    if child:IsA("TextLabel") or child:IsA("TextButton") or child:IsA("TextBox") then
+                        TweenService:Create(child, TweenInfo.new(0.3), {
+                            TextTransparency = 0
+                        }):Play()
+                    end
+                    if child:IsA("ImageLabel") or child:IsA("ImageButton") then
+                        TweenService:Create(child, TweenInfo.new(0.3), {
+                            ImageTransparency = 0
+                        }):Play()
+                    end
+                end
+            end
         end)
     end
 end

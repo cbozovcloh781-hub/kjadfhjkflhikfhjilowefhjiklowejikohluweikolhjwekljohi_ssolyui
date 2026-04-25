@@ -131,7 +131,7 @@ function Dropdown:CreateElement()
     -- Options container (hidden by default)
     self.OptionsContainer = Instance.new("Frame")
     self.OptionsContainer.Name = "Options"
-    self.OptionsContainer.Size = UDim2.new(1, -24, 0, 0)
+    self.OptionsContainer.Size = UDim2.new(0, 0, 0, 0)
     self.OptionsContainer.Position = UDim2.fromOffset(12, dropdownY + 35)
     self.OptionsContainer.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
     self.OptionsContainer.BorderSizePixel = 0
@@ -281,9 +281,10 @@ function Dropdown:Open()
     
     local optionCount = math.min(#self.Values, 5)
     local targetHeight = (optionCount * 30) + 10
+    local buttonWidth = self.DropdownButton.AbsoluteSize.X
     
     self.OptionsContainer.Visible = true
-    self.OptionsContainer.Size = UDim2.new(1, -24, 0, 0)
+    self.OptionsContainer.Size = UDim2.fromOffset(0, 0)
     
     -- Expand container first
     local newHeight = (self.Description and 70 or 55) + targetHeight + 5
@@ -294,7 +295,7 @@ function Dropdown:Open()
     -- Then expand options with slight delay
     task.wait(0.05)
     TweenService:Create(self.OptionsContainer, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-        Size = UDim2.new(1, -24, 0, targetHeight)
+        Size = UDim2.fromOffset(buttonWidth, targetHeight)
     }):Play()
     
     TweenService:Create(self.ArrowIcon, TweenInfo.new(0.25), {
@@ -307,7 +308,7 @@ function Dropdown:Close()
     
     -- Close options first
     TweenService:Create(self.OptionsContainer, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-        Size = UDim2.new(1, -24, 0, 0)
+        Size = UDim2.fromOffset(0, 0)
     }):Play()
     
     TweenService:Create(self.ArrowIcon, TweenInfo.new(0.2), {

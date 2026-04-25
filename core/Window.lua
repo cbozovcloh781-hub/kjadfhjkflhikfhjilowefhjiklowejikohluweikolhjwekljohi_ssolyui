@@ -194,37 +194,20 @@ function Window:CreateGUI()
     ContentPadding.PaddingRight = UDim.new(0, 10)
     ContentPadding.Parent = self.ContentContainer
     
-    -- Resize handle (bottom-right corner) - outside the window
+    -- Resize handle (bottom-right corner) - separate rounded bar outside window
     self.ResizeHandle = Instance.new("Frame")
     self.ResizeHandle.Name = "ResizeHandle"
-    self.ResizeHandle.Size = UDim2.fromOffset(40, 40)
-    self.ResizeHandle.Position = UDim2.new(1, -5, 1, -5)
-    self.ResizeHandle.AnchorPoint = Vector2.new(1, 1)
+    self.ResizeHandle.Size = UDim2.fromOffset(8, 50)
+    self.ResizeHandle.Position = UDim2.new(1, 3, 1, -60)
     self.ResizeHandle.BackgroundColor3 = Color3.fromRGB(74, 158, 255)
-    self.ResizeHandle.BackgroundTransparency = 0.3
+    self.ResizeHandle.BackgroundTransparency = 0.4
     self.ResizeHandle.BorderSizePixel = 0
-    self.ResizeHandle.ZIndex = 0
-    self.ResizeHandle.Parent = self.Container
+    self.ResizeHandle.ZIndex = 5
+    self.ResizeHandle.Parent = self.ScreenGui
     
     local ResizeCorner = Instance.new("UICorner")
-    ResizeCorner.CornerRadius = UDim.new(0, 20)
+    ResizeCorner.CornerRadius = UDim.new(1, 0)
     ResizeCorner.Parent = self.ResizeHandle
-    
-    -- Resize icon (diagonal lines)
-    for i = 1, 3 do
-        local line = Instance.new("Frame")
-        line.Size = UDim2.new(0, 2, 0, 12 + (i * 2))
-        line.Position = UDim2.new(0, 8 + (i * 5), 1, -8 - (12 + (i * 2)))
-        line.Rotation = 45
-        line.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-        line.BackgroundTransparency = 0.3
-        line.BorderSizePixel = 0
-        line.Parent = self.ResizeHandle
-        
-        local lineCorner = Instance.new("UICorner")
-        lineCorner.CornerRadius = UDim.new(1, 0)
-        lineCorner.Parent = line
-    end
     
     -- Minimized indicator (hidden by default)
     self.MinimizedIndicator = Instance.new("Frame")
@@ -343,6 +326,20 @@ function Window:SetupResizing()
     local resizeStart = nil
     local startSize = nil
     
+    -- Update resize handle position when window moves/resizes
+    local function updateResizePosition()
+        local containerPos = self.Container.AbsolutePosition
+        local containerSize = self.Container.AbsoluteSize
+        self.ResizeHandle.Position = UDim2.fromOffset(
+            containerPos.X + containerSize.X + 3,
+            containerPos.Y + containerSize.Y - 60
+        )
+    end
+    
+    self.Container:GetPropertyChangedSignal("AbsolutePosition"):Connect(updateResizePosition)
+    self.Container:GetPropertyChangedSignal("AbsoluteSize"):Connect(updateResizePosition)
+    updateResizePosition()
+    
     self.ResizeHandle.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             resizing = true
@@ -358,6 +355,7 @@ function Window:SetupResizing()
             local newHeight = math.clamp(startSize.Y + delta.Y, self.Config.MinSize.Y, self.Config.MaxSize.Y)
             
             self.Container.Size = UDim2.fromOffset(newWidth, newHeight)
+            updateResizePosition()
         end
     end)
     
@@ -370,16 +368,16 @@ function Window:SetupResizing()
     -- Hover effect
     self.ResizeHandle.MouseEnter:Connect(function()
         TweenService:Create(self.ResizeHandle, TweenInfo.new(0.2), {
-            BackgroundTransparency = 0,
-            Size = UDim2.fromOffset(45, 45)
+            BackgroundTransparency = 0.1,
+            Size = UDim2.fromOffset(10, 55)
         }):Play()
     end)
     
     self.ResizeHandle.MouseLeave:Connect(function()
         if not resizing then
             TweenService:Create(self.ResizeHandle, TweenInfo.new(0.2), {
-                BackgroundTransparency = 0.3,
-                Size = UDim2.fromOffset(40, 40)
+                BackgroundTransparency = 0.4,
+                Size = UDim2.fromOffset(8, 50)
             }):Play()
         end
     end)

@@ -180,12 +180,25 @@ end
 function Notification:Dismiss(notif)
     if not notif or not notif.Parent then return end
     
-    -- Fade and slide out animation
+    -- Slide out animation
     local tween = TweenService:Create(notif, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-        Position = UDim2.new(0, 0, 1, 50),
-        GroupTransparency = 1
+        Position = UDim2.new(0, 0, 1, 50)
     })
     tween:Play()
+    
+    -- Fade out all children
+    for _, child in pairs(notif:GetDescendants()) do
+        if child:IsA("GuiObject") then
+            TweenService:Create(child, TweenInfo.new(0.4), {
+                BackgroundTransparency = 1
+            }):Play()
+            if child:IsA("TextLabel") or child:IsA("TextButton") then
+                TweenService:Create(child, TweenInfo.new(0.4), {
+                    TextTransparency = 1
+                }):Play()
+            end
+        end
+    end
     
     tween.Completed:Connect(function()
         notif:Destroy()
