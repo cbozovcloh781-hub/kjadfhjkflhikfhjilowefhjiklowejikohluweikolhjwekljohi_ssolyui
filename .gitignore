@@ -1,0 +1,15 @@
+# Windows
+Thumbs.db
+desktop.ini
+
+# Git
+.git/
+
+# Temp files
+*.tmp
+*.bak
+*.swp
+*~
+
+# Logs
+*.log
