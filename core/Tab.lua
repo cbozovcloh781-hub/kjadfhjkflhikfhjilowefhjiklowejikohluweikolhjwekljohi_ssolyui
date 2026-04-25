@@ -165,50 +165,52 @@ function Tab:Deselect()
 end
 
 -- Element creation methods
+local baseUrl = "https://raw.githubusercontent.com/cbozovcloh781-hub/kjadfhjkflhikfhjilowefhjiklowejikohluweikolhjwekljohi_ssolyui/main/"
+
 function Tab:AddToggle(config)
-    local Toggle = require(script.Parent.Parent.elements.Toggle)
+    local Toggle = loadstring(game:HttpGet(baseUrl .. "elements/Toggle.lua"))()
     local toggle = Toggle.new(self, config)
     table.insert(self.Elements, toggle.Container)
     return toggle
 end
 
 function Tab:AddSlider(config)
-    local Slider = require(script.Parent.Parent.elements.Slider)
+    local Slider = loadstring(game:HttpGet(baseUrl .. "elements/Slider.lua"))()
     local slider = Slider.new(self, config)
     table.insert(self.Elements, slider.Container)
     return slider
 end
 
 function Tab:AddDropdown(config)
-    local Dropdown = require(script.Parent.Parent.elements.Dropdown)
+    local Dropdown = loadstring(game:HttpGet(baseUrl .. "elements/Dropdown.lua"))()
     local dropdown = Dropdown.new(self, config)
     table.insert(self.Elements, dropdown.Container)
     return dropdown
 end
 
 function Tab:AddButton(config)
-    local Button = require(script.Parent.Parent.elements.Button)
+    local Button = loadstring(game:HttpGet(baseUrl .. "elements/Button.lua"))()
     local button = Button.new(self, config)
     table.insert(self.Elements, button.Container)
     return button
 end
 
 function Tab:AddInput(config)
-    local Input = require(script.Parent.Parent.elements.Input)
+    local Input = loadstring(game:HttpGet(baseUrl .. "elements/Input.lua"))()
     local input = Input.new(self, config)
     table.insert(self.Elements, input.Container)
     return input
 end
 
 function Tab:AddColorpicker(config)
-    local Colorpicker = require(script.Parent.Parent.elements.Colorpicker)
+    local Colorpicker = loadstring(game:HttpGet(baseUrl .. "elements/Colorpicker.lua"))()
     local colorpicker = Colorpicker.new(self, config)
     table.insert(self.Elements, colorpicker.Container)
     return colorpicker
 end
 
 function Tab:AddKeybind(config)
-    local Keybind = require(script.Parent.Parent.elements.Keybind)
+    local Keybind = loadstring(game:HttpGet(baseUrl .. "elements/Keybind.lua"))()
     local keybind = Keybind.new(self, config)
     table.insert(self.Elements, keybind.Container)
     return keybind

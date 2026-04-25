@@ -42,10 +42,8 @@ function Window.new(config)
     self:SetupResizing()
     self:SetupMinimize()
     
-    -- Initialize notification system
-    local Notification = require(script.Parent.utils.Notification)
-    Notification:Init(self.ScreenGui)
-    self.Notification = Notification
+    -- Initialize notification system (will be loaded separately)
+    self.Notification = nil
     
     return self
 end
@@ -230,16 +228,6 @@ function Window:CreateGUI()
     MinIndLabel.TextSize = 14
     MinIndLabel.Font = Enum.Font.GothamBold
     MinIndLabel.Parent = self.MinimizedIndicator
-    
-    local MinIndButton = Instance.new("TextButton")
-    MinIndButton.Size = UDim2.new(1, 0, 1, 0)
-    MinIndButton.BackgroundTransparency = 1
-    MinIndButton.Text = ""
-    MinIndButton.Parent = self.MinimizedIndicator
-    
-    MinIndButton.MouseButton1Click:Connect(function()
-        self:ToggleMinimize()
-    end)
 end
 
 function Window:SetupDragging()
@@ -249,6 +237,7 @@ function Window:SetupDragging()
     local dragStart = nil
     local startPos = nil
     
+    -- Main window dragging
     self.TitleBar.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             dragging = true
@@ -276,6 +265,47 @@ function Window:SetupDragging()
     UserInputService.InputEnded:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             dragging = false
+        end
+    end)
+    
+    -- Minimized indicator dragging
+    local minDragging = false
+    local minDragStart = nil
+    local minStartPos = nil
+    local lastClickTime = 0
+    
+    self.MinimizedIndicator.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            -- Double click detection
+            local currentTime = tick()
+            if currentTime - lastClickTime < 0.3 then
+                self:ToggleMinimize()
+                lastClickTime = 0
+                return
+            end
+            lastClickTime = currentTime
+            
+            minDragging = true
+            minDragStart = input.Position
+            minStartPos = self.MinimizedIndicator.Position
+        end
+    end)
+    
+    UserInputService.InputChanged:Connect(function(input)
+        if minDragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+            local delta = input.Position - minDragStart
+            self.MinimizedIndicator.Position = UDim2.new(
+                minStartPos.X.Scale,
+                minStartPos.X.Offset + delta.X,
+                minStartPos.Y.Scale,
+                minStartPos.Y.Offset + delta.Y
+            )
+        end
+    end)
+    
+    UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            minDragging = false
         end
     end)
 end
@@ -359,6 +389,11 @@ function Window:ToggleMinimize()
     self.Minimized = not self.Minimized
     
     if self.Minimized then
+        -- Hide blur
+        if self.Blur then
+            TweenService:Create(self.Blur, TweenInfo.new(0.3), {Size = 0}):Play()
+        end
+        
         -- Minimize animation
         local tween = TweenService:Create(self.Container, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
             Size = UDim2.fromOffset(0, 0),
@@ -376,6 +411,11 @@ function Window:ToggleMinimize()
             }):Play()
         end)
     else
+        -- Show blur
+        if self.Blur then
+            TweenService:Create(self.Blur, TweenInfo.new(0.3), {Size = 10}):Play()
+        end
+        
         -- Restore animation
         self.MinimizedIndicator.Visible = false
         self.Container.Visible = true
@@ -388,7 +428,8 @@ function Window:ToggleMinimize()
 end
 
 function Window:AddTab(config)
-    local Tab = require(script.Parent.Tab)
+    local baseUrl = "https://raw.githubusercontent.com/cbozovcloh781-hub/kjadfhjkflhikfhjilowefhjiklowejikohluweikolhjwekljohi_ssolyui/main/"
+    local Tab = loadstring(game:HttpGet(baseUrl .. "core/Tab.lua"))()
     local tab = Tab.new(self, config)
     table.insert(self.Tabs, tab)
     
@@ -424,9 +465,14 @@ function Window:SelectTab(tab)
 end
 
 function Window:Notify(config)
-    if self.Notification then
-        self.Notification:Show(config)
+    -- Lazy load notification system
+    if not self.Notification then
+        local baseUrl = "https://raw.githubusercontent.com/cbozovcloh781-hub/kjadfhjkflhikfhjilowefhjiklowejikohluweikolhjwekljohi_ssolyui/main/"
+        self.Notification = loadstring(game:HttpGet(baseUrl .. "utils/Notification.lua"))()
+        self.Notification:Init(self.ScreenGui)
     end
+    
+    self.Notification:Show(config)
 end
 
 function Window:Destroy()
