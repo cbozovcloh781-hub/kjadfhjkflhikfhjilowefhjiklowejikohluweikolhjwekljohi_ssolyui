@@ -60,7 +60,7 @@ function Notification:Show(config)
     Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
     Stroke.Parent = notif
     
-    -- Type indicator (colored bar) - inside left edge with proper padding
+    -- Type indicator (colored bar) - full height from edge
     local typeColors = {
         Info = Color3.fromRGB(74, 158, 255),
         Success = Color3.fromRGB(80, 255, 120),
@@ -70,15 +70,15 @@ function Notification:Show(config)
     
     local indicator = Instance.new("Frame")
     indicator.Name = "Indicator"
-    indicator.Size = UDim2.new(0, 4, 1, -16)
-    indicator.Position = UDim2.fromOffset(8, 8)
+    indicator.Size = UDim2.new(0, 4, 1, 0)
+    indicator.Position = UDim2.fromOffset(0, 0)
     indicator.BackgroundColor3 = typeColors[type] or typeColors.Info
     indicator.BorderSizePixel = 0
     indicator.ZIndex = 2
     indicator.Parent = notif
     
     local IndCorner = Instance.new("UICorner")
-    IndCorner.CornerRadius = UDim.new(1, 0)
+    IndCorner.CornerRadius = UDim.new(0, 12)
     IndCorner.Parent = indicator
     
     -- Icon
@@ -143,27 +143,34 @@ function Notification:Show(config)
     
     local totalHeight = 50 + contentHeight
     
-    -- Progress bar (inside bottom edge with proper padding)
+    -- Progress bar (full width at bottom edge)
     local progress = Instance.new("Frame")
     progress.Name = "Progress"
-    progress.Size = UDim2.new(1, -16, 0, 4)
-    progress.Position = UDim2.new(0, 8, 1, -12)
+    progress.Size = UDim2.new(1, 0, 0, 4)
+    progress.Position = UDim2.new(0, 0, 1, -4)
     progress.BackgroundColor3 = typeColors[type] or typeColors.Info
     progress.BorderSizePixel = 0
     progress.ZIndex = 2
     progress.Parent = notif
     
     local ProgressCorner = Instance.new("UICorner")
-    ProgressCorner.CornerRadius = UDim.new(1, 0)
+    ProgressCorner.CornerRadius = UDim.new(0, 12)
     ProgressCorner.Parent = progress
     
-    -- Slide in animation from right with bounce
+    -- Slide in animation from right
     notif.Size = UDim2.new(1, 0, 0, totalHeight)
     notif.Position = UDim2.new(0, 350, 0, 0)
+    notif.BackgroundTransparency = 1
     
-    TweenService:Create(notif, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+    local slideTween = TweenService:Create(notif, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
         Position = UDim2.new(0, 0, 0, 0)
-    }):Play()
+    })
+    slideTween:Play()
+    
+    local fadeTween = TweenService:Create(notif, TweenInfo.new(0.3), {
+        BackgroundTransparency = 0
+    })
+    fadeTween:Play()
     
     -- Progress bar animation
     TweenService:Create(progress, TweenInfo.new(duration, Enum.EasingStyle.Linear), {

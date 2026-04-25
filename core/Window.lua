@@ -302,7 +302,7 @@ function Window:CreateGUI()
     for i = 0, 6 do
         local angle = (i / 6) * 90
         local rad = math.rad(angle)
-        local radius = 12 -- Radius to match 8px corner
+        local radius = 12
         
         local bar = Instance.new("Frame")
         bar.Size = UDim2.fromOffset(2, 6)
@@ -323,6 +323,40 @@ function Window:CreateGUI()
         
         table.insert(self.ResizeBars, bar)
     end
+    
+    -- Vertical resize handle (bottom center)
+    self.ResizeHandleV = Instance.new("Frame")
+    self.ResizeHandleV.Name = "ResizeHandleV"
+    self.ResizeHandleV.Size = UDim2.fromOffset(40, 6)
+    self.ResizeHandleV.Position = UDim2.new(0, 0, 0, 0)
+    self.ResizeHandleV.AnchorPoint = Vector2.new(0.5, 0.5)
+    self.ResizeHandleV.BackgroundColor3 = Color3.fromRGB(74, 158, 255)
+    self.ResizeHandleV.BackgroundTransparency = 0.3
+    self.ResizeHandleV.BorderSizePixel = 0
+    self.ResizeHandleV.ZIndex = 5
+    self.ResizeHandleV.Visible = true
+    self.ResizeHandleV.Parent = self.ScreenGui
+    
+    local ResizeVCorner = Instance.new("UICorner")
+    ResizeVCorner.CornerRadius = UDim.new(1, 0)
+    ResizeVCorner.Parent = self.ResizeHandleV
+    
+    -- Horizontal resize handle (right center)
+    self.ResizeHandleH = Instance.new("Frame")
+    self.ResizeHandleH.Name = "ResizeHandleH"
+    self.ResizeHandleH.Size = UDim2.fromOffset(6, 40)
+    self.ResizeHandleH.Position = UDim2.new(0, 0, 0, 0)
+    self.ResizeHandleH.AnchorPoint = Vector2.new(0.5, 0.5)
+    self.ResizeHandleH.BackgroundColor3 = Color3.fromRGB(74, 158, 255)
+    self.ResizeHandleH.BackgroundTransparency = 0.3
+    self.ResizeHandleH.BorderSizePixel = 0
+    self.ResizeHandleH.ZIndex = 5
+    self.ResizeHandleH.Visible = true
+    self.ResizeHandleH.Parent = self.ScreenGui
+    
+    local ResizeHCorner = Instance.new("UICorner")
+    ResizeHCorner.CornerRadius = UDim.new(1, 0)
+    ResizeHCorner.Parent = self.ResizeHandleH
     
     -- Minimized indicator (hidden by default) - small icon that follows window
     self.MinimizedIndicator = Instance.new("Frame")
@@ -448,31 +482,72 @@ function Window:SetupResizing()
     local resizing = false
     local resizeStart = nil
     local startSize = nil
+    local resizeMode = nil
     
-    -- Update resize handle position
-    local function updateResizePosition()
+    -- Update resize handle positions
+    local function updateResizePositions()
         local containerPos = self.Container.AbsolutePosition
         local containerSize = self.Container.AbsoluteSize
+        
+        -- Corner handle
         self.ResizeHandle.Position = UDim2.fromOffset(
             containerPos.X + containerSize.X - 20,
             containerPos.Y + containerSize.Y - 20
+        )
+        
+        -- Vertical handle (bottom center)
+        self.ResizeHandleV.Position = UDim2.fromOffset(
+            containerPos.X + containerSize.X / 2,
+            containerPos.Y + containerSize.Y + 3
+        )
+        
+        -- Horizontal handle (right center)
+        self.ResizeHandleH.Position = UDim2.fromOffset(
+            containerPos.X + containerSize.X + 3,
+            containerPos.Y + containerSize.Y / 2
         )
     end
     
     -- Hide initially, show after small delay
     self.ResizeHandle.Visible = false
+    self.ResizeHandleV.Visible = false
+    self.ResizeHandleH.Visible = false
     task.delay(0.1, function()
         self.ResizeHandle.Visible = true
-        updateResizePosition()
+        self.ResizeHandleV.Visible = true
+        self.ResizeHandleH.Visible = true
+        updateResizePositions()
     end)
     
-    self.Container:GetPropertyChangedSignal("AbsolutePosition"):Connect(updateResizePosition)
-    self.Container:GetPropertyChangedSignal("AbsoluteSize"):Connect(updateResizePosition)
-    updateResizePosition()
+    self.Container:GetPropertyChangedSignal("AbsolutePosition"):Connect(updateResizePositions)
+    self.Container:GetPropertyChangedSignal("AbsoluteSize"):Connect(updateResizePositions)
+    updateResizePositions()
     
+    -- Corner resize (both directions)
     self.ResizeHandle.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             resizing = true
+            resizeMode = "both"
+            resizeStart = input.Position
+            startSize = self.Container.AbsoluteSize
+        end
+    end)
+    
+    -- Vertical resize (height only)
+    self.ResizeHandleV.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            resizing = true
+            resizeMode = "vertical"
+            resizeStart = input.Position
+            startSize = self.Container.AbsoluteSize
+        end
+    end)
+    
+    -- Horizontal resize (width only)
+    self.ResizeHandleH.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            resizing = true
+            resizeMode = "horizontal"
             resizeStart = input.Position
             startSize = self.Container.AbsoluteSize
         end
@@ -481,21 +556,31 @@ function Window:SetupResizing()
     UserInputService.InputChanged:Connect(function(input)
         if resizing and input.UserInputType == Enum.UserInputType.MouseMovement then
             local delta = input.Position - resizeStart
-            local newWidth = math.clamp(startSize.X + delta.X, self.Config.MinSize.X, self.Config.MaxSize.X)
-            local newHeight = math.clamp(startSize.Y + delta.Y, self.Config.MinSize.Y, self.Config.MaxSize.Y)
+            local newWidth = startSize.X
+            local newHeight = startSize.Y
+            
+            if resizeMode == "both" then
+                newWidth = math.clamp(startSize.X + delta.X, self.Config.MinSize.X, self.Config.MaxSize.X)
+                newHeight = math.clamp(startSize.Y + delta.Y, self.Config.MinSize.Y, self.Config.MaxSize.Y)
+            elseif resizeMode == "vertical" then
+                newHeight = math.clamp(startSize.Y + delta.Y, self.Config.MinSize.Y, self.Config.MaxSize.Y)
+            elseif resizeMode == "horizontal" then
+                newWidth = math.clamp(startSize.X + delta.X, self.Config.MinSize.X, self.Config.MaxSize.X)
+            end
             
             self.Container.Size = UDim2.fromOffset(newWidth, newHeight)
-            updateResizePosition()
+            updateResizePositions()
         end
     end)
     
     UserInputService.InputEnded:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             resizing = false
+            resizeMode = nil
         end
     end)
     
-    -- Hover effect
+    -- Hover effects
     self.ResizeHandle.MouseEnter:Connect(function()
         for _, bar in ipairs(self.ResizeBars) do
             TweenService:Create(bar, TweenInfo.new(0.2), {
@@ -511,6 +596,34 @@ function Window:SetupResizing()
                     BackgroundTransparency = 0.3
                 }):Play()
             end
+        end
+    end)
+    
+    self.ResizeHandleV.MouseEnter:Connect(function()
+        TweenService:Create(self.ResizeHandleV, TweenInfo.new(0.2), {
+            BackgroundTransparency = 0
+        }):Play()
+    end)
+    
+    self.ResizeHandleV.MouseLeave:Connect(function()
+        if not resizing then
+            TweenService:Create(self.ResizeHandleV, TweenInfo.new(0.2), {
+                BackgroundTransparency = 0.3
+            }):Play()
+        end
+    end)
+    
+    self.ResizeHandleH.MouseEnter:Connect(function()
+        TweenService:Create(self.ResizeHandleH, TweenInfo.new(0.2), {
+            BackgroundTransparency = 0
+        }):Play()
+    end)
+    
+    self.ResizeHandleH.MouseLeave:Connect(function()
+        if not resizing then
+            TweenService:Create(self.ResizeHandleH, TweenInfo.new(0.2), {
+                BackgroundTransparency = 0.3
+            }):Play()
         end
     end)
 end
@@ -551,8 +664,10 @@ function Window:ToggleMinimize()
             TweenService:Create(self.Blur, TweenInfo.new(0.3), {Size = 0}):Play()
         end
         
-        -- Hide resize handle
+        -- Hide resize handles
         self.ResizeHandle.Visible = false
+        self.ResizeHandleV.Visible = false
+        self.ResizeHandleH.Visible = false
         
         -- Hide profile
         self.ProfileContainer.Visible = false
@@ -586,8 +701,10 @@ function Window:ToggleMinimize()
             TweenService:Create(self.Blur, TweenInfo.new(0.3), {Size = 10}):Play()
         end
         
-        -- Show resize handle
+        -- Show resize handles
         self.ResizeHandle.Visible = true
+        self.ResizeHandleV.Visible = true
+        self.ResizeHandleH.Visible = true
         
         -- Show profile
         self.ProfileContainer.Visible = true

@@ -37,48 +37,41 @@ function Tab:CreateButton()
     Corner.CornerRadius = UDim.new(0, 8)
     Corner.Parent = self.Button
     
-    -- Icon (using Lucide-style minimal icons)
-    local iconMap = {
+    -- Icon (Roblox Studio style with ImageLabel)
+    local iconIds = {
         -- Movement icons
-        ["⚡"] = "▲",  -- Arrow up
-        ["movement"] = "▲",
-        ["fly"] = "▲",
+        ["⚡"] = "rbxassetid://7733992901",
+        ["movement"] = "rbxassetid://7733992901",
+        ["fly"] = "rbxassetid://7733992901",
         
         -- Vision/ESP icons  
-        ["👁️"] = "◉",  -- Circle with dot
-        ["esp"] = "◉",
-        ["eye"] = "◉",
+        ["👁️"] = "rbxassetid://7733955511",
+        ["👁"] = "rbxassetid://7733955511",
+        ["esp"] = "rbxassetid://7733955511",
+        ["eye"] = "rbxassetid://7733955511",
         
         -- Autofarm icons
-        ["🤖"] = "▣",  -- Square with lines
-        ["autofarm"] = "▣",
-        ["farm"] = "▣",
+        ["🤖"] = "rbxassetid://7733920644",
+        ["🚜"] = "rbxassetid://7733920644",
+        ["autofarm"] = "rbxassetid://7733920644",
+        ["farm"] = "rbxassetid://7733920644",
         
         -- Settings icons
-        ["⚙️"] = "◎",  -- Gear symbol
-        ["settings"] = "◎",
-        ["config"] = "◎",
-        
-        -- Teleport icons
-        ["teleport"] = "◆",  -- Diamond
-        ["tp"] = "◆",
-        
-        -- Combat icons
-        ["combat"] = "◇",  -- Diamond outline
-        ["fight"] = "◇",
+        ["⚙️"] = "rbxassetid://7733955511",
+        ["⚙"] = "rbxassetid://7733955511",
+        ["settings"] = "rbxassetid://7733955511",
+        ["config"] = "rbxassetid://7733955511",
     }
     
-    local displayIcon = iconMap[self.Icon:lower()] or iconMap[self.Title:lower()] or self.Icon
+    local iconId = iconIds[self.Icon] or iconIds[self.Title:lower()] or "rbxassetid://7733964126"
     
-    self.IconLabel = Instance.new("TextLabel")
+    self.IconLabel = Instance.new("ImageLabel")
     self.IconLabel.Name = "Icon"
-    self.IconLabel.Size = UDim2.fromOffset(20, 20)
-    self.IconLabel.Position = UDim2.fromOffset(12, 10)
+    self.IconLabel.Size = UDim2.fromOffset(18, 18)
+    self.IconLabel.Position = UDim2.fromOffset(12, 11)
     self.IconLabel.BackgroundTransparency = 1
-    self.IconLabel.Text = displayIcon
-    self.IconLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
-    self.IconLabel.TextSize = 16
-    self.IconLabel.Font = Enum.Font.GothamBold
+    self.IconLabel.Image = iconId
+    self.IconLabel.ImageColor3 = Color3.fromRGB(150, 150, 150)
     self.IconLabel.Parent = self.Button
     
     -- Title
@@ -123,7 +116,7 @@ function Tab:CreateButton()
                 TextColor3 = Color3.fromRGB(200, 200, 200)
             }):Play()
             TweenService:Create(self.IconLabel, TweenInfo.new(0.2), {
-                TextColor3 = Color3.fromRGB(200, 200, 200)
+                ImageColor3 = Color3.fromRGB(200, 200, 200)
             }):Play()
         end
     end)
@@ -137,7 +130,7 @@ function Tab:CreateButton()
                 TextColor3 = Color3.fromRGB(150, 150, 150)
             }):Play()
             TweenService:Create(self.IconLabel, TweenInfo.new(0.2), {
-                TextColor3 = Color3.fromRGB(150, 150, 150)
+                ImageColor3 = Color3.fromRGB(150, 150, 150)
             }):Play()
         end
     end)
@@ -157,7 +150,7 @@ function Tab:Select()
     }):Play()
     
     TweenService:Create(self.IconLabel, TweenInfo.new(0.3), {
-        TextColor3 = Color3.fromRGB(255, 255, 255)
+        ImageColor3 = Color3.fromRGB(255, 255, 255)
     }):Play()
     
     TweenService:Create(self.Indicator, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
@@ -228,7 +221,7 @@ function Tab:Deselect()
     }):Play()
     
     TweenService:Create(self.IconLabel, TweenInfo.new(0.3), {
-        TextColor3 = Color3.fromRGB(150, 150, 150)
+        ImageColor3 = Color3.fromRGB(150, 150, 150)
     }):Play()
     
     TweenService:Create(self.Indicator, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
