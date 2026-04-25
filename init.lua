@@ -3,20 +3,21 @@
 -- Created for YBA Enhanced Script
 
 local Ssoly = {}
+local baseUrl = "https://raw.githubusercontent.com/cbozovcloh781-hub/kjadfhjkflhikfhjilowefhjiklowejikohluweikolhjwekljohi_ssolyui/main/"
 
 -- Load core modules
-Ssoly.Window = require(script.core.Window)
-Ssoly.Tab = require(script.core.Tab)
+Ssoly.Window = loadstring(game:HttpGet(baseUrl .. "core/Window.lua"))()
+Ssoly.Tab = loadstring(game:HttpGet(baseUrl .. "core/Tab.lua"))()
 
 -- Load elements
 Ssoly.Elements = {
-    Toggle = require(script.elements.Toggle),
-    Slider = require(script.elements.Slider),
-    Dropdown = require(script.elements.Dropdown),
-    Button = require(script.elements.Button),
-    Input = require(script.elements.Input),
-    Colorpicker = require(script.elements.Colorpicker),
-    Keybind = require(script.elements.Keybind),
+    Toggle = loadstring(game:HttpGet(baseUrl .. "elements/Toggle.lua"))(),
+    Slider = loadstring(game:HttpGet(baseUrl .. "elements/Slider.lua"))(),
+    Dropdown = loadstring(game:HttpGet(baseUrl .. "elements/Dropdown.lua"))(),
+    Button = loadstring(game:HttpGet(baseUrl .. "elements/Button.lua"))(),
+    Input = loadstring(game:HttpGet(baseUrl .. "elements/Input.lua"))(),
+    Colorpicker = loadstring(game:HttpGet(baseUrl .. "elements/Colorpicker.lua"))(),
+    Keybind = loadstring(game:HttpGet(baseUrl .. "elements/Keybind.lua"))(),
 }
 
 -- Create window
