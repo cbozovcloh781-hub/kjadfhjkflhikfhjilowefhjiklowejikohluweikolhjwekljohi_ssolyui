@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global
 -- Ssoly UI Library - Dropdown Element
 -- Single and multi-select dropdown with search
 

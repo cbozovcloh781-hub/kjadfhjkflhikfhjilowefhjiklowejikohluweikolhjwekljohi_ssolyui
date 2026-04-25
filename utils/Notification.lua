@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global
 -- Ssoly UI Library - Notification System
 -- Toast-style notifications with animations
 

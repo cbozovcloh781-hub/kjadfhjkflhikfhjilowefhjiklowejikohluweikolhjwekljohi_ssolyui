@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global
 -- Ssoly UI Library - Test/Demo Script
 -- Run this to see the UI in action
 

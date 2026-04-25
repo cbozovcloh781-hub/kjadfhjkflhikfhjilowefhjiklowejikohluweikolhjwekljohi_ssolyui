@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global
 -- Ssoly UI Library - Window Class
 -- Handles main window creation, dragging, resizing, and animations
 

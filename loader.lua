@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global
 -- Ssoly UI - Quick Loader
 -- Paste this in your executor to test the UI
 

@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global
 -- Ssoly UI Library v1.0
 -- Modern minimalist UI library for Roblox exploits
 -- Created for YBA Enhanced Script

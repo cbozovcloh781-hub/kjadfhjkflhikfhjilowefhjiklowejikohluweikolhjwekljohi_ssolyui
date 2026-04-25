@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global
 -- Ssoly UI Library - Toggle Element
 -- On/Off switch with smooth animations
 

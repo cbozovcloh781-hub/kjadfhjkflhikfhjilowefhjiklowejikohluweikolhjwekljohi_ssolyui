@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global
 -- Ssoly UI Library - Tab Class
 -- Handles individual tabs and their content
 

@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global, undefined-field
 -- Ssoly UI Library - Slider Element
 -- Slider with manual input and smooth animations
 

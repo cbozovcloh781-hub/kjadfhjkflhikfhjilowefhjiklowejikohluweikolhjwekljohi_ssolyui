@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global, undefined-field
 -- Ssoly UI Library - Colorpicker Element
 -- Advanced color picker with HSV palette
 
