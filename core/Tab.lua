@@ -45,7 +45,7 @@ function Tab:CreateButton()
     self.IconLabel.Text = self.Icon
     self.IconLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
     self.IconLabel.TextSize = 18
-    self.IconLabel.Font = Enum.Font.GothamBold
+    self.IconLabel.Font = Enum.Font.SourceSansBold
     self.IconLabel.Parent = self.Button
     
     -- Title
@@ -57,7 +57,7 @@ function Tab:CreateButton()
     self.TitleLabel.Text = self.Title
     self.TitleLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
     self.TitleLabel.TextSize = 14
-    self.TitleLabel.Font = Enum.Font.GothamBold
+    self.TitleLabel.Font = Enum.Font.SourceSansBold
     self.TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
     self.TitleLabel.Parent = self.Button
     
@@ -131,9 +131,16 @@ function Tab:Select()
         Size = UDim2.new(0, 3, 0, 30)
     }):Play()
     
-    -- Show elements
-    for _, element in pairs(self.Elements) do
+    -- Show elements with fade-in animation
+    for i, element in pairs(self.Elements) do
         element.Visible = true
+        element.GroupTransparency = 1
+        
+        task.delay(i * 0.03, function()
+            TweenService:Create(element, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                GroupTransparency = 0
+            }):Play()
+        end)
     end
 end
 

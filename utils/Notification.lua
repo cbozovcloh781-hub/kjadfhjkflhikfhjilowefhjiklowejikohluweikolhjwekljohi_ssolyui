@@ -11,17 +11,19 @@ Notification.Active = {}
 function Notification:Init(screenGui)
     if self.Container then return end
     
-    -- Notification container (top-right)
+    -- Notification container (bottom-right)
     self.Container = Instance.new("Frame")
     self.Container.Name = "Notifications"
-    self.Container.Size = UDim2.fromOffset(300, 0)
-    self.Container.Position = UDim2.new(1, -310, 0, 10)
+    self.Container.Size = UDim2.fromOffset(320, 0)
+    self.Container.Position = UDim2.new(1, -330, 1, -10)
+    self.Container.AnchorPoint = Vector2.new(0, 1)
     self.Container.BackgroundTransparency = 1
     self.Container.Parent = screenGui
     
     local Layout = Instance.new("UIListLayout")
     Layout.SortOrder = Enum.SortOrder.LayoutOrder
     Layout.Padding = UDim.new(0, 8)
+    Layout.VerticalAlignment = Enum.VerticalAlignment.Bottom
     Layout.Parent = self.Container
     
     -- Auto-resize container
@@ -49,7 +51,7 @@ function Notification:Show(config)
     notif.Parent = self.Container
     
     local Corner = Instance.new("UICorner")
-    Corner.CornerRadius = UDim.new(0, 8)
+    Corner.CornerRadius = UDim.new(0, 10)
     Corner.Parent = notif
     
     -- Type indicator (colored bar)
@@ -68,7 +70,7 @@ function Notification:Show(config)
     indicator.Parent = notif
     
     local IndCorner = Instance.new("UICorner")
-    IndCorner.CornerRadius = UDim.new(0, 8)
+    IndCorner.CornerRadius = UDim.new(0, 10)
     IndCorner.Parent = indicator
     
     -- Icon
@@ -87,7 +89,7 @@ function Notification:Show(config)
     icon.Text = typeIcons[type] or typeIcons.Info
     icon.TextColor3 = Color3.fromRGB(255, 255, 255)
     icon.TextSize = 18
-    icon.Font = Enum.Font.GothamBold
+    icon.Font = Enum.Font.SourceSansBold
     icon.Parent = notif
     
     -- Title
@@ -99,7 +101,7 @@ function Notification:Show(config)
     titleLabel.Text = title
     titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
     titleLabel.TextSize = 14
-    titleLabel.Font = Enum.Font.GothamBold
+    titleLabel.Font = Enum.Font.SourceSansBold
     titleLabel.TextXAlignment = Enum.TextXAlignment.Left
     titleLabel.TextTruncate = Enum.TextTruncate.AtEnd
     titleLabel.Parent = notif
@@ -113,7 +115,7 @@ function Notification:Show(config)
     contentLabel.Text = content
     contentLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
     contentLabel.TextSize = 12
-    contentLabel.Font = Enum.Font.Gotham
+    contentLabel.Font = Enum.Font.SourceSans
     contentLabel.TextXAlignment = Enum.TextXAlignment.Left
     contentLabel.TextYAlignment = Enum.TextYAlignment.Top
     contentLabel.TextWrapped = true
@@ -142,11 +144,11 @@ function Notification:Show(config)
     progress.BorderSizePixel = 0
     progress.Parent = notif
     
-    -- Slide in animation
+    -- Slide in animation from bottom
     notif.Size = UDim2.new(1, 0, 0, totalHeight)
-    notif.Position = UDim2.new(1, 50, 0, 0)
+    notif.Position = UDim2.new(0, 0, 1, 50)
     
-    TweenService:Create(notif, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+    TweenService:Create(notif, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
         Position = UDim2.new(0, 0, 0, 0)
     }):Play()
     
@@ -177,9 +179,10 @@ end
 function Notification:Dismiss(notif)
     if not notif or not notif.Parent then return end
     
-    -- Slide out animation
-    local tween = TweenService:Create(notif, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
-        Position = UDim2.new(1, 50, 0, 0)
+    -- Fade and slide out animation
+    local tween = TweenService:Create(notif, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+        Position = UDim2.new(0, 0, 1, 50),
+        GroupTransparency = 1
     })
     tween:Play()
     

@@ -49,7 +49,7 @@ function Colorpicker:CreateElement()
     self.TitleLabel.Text = self.Title
     self.TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
     self.TitleLabel.TextSize = 14
-    self.TitleLabel.Font = Enum.Font.GothamBold
+    self.TitleLabel.Font = Enum.Font.SourceSans
     self.TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
     self.TitleLabel.Parent = self.Container
     
@@ -84,7 +84,7 @@ function Colorpicker:CreateElement()
         self.DescLabel.Text = self.Description
         self.DescLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
         self.DescLabel.TextSize = 11
-        self.DescLabel.Font = Enum.Font.Gotham
+        self.DescLabel.Font = Enum.Font.SourceSans
         self.DescLabel.TextXAlignment = Enum.TextXAlignment.Left
         self.DescLabel.TextWrapped = true
         self.DescLabel.Parent = self.Container
@@ -145,21 +145,39 @@ function Colorpicker:CreateElement()
     CursorStroke.Thickness = 2
     CursorStroke.Parent = self.PaletteCursor
     
-    -- Hue slider
-    self.HueSlider = Instance.new("ImageButton")
+    -- Hue slider (rainbow gradient)
+    self.HueSlider = Instance.new("Frame")
     self.HueSlider.Name = "HueSlider"
     self.HueSlider.Size = UDim2.fromOffset(30, 150)
     self.HueSlider.Position = UDim2.new(1, -50, 0, 10)
     self.HueSlider.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     self.HueSlider.BorderSizePixel = 0
-    self.HueSlider.Image = "rbxassetid://3641079629"
-    self.HueSlider.ImageColor3 = Color3.fromRGB(255, 255, 255)
-    self.HueSlider.AutoButtonColor = false
     self.HueSlider.Parent = self.PickerContainer
     
     local HueCorner = Instance.new("UICorner")
     HueCorner.CornerRadius = UDim.new(0, 6)
     HueCorner.Parent = self.HueSlider
+    
+    -- Create rainbow gradient
+    local gradient = Instance.new("UIGradient")
+    gradient.Rotation = 90
+    gradient.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
+        ColorSequenceKeypoint.new(0.17, Color3.fromRGB(255, 255, 0)),
+        ColorSequenceKeypoint.new(0.33, Color3.fromRGB(0, 255, 0)),
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 255, 255)),
+        ColorSequenceKeypoint.new(0.67, Color3.fromRGB(0, 0, 255)),
+        ColorSequenceKeypoint.new(0.83, Color3.fromRGB(255, 0, 255)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 0))
+    })
+    gradient.Parent = self.HueSlider
+    
+    -- Make it clickable
+    local HueButton = Instance.new("TextButton")
+    HueButton.Size = UDim2.new(1, 0, 1, 0)
+    HueButton.BackgroundTransparency = 1
+    HueButton.Text = ""
+    HueButton.Parent = self.HueSlider
     
     -- Hue cursor
     self.HueCursor = Instance.new("Frame")
@@ -203,7 +221,7 @@ function Colorpicker:CreateElement()
         inputLabel.Text = label
         inputLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
         inputLabel.TextSize = 12
-        inputLabel.Font = Enum.Font.GothamBold
+        inputLabel.Font = Enum.Font.SourceSansBold
         inputLabel.Parent = inputFrame
         
         local inputBox = Instance.new("TextBox")
@@ -213,7 +231,7 @@ function Colorpicker:CreateElement()
         inputBox.Text = "255"
         inputBox.TextColor3 = Color3.fromRGB(255, 255, 255)
         inputBox.TextSize = 12
-        inputBox.Font = Enum.Font.Gotham
+        inputBox.Font = Enum.Font.SourceSans
         inputBox.ClearTextOnFocus = false
         inputBox.Parent = inputFrame
         
@@ -265,7 +283,7 @@ function Colorpicker:CreateElement()
     -- Hue dragging
     local hueDragging = false
     
-    self.HueSlider.InputBegan:Connect(function(input)
+    HueButton.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             hueDragging = true
             self:UpdateHue(input.Position.Y)

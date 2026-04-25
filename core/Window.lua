@@ -49,18 +49,33 @@ function Window.new(config)
 end
 
 function Window:CreateGUI()
+    -- Remove old UI if exists
+    local coreGui = game:GetService("CoreGui")
+    local oldUI = coreGui:FindFirstChild("SsolyUI")
+    if oldUI then
+        oldUI:Destroy()
+    end
+    
+    -- Remove old blur if exists
+    local lighting = game:GetService("Lighting")
+    local oldBlur = lighting:FindFirstChild("SsolyBlur")
+    if oldBlur then
+        oldBlur:Destroy()
+    end
+    
     -- Main ScreenGui
     self.ScreenGui = Instance.new("ScreenGui")
     self.ScreenGui.Name = "SsolyUI"
     self.ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     self.ScreenGui.ResetOnSpawn = false
-    self.ScreenGui.Parent = game:GetService("CoreGui")
+    self.ScreenGui.Parent = coreGui
     
     -- Blur effect
     if self.Config.BlurEnabled then
         self.Blur = Instance.new("BlurEffect")
+        self.Blur.Name = "SsolyBlur"
         self.Blur.Size = 10
-        self.Blur.Parent = game:GetService("Lighting")
+        self.Blur.Parent = lighting
     end
     
     -- Main container (rounded)
@@ -108,7 +123,7 @@ function Window:CreateGUI()
     self.TitleLabel.Text = self.Config.Title
     self.TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
     self.TitleLabel.TextSize = 16
-    self.TitleLabel.Font = Enum.Font.GothamBold
+    self.TitleLabel.Font = Enum.Font.SourceSansBold
     self.TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
     self.TitleLabel.Parent = self.TitleBar
     
@@ -123,7 +138,7 @@ function Window:CreateGUI()
     self.MinimizeButton.Text = "−"
     self.MinimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     self.MinimizeButton.TextSize = 20
-    self.MinimizeButton.Font = Enum.Font.GothamBold
+    self.MinimizeButton.Font = Enum.Font.SourceSansBold
     self.MinimizeButton.Parent = self.TitleBar
     
     local MinCorner = Instance.new("UICorner")
@@ -143,7 +158,7 @@ function Window:CreateGUI()
     TabLayout.Padding = UDim.new(0, 5)
     TabLayout.Parent = self.TabContainer
     
-    -- Content container (right side)
+    -- Content container (right side) - with visible scrollbar
     self.ContentContainer = Instance.new("ScrollingFrame")
     self.ContentContainer.Name = "ContentContainer"
     self.ContentContainer.Size = UDim2.new(1, -175, 1, -50)
@@ -151,8 +166,9 @@ function Window:CreateGUI()
     self.ContentContainer.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
     self.ContentContainer.BackgroundTransparency = 0.5
     self.ContentContainer.BorderSizePixel = 0
-    self.ContentContainer.ScrollBarThickness = 4
+    self.ContentContainer.ScrollBarThickness = 6
     self.ContentContainer.ScrollBarImageColor3 = Color3.fromRGB(74, 158, 255)
+    self.ContentContainer.ScrollBarImageTransparency = 0
     self.ContentContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
     self.ContentContainer.Parent = self.Container
     
@@ -165,6 +181,11 @@ function Window:CreateGUI()
     ContentLayout.Padding = UDim.new(0, 8)
     ContentLayout.Parent = self.ContentContainer
     
+    -- Auto-update canvas size
+    ContentLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        self.ContentContainer.CanvasSize = UDim2.new(0, 0, 0, ContentLayout.AbsoluteContentSize.Y + 20)
+    end)
+    
     local ContentPadding = Instance.new("UIPadding")
     ContentPadding.PaddingTop = UDim.new(0, 10)
     ContentPadding.PaddingBottom = UDim.new(0, 10)
@@ -172,33 +193,19 @@ function Window:CreateGUI()
     ContentPadding.PaddingRight = UDim.new(0, 10)
     ContentPadding.Parent = self.ContentContainer
     
-    -- Resize handle (bottom-left corner)
+    -- Resize handle (bottom-right corner) - sleek bar
     self.ResizeHandle = Instance.new("Frame")
     self.ResizeHandle.Name = "ResizeHandle"
-    self.ResizeHandle.Size = UDim2.fromOffset(40, 40)
-    self.ResizeHandle.Position = UDim2.new(0, 5, 1, -45)
-    self.ResizeHandle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    self.ResizeHandle.BackgroundTransparency = 0.8
+    self.ResizeHandle.Size = UDim2.fromOffset(50, 6)
+    self.ResizeHandle.Position = UDim2.new(1, -55, 1, -10)
+    self.ResizeHandle.BackgroundColor3 = Color3.fromRGB(74, 158, 255)
+    self.ResizeHandle.BackgroundTransparency = 0.6
     self.ResizeHandle.BorderSizePixel = 0
     self.ResizeHandle.Parent = self.Container
     
     local ResizeCorner = Instance.new("UICorner")
-    ResizeCorner.CornerRadius = UDim.new(0, 8)
+    ResizeCorner.CornerRadius = UDim.new(1, 0)
     ResizeCorner.Parent = self.ResizeHandle
-    
-    -- Resize icon (3 lines)
-    for i = 1, 3 do
-        local line = Instance.new("Frame")
-        line.Size = UDim2.new(0, 2, 0, 15 - (i * 3))
-        line.Position = UDim2.new(0, 10 + (i * 6), 1, -10 - (15 - (i * 3)))
-        line.BackgroundColor3 = Color3.fromRGB(150, 150, 150)
-        line.BorderSizePixel = 0
-        line.Parent = self.ResizeHandle
-        
-        local lineCorner = Instance.new("UICorner")
-        lineCorner.CornerRadius = UDim.new(1, 0)
-        lineCorner.Parent = line
-    end
     
     -- Minimized indicator (hidden by default)
     self.MinimizedIndicator = Instance.new("Frame")
@@ -226,7 +233,7 @@ function Window:CreateGUI()
     MinIndLabel.Text = "📋 " .. self.Config.Title
     MinIndLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
     MinIndLabel.TextSize = 14
-    MinIndLabel.Font = Enum.Font.GothamBold
+    MinIndLabel.Font = Enum.Font.SourceSansBold
     MinIndLabel.Parent = self.MinimizedIndicator
 end
 
@@ -331,10 +338,7 @@ function Window:SetupResizing()
             local newWidth = math.clamp(startSize.X + delta.X, self.Config.MinSize.X, self.Config.MaxSize.X)
             local newHeight = math.clamp(startSize.Y + delta.Y, self.Config.MinSize.Y, self.Config.MaxSize.Y)
             
-            -- Smooth animation
-            TweenService:Create(self.Container, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-                Size = UDim2.fromOffset(newWidth, newHeight)
-            }):Play()
+            self.Container.Size = UDim2.fromOffset(newWidth, newHeight)
         end
     end)
     
@@ -347,14 +351,18 @@ function Window:SetupResizing()
     -- Hover effect
     self.ResizeHandle.MouseEnter:Connect(function()
         TweenService:Create(self.ResizeHandle, TweenInfo.new(0.2), {
-            BackgroundTransparency = 0.5
+            BackgroundTransparency = 0.2,
+            Size = UDim2.fromOffset(60, 8)
         }):Play()
     end)
     
     self.ResizeHandle.MouseLeave:Connect(function()
-        TweenService:Create(self.ResizeHandle, TweenInfo.new(0.2), {
-            BackgroundTransparency = 0.8
-        }):Play()
+        if not resizing then
+            TweenService:Create(self.ResizeHandle, TweenInfo.new(0.2), {
+                BackgroundTransparency = 0.6,
+                Size = UDim2.fromOffset(50, 6)
+            }):Play()
+        end
     end)
 end
 

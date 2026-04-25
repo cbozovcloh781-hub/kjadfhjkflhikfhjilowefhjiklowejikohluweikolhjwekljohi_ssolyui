@@ -57,7 +57,7 @@ function Button:CreateElement()
     self.TitleLabel.Text = self.Title
     self.TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
     self.TitleLabel.TextSize = 14
-    self.TitleLabel.Font = Enum.Font.GothamBold
+    self.TitleLabel.Font = Enum.Font.SourceSansBold
     self.TitleLabel.Parent = self.Button
     
     -- Description (optional)
@@ -70,7 +70,7 @@ function Button:CreateElement()
         self.DescLabel.Text = self.Description
         self.DescLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
         self.DescLabel.TextSize = 11
-        self.DescLabel.Font = Enum.Font.Gotham
+        self.DescLabel.Font = Enum.Font.SourceSans
         self.DescLabel.TextXAlignment = Enum.TextXAlignment.Left
         self.DescLabel.TextWrapped = true
         self.DescLabel.Parent = self.Container

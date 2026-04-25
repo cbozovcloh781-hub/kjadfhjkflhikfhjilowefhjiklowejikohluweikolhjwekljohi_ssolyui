@@ -62,7 +62,7 @@ function Dropdown:CreateElement()
     self.TitleLabel.Text = self.Title
     self.TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
     self.TitleLabel.TextSize = 14
-    self.TitleLabel.Font = Enum.Font.GothamBold
+    self.TitleLabel.Font = Enum.Font.SourceSans
     self.TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
     self.TitleLabel.Parent = self.Container
     
@@ -77,7 +77,7 @@ function Dropdown:CreateElement()
         self.DescLabel.Text = self.Description
         self.DescLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
         self.DescLabel.TextSize = 11
-        self.DescLabel.Font = Enum.Font.Gotham
+        self.DescLabel.Font = Enum.Font.SourceSans
         self.DescLabel.TextXAlignment = Enum.TextXAlignment.Left
         self.DescLabel.TextWrapped = true
         self.DescLabel.Parent = self.Container
@@ -109,7 +109,7 @@ function Dropdown:CreateElement()
     self.DisplayLabel.Text = self.Multi and "None" or "Select..."
     self.DisplayLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
     self.DisplayLabel.TextSize = 13
-    self.DisplayLabel.Font = Enum.Font.Gotham
+    self.DisplayLabel.Font = Enum.Font.SourceSans
     self.DisplayLabel.TextXAlignment = Enum.TextXAlignment.Left
     self.DisplayLabel.TextTruncate = Enum.TextTruncate.AtEnd
     self.DisplayLabel.Parent = self.DropdownButton
@@ -123,7 +123,7 @@ function Dropdown:CreateElement()
     self.ArrowIcon.Text = "▼"
     self.ArrowIcon.TextColor3 = Color3.fromRGB(150, 150, 150)
     self.ArrowIcon.TextSize = 12
-    self.ArrowIcon.Font = Enum.Font.GothamBold
+    self.ArrowIcon.Font = Enum.Font.SourceSansBold
     self.ArrowIcon.Parent = self.DropdownButton
     
     -- Options container (hidden by default)
@@ -222,7 +222,7 @@ function Dropdown:CreateOptions()
         checkmark.Text = self.Multi and "☐" or ""
         checkmark.TextColor3 = Color3.fromRGB(150, 150, 150)
         checkmark.TextSize = 16
-        checkmark.Font = Enum.Font.GothamBold
+        checkmark.Font = Enum.Font.SourceSansBold
         checkmark.Parent = optionButton
         
         -- Option text
@@ -234,7 +234,7 @@ function Dropdown:CreateOptions()
         optionLabel.Text = value
         optionLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
         optionLabel.TextSize = 12
-        optionLabel.Font = Enum.Font.Gotham
+        optionLabel.Font = Enum.Font.SourceSans
         optionLabel.TextXAlignment = Enum.TextXAlignment.Left
         optionLabel.TextTruncate = Enum.TextTruncate.AtEnd
         optionLabel.Parent = optionButton

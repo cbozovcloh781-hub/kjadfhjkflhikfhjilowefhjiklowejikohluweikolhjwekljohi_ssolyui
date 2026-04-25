@@ -274,6 +274,28 @@ SettingsTab:AddSlider({
     end
 })
 
+-- Theme Settings
+SettingsTab:AddColorpicker({
+    Title = "Accent Color",
+    Description = "Main UI accent color",
+    Default = Color3.fromRGB(74, 158, 255),
+    Callback = function(Color)
+        print("Accent Color:", Color)
+        -- You can apply this to all UI elements
+    end
+})
+
+SettingsTab:AddToggle({
+    Title = "Blur Effect",
+    Description = "Enable background blur",
+    Default = true,
+    Callback = function(Value)
+        if Window.Blur then
+            Window.Blur.Enabled = Value
+        end
+    end
+})
+
 SettingsTab:AddButton({
     Title = "Test Notifications",
     Callback = function()

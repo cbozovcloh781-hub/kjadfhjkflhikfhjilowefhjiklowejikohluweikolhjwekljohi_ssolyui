@@ -50,7 +50,7 @@ function Slider:CreateElement()
     self.TitleLabel.Text = self.Title
     self.TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
     self.TitleLabel.TextSize = 14
-    self.TitleLabel.Font = Enum.Font.GothamBold
+    self.TitleLabel.Font = Enum.Font.SourceSans
     self.TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
     self.TitleLabel.Parent = self.Container
     
@@ -65,7 +65,7 @@ function Slider:CreateElement()
     self.ValueBox.Text = tostring(self.Value) .. self.Suffix
     self.ValueBox.TextColor3 = Color3.fromRGB(255, 255, 255)
     self.ValueBox.TextSize = 13
-    self.ValueBox.Font = Enum.Font.GothamBold
+    self.ValueBox.Font = Enum.Font.SourceSansBold
     self.ValueBox.ClearTextOnFocus = false
     self.ValueBox.Parent = self.Container
     
@@ -83,7 +83,7 @@ function Slider:CreateElement()
         self.DescLabel.Text = self.Description
         self.DescLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
         self.DescLabel.TextSize = 11
-        self.DescLabel.Font = Enum.Font.Gotham
+        self.DescLabel.Font = Enum.Font.SourceSans
         self.DescLabel.TextXAlignment = Enum.TextXAlignment.Left
         self.DescLabel.TextWrapped = true
         self.DescLabel.Parent = self.Container
@@ -115,7 +115,7 @@ function Slider:CreateElement()
     FillCorner.CornerRadius = UDim.new(1, 0)
     FillCorner.Parent = self.SliderFill
     
-    -- Slider handle (circle)
+    -- Slider handle (circle) - positioned on track
     self.SliderHandle = Instance.new("Frame")
     self.SliderHandle.Name = "Handle"
     self.SliderHandle.Size = UDim2.fromOffset(16, 16)
@@ -123,7 +123,7 @@ function Slider:CreateElement()
     self.SliderHandle.AnchorPoint = Vector2.new(0, 0.5)
     self.SliderHandle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     self.SliderHandle.BorderSizePixel = 0
-    self.SliderHandle.Parent = self.SliderFill
+    self.SliderHandle.Parent = self.SliderTrack
     
     local HandleCorner = Instance.new("UICorner")
     HandleCorner.CornerRadius = UDim.new(1, 0)
@@ -137,7 +137,7 @@ function Slider:CreateElement()
     self.MinLabel.Text = tostring(self.Min)
     self.MinLabel.TextColor3 = Color3.fromRGB(120, 120, 120)
     self.MinLabel.TextSize = 10
-    self.MinLabel.Font = Enum.Font.Gotham
+    self.MinLabel.Font = Enum.Font.SourceSans
     self.MinLabel.TextXAlignment = Enum.TextXAlignment.Left
     self.MinLabel.Parent = self.Container
     
@@ -148,7 +148,7 @@ function Slider:CreateElement()
     self.MaxLabel.Text = tostring(self.Max)
     self.MaxLabel.TextColor3 = Color3.fromRGB(120, 120, 120)
     self.MaxLabel.TextSize = 10
-    self.MaxLabel.Font = Enum.Font.Gotham
+    self.MaxLabel.Font = Enum.Font.SourceSans
     self.MaxLabel.TextXAlignment = Enum.TextXAlignment.Right
     self.MaxLabel.Parent = self.Container
     
@@ -174,18 +174,22 @@ function Slider:CreateElement()
         end
     end)
     
-    -- Manual input
+    -- Manual input with suffix handling
+    self.ValueBox.Focused:Connect(function()
+        -- Remove suffix when focused
+        local text = self.ValueBox.Text:gsub(self.Suffix, ""):gsub("%s+", "")
+        self.ValueBox.Text = text
+    end)
+    
     self.ValueBox.FocusLost:Connect(function(enterPressed)
-        if enterPressed then
-            local text = self.ValueBox.Text:gsub(self.Suffix, ""):gsub("%s+", "")
-            local num = tonumber(text)
-            
-            if num then
-                self:SetValue(math.clamp(num, self.Min, self.Max))
-            else
-                -- Reset to current value if invalid
-                self.ValueBox.Text = tostring(self.Value) .. self.Suffix
-            end
+        local text = self.ValueBox.Text:gsub("%s+", "")
+        local num = tonumber(text)
+        
+        if num then
+            self:SetValue(math.clamp(num, self.Min, self.Max))
+        else
+            -- Reset to current value if invalid
+            self.ValueBox.Text = tostring(self.Value) .. self.Suffix
         end
     end)
     
@@ -232,8 +236,14 @@ function Slider:SetValue(value, silent)
     -- Update UI
     local percentage = (value - self.Min) / (self.Max - self.Min)
     
-    TweenService:Create(self.SliderFill, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+    TweenService:Create(self.SliderFill, TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
         Size = UDim2.new(percentage, 0, 1, 0)
+    }):Play()
+    
+    -- Move handle smoothly on track
+    local trackWidth = self.SliderTrack.AbsoluteSize.X
+    TweenService:Create(self.SliderHandle, TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        Position = UDim2.new(0, (trackWidth * percentage) - 8, 0.5, -8)
     }):Play()
     
     self.ValueBox.Text = tostring(value) .. self.Suffix
