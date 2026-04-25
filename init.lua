@@ -139,7 +139,7 @@ Ssoly.Elements = {
     Keybind = Keybind,
 }
 
-task.wait(0.2)
+task.wait(1.5)
 
 -- Remove loading screen
 local TweenService = game:GetService("TweenService")

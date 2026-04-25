@@ -164,6 +164,10 @@ function Dropdown:CreateElement()
     self.OptionsScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
     self.OptionsScroll.Parent = self.OptionsContainer
     
+    if self.Tab.Window.AccentElements then
+        table.insert(self.Tab.Window.AccentElements, self.OptionsScroll)
+    end
+    
     local OptionsLayout = Instance.new("UIListLayout")
     OptionsLayout.SortOrder = Enum.SortOrder.LayoutOrder
     OptionsLayout.Padding = UDim.new(0, 2)

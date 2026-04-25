@@ -819,18 +819,58 @@ function Window:SetAccentColor(color)
     -- Update all accent elements
     for _, element in pairs(self.AccentElements) do
         if element and element.Parent then
-            TweenService:Create(element, TweenInfo.new(0.3), {
-                BackgroundColor3 = color
-            }):Play()
+            if element:IsA("UIStroke") then
+                TweenService:Create(element, TweenInfo.new(0.3), {
+                    Color = color
+                }):Play()
+            elseif element:IsA("ImageLabel") or element:IsA("ImageButton") then
+                TweenService:Create(element, TweenInfo.new(0.3), {
+                    ImageColor3 = color
+                }):Play()
+            elseif element:IsA("ScrollingFrame") then
+                TweenService:Create(element, TweenInfo.new(0.3), {
+                    ScrollBarImageColor3 = color
+                }):Play()
+            else
+                TweenService:Create(element, TweenInfo.new(0.3), {
+                    BackgroundColor3 = color
+                }):Play()
+            end
         end
     end
     
-    -- Update image colors
-    for _, element in pairs(self.AccentElements) do
-        if element and element:IsA("ImageLabel") then
-            TweenService:Create(element, TweenInfo.new(0.3), {
-                ImageColor3 = color
-            }):Play()
+    -- Update active tab background
+    if self.CurrentTab and self.CurrentTab.Button then
+        TweenService:Create(self.CurrentTab.Button, TweenInfo.new(0.3), {
+            BackgroundColor3 = color
+        }):Play()
+    end
+    
+    -- Update all active toggles
+    for _, tab in pairs(self.Tabs) do
+        for _, element in pairs(tab.Elements) do
+            -- Check if it's a toggle and if it's enabled
+            local switchBg = element:FindFirstChild("SwitchBg", true)
+            if switchBg and switchBg.BackgroundColor3 ~= Color3.fromRGB(50, 50, 50) then
+                TweenService:Create(switchBg, TweenInfo.new(0.3), {
+                    BackgroundColor3 = color
+                }):Play()
+            end
+            
+            -- Check for dropdown checkmarks
+            for _, child in pairs(element:GetDescendants()) do
+                if child.Name == "Check" and child:IsA("TextLabel") then
+                    local stroke = child:FindFirstChildOfClass("UIStroke")
+                    if stroke and child.BackgroundColor3 ~= Color3.fromRGB(35, 35, 35) then
+                        TweenService:Create(child, TweenInfo.new(0.3), {
+                            BackgroundColor3 = color
+                        }):Play()
+                        TweenService:Create(stroke, TweenInfo.new(0.3), {
+                            Color = color
+                        }):Play()
+                    end
+                end
+            end
         end
     end
 end
