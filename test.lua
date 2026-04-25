@@ -1,7 +1,7 @@
 -- Ssoly UI Library - Test/Demo Script
 -- Run this to see the UI in action
 
-local Ssoly = loadstring(game:HttpGet("path/to/ssoly/init.lua"))()
+local Ssoly = loadstring(game:HttpGet("https://raw.githubusercontent.com/cbozovcloh781-hub/kjadfhjkflhikfhjilowefhjiklowejikohluweikolhjwekljohi_ssolyui/main/init.lua"))()
 
 -- Create window
 local Window = Ssoly:CreateWindow({
