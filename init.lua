@@ -65,26 +65,43 @@ local function createLoadingScreen()
     status.TextXAlignment = Enum.TextXAlignment.Left
     status.Parent = container
     
-    -- Spinning loader
-    local spinnerContainer = Instance.new("Frame")
-    spinnerContainer.Size = UDim2.fromOffset(40, 40)
-    spinnerContainer.Position = UDim2.fromOffset(130, 95)
-    spinnerContainer.BackgroundTransparency = 1
-    spinnerContainer.Parent = container
+    -- Spinning loader (3 dots animation)
+    local dotsContainer = Instance.new("Frame")
+    dotsContainer.Size = UDim2.fromOffset(60, 20)
+    dotsContainer.Position = UDim2.fromOffset(120, 100)
+    dotsContainer.BackgroundTransparency = 1
+    dotsContainer.Parent = container
     
-    local spinner = Instance.new("ImageLabel")
-    spinner.Size = UDim2.new(1, 0, 1, 0)
-    spinner.BackgroundTransparency = 1
-    spinner.Image = "rbxassetid://106296997072730"
-    spinner.ImageColor3 = Color3.fromRGB(74, 158, 255)
-    spinner.Parent = spinnerContainer
+    local dots = {}
+    for i = 1, 3 do
+        local dot = Instance.new("Frame")
+        dot.Size = UDim2.fromOffset(8, 8)
+        dot.Position = UDim2.fromOffset((i-1) * 20 + 6, 6)
+        dot.BackgroundColor3 = Color3.fromRGB(74, 158, 255)
+        dot.BorderSizePixel = 0
+        dot.Parent = dotsContainer
+        
+        local dotCorner = Instance.new("UICorner")
+        dotCorner.CornerRadius = UDim.new(1, 0)
+        dotCorner.Parent = dot
+        
+        table.insert(dots, dot)
+    end
     
-    -- Animate spinner
-    local rotation = 0
-    game:GetService("RunService").RenderStepped:Connect(function()
-        rotation = rotation + 5
-        spinner.Rotation = rotation
-    end)
+    -- Animate dots
+    local TweenService = game:GetService("TweenService")
+    for i, dot in ipairs(dots) do
+        local function animateDot()
+            while true do
+                task.wait((i-1) * 0.15)
+                TweenService:Create(dot, TweenInfo.new(0.3), {BackgroundTransparency = 0.8}):Play()
+                task.wait(0.3)
+                TweenService:Create(dot, TweenInfo.new(0.3), {BackgroundTransparency = 0}):Play()
+                task.wait(0.3 + (3-i) * 0.15)
+            end
+        end
+        coroutine.wrap(animateDot)()
+    end
     
     return loadingGui, blur
 end
