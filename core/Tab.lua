@@ -98,7 +98,9 @@ function Tab:CreateButton()
     self.Indicator.BorderSizePixel = 0
     self.Indicator.Parent = self.Button
     
-    table.insert(self.Window.AccentElements, self.Indicator)
+    if self.Window.AccentElements then
+        table.insert(self.Window.AccentElements, self.Indicator)
+    end
     
     local IndCorner = Instance.new("UICorner")
     IndCorner.CornerRadius = UDim.new(1, 0)

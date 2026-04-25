@@ -42,7 +42,7 @@ function Dropdown:CreateElement()
     -- Main container
     self.Container = Instance.new("Frame")
     self.Container.Name = "Dropdown"
-    self.Container.Size = UDim2.new(1, -20, 0, self.Description and 85 or 70)
+    self.Container.Size = UDim2.new(1, -20, 0, 70)
     self.Container.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     self.Container.BackgroundTransparency = 0.5
     self.Container.BorderSizePixel = 0
@@ -83,7 +83,6 @@ function Dropdown:CreateElement()
         self.DescLabel.TextXAlignment = Enum.TextXAlignment.Left
         self.DescLabel.TextWrapped = true
         self.DescLabel.Parent = self.Container
-        dropdownY = 48
     end
     
     -- Dropdown button
@@ -151,7 +150,9 @@ function Dropdown:CreateElement()
     OptionsStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
     OptionsStroke.Parent = self.OptionsContainer
     
-    table.insert(self.Tab.Window.AccentElements, OptionsStroke)
+    if self.Tab.Window.AccentElements then
+        table.insert(self.Tab.Window.AccentElements, OptionsStroke)
+    end
     
     -- Scrolling frame for options
     self.OptionsScroll = Instance.new("ScrollingFrame")

@@ -115,7 +115,9 @@ function Slider:CreateElement()
     self.SliderFill.BorderSizePixel = 0
     self.SliderFill.Parent = self.SliderTrack
     
-    table.insert(self.Tab.Window.AccentElements, self.SliderFill)
+    if self.Tab.Window.AccentElements then
+        table.insert(self.Tab.Window.AccentElements, self.SliderFill)
+    end
     
     local FillCorner = Instance.new("UICorner")
     FillCorner.CornerRadius = UDim.new(1, 0)

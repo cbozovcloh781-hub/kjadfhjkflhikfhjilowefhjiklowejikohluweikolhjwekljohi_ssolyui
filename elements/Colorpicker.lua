@@ -115,7 +115,9 @@ function Colorpicker:CreateElement()
     PickerStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
     PickerStroke.Parent = self.PickerContainer
     
-    table.insert(self.Tab.Window.AccentElements, PickerStroke)
+    if self.Tab.Window.AccentElements then
+        table.insert(self.Tab.Window.AccentElements, PickerStroke)
+    end
     
     -- HSV Palette
     self.Palette = Instance.new("ImageButton")
