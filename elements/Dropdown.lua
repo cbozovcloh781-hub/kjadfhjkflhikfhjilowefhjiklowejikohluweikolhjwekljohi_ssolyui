@@ -128,17 +128,17 @@ function Dropdown:CreateElement()
     self.ArrowIcon.Font = Enum.Font.SourceSansBold
     self.ArrowIcon.Parent = self.DropdownButton
     
-    -- Options container (hidden by default)
+    -- Options container (hidden by default) - inside button
     self.OptionsContainer = Instance.new("Frame")
     self.OptionsContainer.Name = "Options"
     self.OptionsContainer.Size = UDim2.new(0, 0, 0, 0)
-    self.OptionsContainer.Position = UDim2.fromOffset(12, dropdownY + 35)
+    self.OptionsContainer.Position = UDim2.new(0, 0, 1, 5)
     self.OptionsContainer.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
     self.OptionsContainer.BorderSizePixel = 0
     self.OptionsContainer.ClipsDescendants = true
     self.OptionsContainer.Visible = false
     self.OptionsContainer.ZIndex = 10
-    self.OptionsContainer.Parent = self.Container
+    self.OptionsContainer.Parent = self.DropdownButton
     
     local OptionsCorner = Instance.new("UICorner")
     OptionsCorner.CornerRadius = UDim.new(0, 6)
@@ -284,18 +284,11 @@ function Dropdown:Open()
     local buttonWidth = self.DropdownButton.AbsoluteSize.X
     
     self.OptionsContainer.Visible = true
-    self.OptionsContainer.Size = UDim2.fromOffset(0, 0)
+    self.OptionsContainer.Size = UDim2.new(1, 0, 0, 0)
     
-    -- Expand container first
-    local newHeight = (self.Description and 70 or 55) + targetHeight + 5
-    TweenService:Create(self.Container, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-        Size = UDim2.new(1, -20, 0, newHeight)
-    }):Play()
-    
-    -- Then expand options with slight delay
-    task.wait(0.05)
+    -- Expand options
     TweenService:Create(self.OptionsContainer, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-        Size = UDim2.fromOffset(buttonWidth, targetHeight)
+        Size = UDim2.new(1, 0, 0, targetHeight)
     }):Play()
     
     TweenService:Create(self.ArrowIcon, TweenInfo.new(0.25), {
@@ -306,20 +299,13 @@ end
 function Dropdown:Close()
     self.Opened = false
     
-    -- Close options first
+    -- Close options
     TweenService:Create(self.OptionsContainer, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-        Size = UDim2.fromOffset(0, 0)
+        Size = UDim2.new(1, 0, 0, 0)
     }):Play()
     
     TweenService:Create(self.ArrowIcon, TweenInfo.new(0.2), {
         Rotation = 0
-    }):Play()
-    
-    -- Then shrink container
-    task.wait(0.1)
-    local newHeight = self.Description and 70 or 55
-    TweenService:Create(self.Container, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-        Size = UDim2.new(1, -20, 0, newHeight)
     }):Play()
     
     task.delay(0.2, function()

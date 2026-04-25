@@ -197,10 +197,10 @@ function Window:CreateGUI()
     -- Resize handle (bottom-right corner) - separate rounded bar outside window
     self.ResizeHandle = Instance.new("Frame")
     self.ResizeHandle.Name = "ResizeHandle"
-    self.ResizeHandle.Size = UDim2.fromOffset(8, 50)
-    self.ResizeHandle.Position = UDim2.new(1, 3, 1, -60)
+    self.ResizeHandle.Size = UDim2.fromOffset(6, 40)
+    self.ResizeHandle.Position = UDim2.new(1, 5, 1, -50)
     self.ResizeHandle.BackgroundColor3 = Color3.fromRGB(74, 158, 255)
-    self.ResizeHandle.BackgroundTransparency = 0.4
+    self.ResizeHandle.BackgroundTransparency = 0.3
     self.ResizeHandle.BorderSizePixel = 0
     self.ResizeHandle.ZIndex = 5
     self.ResizeHandle.Parent = self.ScreenGui
@@ -331,8 +331,8 @@ function Window:SetupResizing()
         local containerPos = self.Container.AbsolutePosition
         local containerSize = self.Container.AbsoluteSize
         self.ResizeHandle.Position = UDim2.fromOffset(
-            containerPos.X + containerSize.X + 3,
-            containerPos.Y + containerSize.Y - 60
+            containerPos.X + containerSize.X + 5,
+            containerPos.Y + containerSize.Y - 50
         )
     end
     
@@ -368,16 +368,16 @@ function Window:SetupResizing()
     -- Hover effect
     self.ResizeHandle.MouseEnter:Connect(function()
         TweenService:Create(self.ResizeHandle, TweenInfo.new(0.2), {
-            BackgroundTransparency = 0.1,
-            Size = UDim2.fromOffset(10, 55)
+            BackgroundTransparency = 0,
+            Size = UDim2.fromOffset(8, 45)
         }):Play()
     end)
     
     self.ResizeHandle.MouseLeave:Connect(function()
         if not resizing then
             TweenService:Create(self.ResizeHandle, TweenInfo.new(0.2), {
-                BackgroundTransparency = 0.4,
-                Size = UDim2.fromOffset(8, 50)
+                BackgroundTransparency = 0.3,
+                Size = UDim2.fromOffset(6, 40)
             }):Play()
         end
     end)

@@ -47,12 +47,18 @@ function Notification:Show(config)
     notif.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     notif.BackgroundTransparency = 0.1
     notif.BorderSizePixel = 0
-    notif.ClipsDescendants = true
+    notif.ClipsDescendants = false
     notif.Parent = self.Container
     
     local Corner = Instance.new("UICorner")
     Corner.CornerRadius = UDim.new(0, 10)
     Corner.Parent = notif
+    
+    local Stroke = Instance.new("UIStroke")
+    Stroke.Color = Color3.fromRGB(45, 45, 45)
+    Stroke.Thickness = 1
+    Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    Stroke.Parent = notif
     
     -- Type indicator (colored bar)
     local typeColors = {
@@ -145,9 +151,9 @@ function Notification:Show(config)
     progress.BorderSizePixel = 0
     progress.Parent = notif
     
-    -- Slide in animation from bottom
+    -- Slide in animation from right with bounce
     notif.Size = UDim2.new(1, 0, 0, totalHeight)
-    notif.Position = UDim2.new(0, 0, 1, 50)
+    notif.Position = UDim2.new(1, 50, 0, 0)
     
     TweenService:Create(notif, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
         Position = UDim2.new(0, 0, 0, 0)
@@ -180,13 +186,17 @@ end
 function Notification:Dismiss(notif)
     if not notif or not notif.Parent then return end
     
-    -- Slide out animation
-    local tween = TweenService:Create(notif, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-        Position = UDim2.new(0, 0, 1, 50)
+    -- Slide out animation to right
+    local tween = TweenService:Create(notif, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
+        Position = UDim2.new(1, 50, 0, 0)
     })
     tween:Play()
     
-    -- Fade out all children
+    -- Fade out
+    TweenService:Create(notif, TweenInfo.new(0.4), {
+        BackgroundTransparency = 1
+    }):Play()
+    
     for _, child in pairs(notif:GetDescendants()) do
         if child:IsA("GuiObject") then
             TweenService:Create(child, TweenInfo.new(0.4), {
