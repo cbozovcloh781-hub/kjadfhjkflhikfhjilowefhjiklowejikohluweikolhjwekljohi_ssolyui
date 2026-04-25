@@ -284,7 +284,26 @@ function Dropdown:Open()
     local optionCount = math.min(#self.Values, 5)
     local targetHeight = (optionCount * 30) + 10
     
-    -- Position dropdown relative to button in screen space
+    -- Update position on every frame while open
+    if self.UpdateConnection then
+        self.UpdateConnection:Disconnect()
+    end
+    
+    local function updatePosition()
+        if not self.Opened then return end
+        local buttonPos = self.DropdownButton.AbsolutePosition
+        local buttonSize = self.DropdownButton.AbsoluteSize
+        
+        self.OptionsContainer.Position = UDim2.fromOffset(
+            buttonPos.X,
+            buttonPos.Y + buttonSize.Y + 5
+        )
+        self.OptionsContainer.Size = UDim2.new(0, buttonSize.X, 0, self.OptionsContainer.AbsoluteSize.Y)
+    end
+    
+    self.UpdateConnection = game:GetService("RunService").RenderStepped:Connect(updatePosition)
+    
+    -- Initial position
     local buttonPos = self.DropdownButton.AbsolutePosition
     local buttonSize = self.DropdownButton.AbsoluteSize
     
@@ -307,6 +326,12 @@ end
 
 function Dropdown:Close()
     self.Opened = false
+    
+    -- Disconnect update
+    if self.UpdateConnection then
+        self.UpdateConnection:Disconnect()
+        self.UpdateConnection = nil
+    end
     
     -- Close options
     TweenService:Create(self.OptionsContainer, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {

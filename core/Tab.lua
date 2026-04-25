@@ -138,10 +138,13 @@ function Tab:Select()
         element.Visible = true
         element.BackgroundTransparency = 1
         
-        -- Fade in each child
+        -- Store original transparency values
         for _, child in pairs(element:GetDescendants()) do
             if child:IsA("GuiObject") then
-                child.BackgroundTransparency = math.min(child.BackgroundTransparency + 0.5, 1)
+                if not child:GetAttribute("OriginalTransparency") then
+                    child:SetAttribute("OriginalTransparency", child.BackgroundTransparency)
+                end
+                child.BackgroundTransparency = 1
                 if child:IsA("TextLabel") or child:IsA("TextButton") or child:IsA("TextBox") then
                     child.TextTransparency = 1
                 end
@@ -151,22 +154,26 @@ function Tab:Select()
             end
         end
         
-        task.delay(i * 0.03, function()
+        task.delay(i * 0.02, function()
             -- Restore transparency
+            TweenService:Create(element, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                BackgroundTransparency = element:GetAttribute("OriginalTransparency") or 0.5
+            }):Play()
+            
             for _, child in pairs(element:GetDescendants()) do
                 if child:IsA("GuiObject") then
-                    local targetBg = child:GetAttribute("OriginalTransparency") or 0.5
-                    TweenService:Create(child, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                    local targetBg = child:GetAttribute("OriginalTransparency") or 0
+                    TweenService:Create(child, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
                         BackgroundTransparency = targetBg
                     }):Play()
                     
                     if child:IsA("TextLabel") or child:IsA("TextButton") or child:IsA("TextBox") then
-                        TweenService:Create(child, TweenInfo.new(0.3), {
+                        TweenService:Create(child, TweenInfo.new(0.2), {
                             TextTransparency = 0
                         }):Play()
                     end
                     if child:IsA("ImageLabel") or child:IsA("ImageButton") then
-                        TweenService:Create(child, TweenInfo.new(0.3), {
+                        TweenService:Create(child, TweenInfo.new(0.2), {
                             ImageTransparency = 0
                         }):Play()
                     end
