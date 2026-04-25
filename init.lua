@@ -140,7 +140,7 @@ Ssoly.Elements = {
 }
 
 updateProgress(1.0)
-task.wait(0.5)
+task.wait(0.3)
 
 -- Remove loading screen
 local TweenService = game:GetService("TweenService")

@@ -32,7 +32,7 @@ function Slider:CreateElement()
     -- Main container
     self.Container = Instance.new("Frame")
     self.Container.Name = "Slider"
-    self.Container.Size = UDim2.new(1, -20, 0, self.Description and 75 or 60)
+    self.Container.Size = UDim2.new(1, -20, 0, self.Description and 85 or 70)
     self.Container.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     self.Container.BackgroundTransparency = 0.5
     self.Container.BorderSizePixel = 0
@@ -150,8 +150,8 @@ function Slider:CreateElement()
     
     -- Min/Max labels
     self.MinLabel = Instance.new("TextLabel")
-    self.MinLabel.Size = UDim2.fromOffset(40, 15)
-    self.MinLabel.Position = UDim2.fromOffset(12, sliderY + 12)
+    self.MinLabel.Size = UDim2.fromOffset(50, 15)
+    self.MinLabel.Position = UDim2.fromOffset(12, sliderY + 15)
     self.MinLabel.BackgroundTransparency = 1
     self.MinLabel.Text = tostring(self.Min)
     self.MinLabel.TextColor3 = Color3.fromRGB(120, 120, 120)
@@ -161,8 +161,8 @@ function Slider:CreateElement()
     self.MinLabel.Parent = self.Container
     
     self.MaxLabel = Instance.new("TextLabel")
-    self.MaxLabel.Size = UDim2.fromOffset(40, 15)
-    self.MaxLabel.Position = UDim2.new(1, -52, 0, sliderY + 12)
+    self.MaxLabel.Size = UDim2.fromOffset(50, 15)
+    self.MaxLabel.Position = UDim2.new(1, -62, 0, sliderY + 15)
     self.MaxLabel.BackgroundTransparency = 1
     self.MaxLabel.Text = tostring(self.Max)
     self.MaxLabel.TextColor3 = Color3.fromRGB(120, 120, 120)

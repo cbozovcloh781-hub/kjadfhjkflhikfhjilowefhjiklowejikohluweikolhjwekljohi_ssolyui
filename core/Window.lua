@@ -301,14 +301,14 @@ function Window:CreateGUI()
     
     self.ResizeBars = {}
     
-    -- Create arc using multiple small bars matching window corner radius (8px)
-    for i = 0, 6 do
-        local angle = (i / 6) * 90
+    -- Create arc using more bars for smoother appearance
+    for i = 0, 12 do
+        local angle = (i / 12) * 90
         local rad = math.rad(angle)
         local radius = 12
         
         local bar = Instance.new("Frame")
-        bar.Size = UDim2.fromOffset(6, 6)
+        bar.Size = UDim2.fromOffset(8, 8)
         bar.Position = UDim2.fromOffset(
             15 + math.cos(rad) * radius,
             15 + math.sin(rad) * radius
@@ -572,6 +572,7 @@ function Window:SetupResizing()
             end
             
             self.Container.Size = UDim2.fromOffset(newWidth, newHeight)
+            self.Config.Size = UDim2.fromOffset(newWidth, newHeight)
             updateResizePositions()
         end
     end)
