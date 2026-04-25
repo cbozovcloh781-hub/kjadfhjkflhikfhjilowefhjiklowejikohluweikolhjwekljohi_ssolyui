@@ -95,7 +95,7 @@ function Slider:CreateElement()
     local sliderY = self.Description and 52 or 38
     self.SliderTrack = Instance.new("Frame")
     self.SliderTrack.Name = "Track"
-    self.SliderTrack.Size = UDim2.new(1, -24, 0, 6)
+    self.SliderTrack.Size = UDim2.new(1, -24, 0, 10)
     self.SliderTrack.Position = UDim2.fromOffset(12, sliderY)
     self.SliderTrack.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     self.SliderTrack.BorderSizePixel = 0
@@ -120,8 +120,8 @@ function Slider:CreateElement()
     -- Slider handle (circle) - properly centered on track
     self.SliderHandle = Instance.new("Frame")
     self.SliderHandle.Name = "Handle"
-    self.SliderHandle.Size = UDim2.fromOffset(16, 16)
-    self.SliderHandle.Position = UDim2.new(0, 0, 0.5, -8)
+    self.SliderHandle.Size = UDim2.fromOffset(18, 18)
+    self.SliderHandle.Position = UDim2.new(0, 0, 0.5, 0)
     self.SliderHandle.AnchorPoint = Vector2.new(0.5, 0.5)
     self.SliderHandle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     self.SliderHandle.BorderSizePixel = 0
@@ -199,14 +199,14 @@ function Slider:CreateElement()
     -- Hover effects
     self.SliderTrack.MouseEnter:Connect(function()
         TweenService:Create(self.SliderHandle, TweenInfo.new(0.2), {
-            Size = UDim2.fromOffset(20, 20)
+            Size = UDim2.fromOffset(22, 22)
         }):Play()
     end)
     
     self.SliderTrack.MouseLeave:Connect(function()
         if not dragging then
             TweenService:Create(self.SliderHandle, TweenInfo.new(0.2), {
-                Size = UDim2.fromOffset(16, 16)
+                Size = UDim2.fromOffset(18, 18)
             }):Play()
         end
     end)

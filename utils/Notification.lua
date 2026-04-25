@@ -60,7 +60,7 @@ function Notification:Show(config)
     Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
     Stroke.Parent = notif
     
-    -- Type indicator (colored bar)
+    -- Type indicator (colored bar) - inside with proper clipping
     local typeColors = {
         Info = Color3.fromRGB(74, 158, 255),
         Success = Color3.fromRGB(80, 255, 120),
@@ -70,13 +70,14 @@ function Notification:Show(config)
     
     local indicator = Instance.new("Frame")
     indicator.Name = "Indicator"
-    indicator.Size = UDim2.new(0, 4, 1, 0)
+    indicator.Size = UDim2.new(0, 4, 1, -8)
+    indicator.Position = UDim2.fromOffset(4, 4)
     indicator.BackgroundColor3 = typeColors[type] or typeColors.Info
     indicator.BorderSizePixel = 0
     indicator.Parent = notif
     
     local IndCorner = Instance.new("UICorner")
-    IndCorner.CornerRadius = UDim.new(0, 10)
+    IndCorner.CornerRadius = UDim.new(1, 0)
     IndCorner.Parent = indicator
     
     -- Icon

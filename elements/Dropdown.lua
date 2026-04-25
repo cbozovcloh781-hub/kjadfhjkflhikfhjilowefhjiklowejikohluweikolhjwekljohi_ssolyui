@@ -95,6 +95,7 @@ function Dropdown:CreateElement()
     self.DropdownButton.BorderSizePixel = 0
     self.DropdownButton.Text = ""
     self.DropdownButton.AutoButtonColor = false
+    self.DropdownButton.SelectionImageObject = nil
     self.DropdownButton.Parent = self.Container
     
     local ButtonCorner = Instance.new("UICorner")
@@ -128,17 +129,17 @@ function Dropdown:CreateElement()
     self.ArrowIcon.Font = Enum.Font.SourceSansBold
     self.ArrowIcon.Parent = self.DropdownButton
     
-    -- Options container (hidden by default) - inside button with proper clipping
+    -- Options container (hidden by default) - positioned below button with ZIndex
     self.OptionsContainer = Instance.new("Frame")
     self.OptionsContainer.Name = "Options"
-    self.OptionsContainer.Size = UDim2.new(1, 0, 0, 0)
-    self.OptionsContainer.Position = UDim2.new(0, 0, 1, 5)
+    self.OptionsContainer.Size = UDim2.new(1, -24, 0, 0)
+    self.OptionsContainer.Position = UDim2.fromOffset(12, dropdownY + 35)
     self.OptionsContainer.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
     self.OptionsContainer.BorderSizePixel = 0
     self.OptionsContainer.ClipsDescendants = true
     self.OptionsContainer.Visible = false
-    self.OptionsContainer.ZIndex = 10
-    self.OptionsContainer.Parent = self.Container
+    self.OptionsContainer.ZIndex = 100
+    self.OptionsContainer.Parent = self.Tab.Window.ScreenGui
     
     local OptionsCorner = Instance.new("UICorner")
     OptionsCorner.CornerRadius = UDim.new(0, 6)
@@ -281,14 +282,21 @@ function Dropdown:Open()
     
     local optionCount = math.min(#self.Values, 5)
     local targetHeight = (optionCount * 30) + 10
-    local buttonWidth = self.DropdownButton.AbsoluteSize.X
     
+    -- Position dropdown relative to button in screen space
+    local buttonPos = self.DropdownButton.AbsolutePosition
+    local buttonSize = self.DropdownButton.AbsoluteSize
+    
+    self.OptionsContainer.Position = UDim2.fromOffset(
+        buttonPos.X,
+        buttonPos.Y + buttonSize.Y + 5
+    )
+    self.OptionsContainer.Size = UDim2.new(0, buttonSize.X, 0, 0)
     self.OptionsContainer.Visible = true
-    self.OptionsContainer.Size = UDim2.new(1, 0, 0, 0)
     
     -- Expand options
     TweenService:Create(self.OptionsContainer, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-        Size = UDim2.new(1, 0, 0, targetHeight)
+        Size = UDim2.new(0, buttonSize.X, 0, targetHeight)
     }):Play()
     
     TweenService:Create(self.ArrowIcon, TweenInfo.new(0.25), {
@@ -301,7 +309,7 @@ function Dropdown:Close()
     
     -- Close options
     TweenService:Create(self.OptionsContainer, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-        Size = UDim2.new(1, 0, 0, 0)
+        Size = UDim2.new(0, self.DropdownButton.AbsoluteSize.X, 0, 0)
     }):Play()
     
     TweenService:Create(self.ArrowIcon, TweenInfo.new(0.2), {

@@ -102,6 +102,8 @@ function Toggle:CreateElement()
     self.Button.Size = UDim2.new(1, 0, 1, 0)
     self.Button.BackgroundTransparency = 1
     self.Button.Text = ""
+    self.Button.AutoButtonColor = false
+    self.Button.SelectionImageObject = nil
     self.Button.Parent = self.Container
     
     -- Click handler

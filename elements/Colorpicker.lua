@@ -63,6 +63,7 @@ function Colorpicker:CreateElement()
     self.ColorButton.BorderSizePixel = 0
     self.ColorButton.Text = ""
     self.ColorButton.AutoButtonColor = false
+    self.ColorButton.SelectionImageObject = nil
     self.ColorButton.Parent = self.Container
     
     local ColorCorner = Instance.new("UICorner")
@@ -382,15 +383,14 @@ function Colorpicker:Open()
     self.PickerContainer.Visible = true
     self.PickerContainer.Size = UDim2.new(1, -24, 0, 0)
     
-    -- Expand container first to make space
+    -- Expand container first
     local newHeight = (self.Description and 70 or 55) + 220
     TweenService:Create(self.Container, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
         Size = UDim2.new(1, -20, 0, newHeight)
     }):Play()
     
     -- Then expand picker
-    task.wait(0.05)
-    TweenService:Create(self.PickerContainer, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+    TweenService:Create(self.PickerContainer, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
         Size = UDim2.new(1, -24, 0, 215)
     }):Play()
 end
@@ -398,13 +398,11 @@ end
 function Colorpicker:Close()
     self.Opened = false
     
-    -- Close picker first
+    -- Close picker and container simultaneously
     TweenService:Create(self.PickerContainer, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
         Size = UDim2.new(1, -24, 0, 0)
     }):Play()
     
-    -- Then shrink container
-    task.wait(0.1)
     local newHeight = self.Description and 70 or 55
     TweenService:Create(self.Container, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
         Size = UDim2.new(1, -20, 0, newHeight)

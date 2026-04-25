@@ -43,6 +43,7 @@ function Button:CreateElement()
     self.Button.BorderSizePixel = 0
     self.Button.Text = ""
     self.Button.AutoButtonColor = false
+    self.Button.SelectionImageObject = nil
     self.Button.Parent = self.Container
     
     local ButtonCorner = Instance.new("UICorner")

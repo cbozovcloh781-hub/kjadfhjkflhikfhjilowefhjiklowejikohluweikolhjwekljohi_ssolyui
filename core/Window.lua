@@ -68,6 +68,7 @@ function Window:CreateGUI()
     self.ScreenGui.Name = "SsolyUI"
     self.ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     self.ScreenGui.ResetOnSpawn = false
+    self.ScreenGui.IgnoreGuiInset = false
     self.ScreenGui.Parent = coreGui
     
     -- Blur effect
@@ -87,6 +88,7 @@ function Window:CreateGUI()
     self.Container.BackgroundTransparency = self.Config.Transparency
     self.Container.BorderSizePixel = 0
     self.Container.ClipsDescendants = true
+    self.Container.SelectionImageObject = nil
     self.Container.Parent = self.ScreenGui
     
     -- Rounded corners
@@ -140,6 +142,7 @@ function Window:CreateGUI()
     self.MinimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     self.MinimizeButton.TextSize = 20
     self.MinimizeButton.Font = Enum.Font.SourceSansBold
+    self.MinimizeButton.AutoButtonColor = false
     self.MinimizeButton.Parent = self.TitleBar
     
     local MinCorner = Instance.new("UICorner")
@@ -194,27 +197,28 @@ function Window:CreateGUI()
     ContentPadding.PaddingRight = UDim.new(0, 10)
     ContentPadding.Parent = self.ContentContainer
     
-    -- Resize handle (bottom-right corner) - separate rounded bar positioned around corner
+    -- Resize handle (bottom-right corner) - rounded bar around corner
     self.ResizeHandle = Instance.new("Frame")
     self.ResizeHandle.Name = "ResizeHandle"
     self.ResizeHandle.Size = UDim2.fromOffset(6, 40)
-    self.ResizeHandle.Position = UDim2.new(1, 8, 1, -45)
-    self.ResizeHandle.AnchorPoint = Vector2.new(0, 0.5)
+    self.ResizeHandle.Position = UDim2.new(1, -3, 1, -20)
+    self.ResizeHandle.AnchorPoint = Vector2.new(0.5, 0.5)
     self.ResizeHandle.BackgroundColor3 = Color3.fromRGB(74, 158, 255)
     self.ResizeHandle.BackgroundTransparency = 0.3
     self.ResizeHandle.BorderSizePixel = 0
     self.ResizeHandle.ZIndex = 5
-    self.ResizeHandle.Parent = self.ScreenGui
+    self.ResizeHandle.Parent = self.Container
     
     local ResizeCorner = Instance.new("UICorner")
     ResizeCorner.CornerRadius = UDim.new(1, 0)
     ResizeCorner.Parent = self.ResizeHandle
     
-    -- Minimized indicator (hidden by default)
+    -- Minimized indicator (hidden by default) - small icon that follows window
     self.MinimizedIndicator = Instance.new("Frame")
     self.MinimizedIndicator.Name = "MinimizedIndicator"
-    self.MinimizedIndicator.Size = UDim2.fromOffset(150, 40)
-    self.MinimizedIndicator.Position = UDim2.new(0.5, -75, 0.95, -20)
+    self.MinimizedIndicator.Size = UDim2.fromOffset(50, 50)
+    self.MinimizedIndicator.Position = self.Config.Position
+    self.MinimizedIndicator.AnchorPoint = Vector2.new(0.5, 0.5)
     self.MinimizedIndicator.BackgroundColor3 = Color3.fromRGB(26, 26, 26)
     self.MinimizedIndicator.BackgroundTransparency = 0.1
     self.MinimizedIndicator.BorderSizePixel = 0
@@ -222,7 +226,7 @@ function Window:CreateGUI()
     self.MinimizedIndicator.Parent = self.ScreenGui
     
     local MinIndCorner = Instance.new("UICorner")
-    MinIndCorner.CornerRadius = UDim.new(0, 10)
+    MinIndCorner.CornerRadius = UDim.new(1, 0)
     MinIndCorner.Parent = self.MinimizedIndicator
     
     local MinIndStroke = Instance.new("UIStroke")
@@ -233,9 +237,9 @@ function Window:CreateGUI()
     local MinIndLabel = Instance.new("TextLabel")
     MinIndLabel.Size = UDim2.new(1, 0, 1, 0)
     MinIndLabel.BackgroundTransparency = 1
-    MinIndLabel.Text = "📋 " .. self.Config.Title
+    MinIndLabel.Text = self.Config.Title:sub(1, 1)
     MinIndLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    MinIndLabel.TextSize = 14
+    MinIndLabel.TextSize = 24
     MinIndLabel.Font = Enum.Font.SourceSansBold
     MinIndLabel.Parent = self.MinimizedIndicator
 end
@@ -286,7 +290,6 @@ function Window:SetupDragging()
     
     self.MinimizedIndicator.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            -- Double click detection
             local currentTime = tick()
             if currentTime - lastClickTime < 0.3 then
                 self:ToggleMinimize()
@@ -310,6 +313,8 @@ function Window:SetupDragging()
                 minStartPos.Y.Scale,
                 minStartPos.Y.Offset + delta.Y
             )
+            -- Update config position for restore
+            self.Config.Position = self.MinimizedIndicator.Position
         end
     end)
     
@@ -327,20 +332,6 @@ function Window:SetupResizing()
     local resizeStart = nil
     local startSize = nil
     
-    -- Update resize handle position when window moves/resizes
-    local function updateResizePosition()
-        local containerPos = self.Container.AbsolutePosition
-        local containerSize = self.Container.AbsoluteSize
-        self.ResizeHandle.Position = UDim2.fromOffset(
-            containerPos.X + containerSize.X + 8,
-            containerPos.Y + containerSize.Y - 45
-        )
-    end
-    
-    self.Container:GetPropertyChangedSignal("AbsolutePosition"):Connect(updateResizePosition)
-    self.Container:GetPropertyChangedSignal("AbsoluteSize"):Connect(updateResizePosition)
-    updateResizePosition()
-    
     self.ResizeHandle.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             resizing = true
@@ -356,7 +347,6 @@ function Window:SetupResizing()
             local newHeight = math.clamp(startSize.Y + delta.Y, self.Config.MinSize.Y, self.Config.MaxSize.Y)
             
             self.Container.Size = UDim2.fromOffset(newWidth, newHeight)
-            updateResizePosition()
         end
     end)
     
@@ -420,20 +410,30 @@ function Window:ToggleMinimize()
             TweenService:Create(self.Blur, TweenInfo.new(0.3), {Size = 0}):Play()
         end
         
-        -- Minimize animation
+        -- Hide resize handle
+        self.ResizeHandle.Visible = false
+        
+        -- Store current position
+        local currentPos = self.Container.Position
+        local currentSize = self.Container.Size
+        
+        -- Minimize animation to center
         local tween = TweenService:Create(self.Container, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
             Size = UDim2.fromOffset(0, 0),
-            Position = UDim2.new(0.5, 0, 0.5, 0)
+            Position = UDim2.new(currentPos.X.Scale, currentPos.X.Offset + currentSize.X.Offset/2, currentPos.Y.Scale, currentPos.Y.Offset + currentSize.Y.Offset/2)
         })
         tween:Play()
         
         tween.Completed:Connect(function()
             self.Container.Visible = false
-            self.MinimizedIndicator.Visible = true
             
-            -- Show indicator animation
+            -- Show indicator at same position
+            self.MinimizedIndicator.Position = UDim2.new(currentPos.X.Scale, currentPos.X.Offset + currentSize.X.Offset/2, currentPos.Y.Scale, currentPos.Y.Offset + currentSize.Y.Offset/2)
+            self.MinimizedIndicator.Visible = true
+            self.MinimizedIndicator.Size = UDim2.fromOffset(0, 0)
+            
             TweenService:Create(self.MinimizedIndicator, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-                Size = UDim2.fromOffset(150, 40)
+                Size = UDim2.fromOffset(50, 50)
             }):Play()
         end)
     else
@@ -442,13 +442,28 @@ function Window:ToggleMinimize()
             TweenService:Create(self.Blur, TweenInfo.new(0.3), {Size = 10}):Play()
         end
         
-        -- Restore animation
+        -- Show resize handle
+        self.ResizeHandle.Visible = true
+        
+        -- Get indicator position
+        local indPos = self.MinimizedIndicator.Position
+        
+        -- Hide indicator
+        TweenService:Create(self.MinimizedIndicator, TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
+            Size = UDim2.fromOffset(0, 0)
+        }):Play()
+        
+        task.wait(0.2)
         self.MinimizedIndicator.Visible = false
+        
+        -- Restore window from indicator position
         self.Container.Visible = true
+        self.Container.Size = UDim2.fromOffset(0, 0)
+        self.Container.Position = indPos
         
         TweenService:Create(self.Container, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
             Size = self.Config.Size,
-            Position = self.Config.Position
+            Position = UDim2.new(indPos.X.Scale, indPos.X.Offset - self.Config.Size.X.Offset/2, indPos.Y.Scale, indPos.Y.Offset - self.Config.Size.Y.Offset/2)
         }):Play()
     end
 end

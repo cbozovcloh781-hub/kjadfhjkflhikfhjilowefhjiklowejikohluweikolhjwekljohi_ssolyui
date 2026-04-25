@@ -30,6 +30,7 @@ function Tab:CreateButton()
     self.Button.BorderSizePixel = 0
     self.Button.Text = ""
     self.Button.AutoButtonColor = false
+    self.Button.SelectionImageObject = nil
     self.Button.Parent = self.Window.TabContainer
     
     local Corner = Instance.new("UICorner")
