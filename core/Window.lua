@@ -884,9 +884,17 @@ function Window:Show()
     if self.Config._loadingGui and self.Config._loadingGui.Parent then
         local TweenService = game:GetService("TweenService")
         
+        -- Stop animation
+        self.Config._loadingGui:SetAttribute("StopAnimation", true)
+        
         -- Fade out blur immediately
         if self.Config._loadingBlur and self.Config._loadingBlur.Parent then
             TweenService:Create(self.Config._loadingBlur, TweenInfo.new(0.2), {Size = 0}):Play()
+            task.delay(0.25, function()
+                if self.Config._loadingBlur and self.Config._loadingBlur.Parent then
+                    self.Config._loadingBlur:Destroy()
+                end
+            end)
         end
         
         -- Fade out loading GUI
@@ -907,9 +915,6 @@ function Window:Show()
         task.delay(0.25, function()
             if self.Config._loadingGui and self.Config._loadingGui.Parent then
                 self.Config._loadingGui:Destroy()
-            end
-            if self.Config._loadingBlur and self.Config._loadingBlur.Parent then
-                self.Config._loadingBlur:Destroy()
             end
         end)
     end

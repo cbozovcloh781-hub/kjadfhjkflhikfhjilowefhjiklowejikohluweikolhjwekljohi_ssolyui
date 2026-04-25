@@ -90,17 +90,23 @@ local function createLoadingScreen()
     
     -- Animate dots
     local TweenService = game:GetService("TweenService")
+    local animationRunning = true
+    
+    -- Store cleanup function
+    loadingGui:SetAttribute("StopAnimation", false)
+    
     for i, dot in ipairs(dots) do
-        local function animateDot()
-            while true do
+        coroutine.wrap(function()
+            while loadingGui.Parent and not loadingGui:GetAttribute("StopAnimation") do
                 task.wait((i-1) * 0.15)
+                if not loadingGui.Parent then break end
                 TweenService:Create(dot, TweenInfo.new(0.3), {BackgroundTransparency = 0.8}):Play()
                 task.wait(0.3)
+                if not loadingGui.Parent then break end
                 TweenService:Create(dot, TweenInfo.new(0.3), {BackgroundTransparency = 0}):Play()
                 task.wait(0.3 + (3-i) * 0.15)
             end
-        end
-        coroutine.wrap(animateDot)()
+        end)()
     end
     
     return loadingGui, blur
