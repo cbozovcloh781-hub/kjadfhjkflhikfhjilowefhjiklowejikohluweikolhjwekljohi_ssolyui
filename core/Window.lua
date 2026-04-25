@@ -46,12 +46,9 @@ function Window.new(config)
     self:SetupResizing()
     self:SetupMinimize()
     
-    -- Hide if delayed
+    -- Always hide initially if delayed
     if self._delayShow then
         self.Container.Visible = false
-        self.ResizeHandle.Visible = false
-        self.ResizeHandleV.Visible = false
-        self.ResizeHandleH.Visible = false
     end
     
     -- Initialize notification system (will be loaded separately)
@@ -307,7 +304,7 @@ function Window:CreateGUI()
     self.ResizeHandle.BackgroundTransparency = 1
     self.ResizeHandle.ClipsDescendants = false
     self.ResizeHandle.ZIndex = 5
-    self.ResizeHandle.Visible = true
+    self.ResizeHandle.Visible = false
     self.ResizeHandle.Parent = self.ScreenGui
     
     self.ResizeBars = {}
@@ -349,7 +346,7 @@ function Window:CreateGUI()
     self.ResizeHandleV.BackgroundTransparency = 0.3
     self.ResizeHandleV.BorderSizePixel = 0
     self.ResizeHandleV.ZIndex = 5
-    self.ResizeHandleV.Visible = true
+    self.ResizeHandleV.Visible = false
     self.ResizeHandleV.Parent = self.ScreenGui
     
     table.insert(self.AccentElements, self.ResizeHandleV)
@@ -368,7 +365,7 @@ function Window:CreateGUI()
     self.ResizeHandleH.BackgroundTransparency = 0.3
     self.ResizeHandleH.BorderSizePixel = 0
     self.ResizeHandleH.ZIndex = 5
-    self.ResizeHandleH.Visible = true
+    self.ResizeHandleH.Visible = false
     self.ResizeHandleH.Parent = self.ScreenGui
     
     table.insert(self.AccentElements, self.ResizeHandleH)
@@ -528,17 +525,6 @@ function Window:SetupResizing()
             containerPos.Y + containerSize.Y / 2
         )
     end
-    
-    -- Hide initially, show after small delay
-    self.ResizeHandle.Visible = false
-    self.ResizeHandleV.Visible = false
-    self.ResizeHandleH.Visible = false
-    task.delay(0.1, function()
-        self.ResizeHandle.Visible = true
-        self.ResizeHandleV.Visible = true
-        self.ResizeHandleH.Visible = true
-        updateResizePositions()
-    end)
     
     self.Container:GetPropertyChangedSignal("AbsolutePosition"):Connect(updateResizePositions)
     self.Container:GetPropertyChangedSignal("AbsoluteSize"):Connect(updateResizePositions)

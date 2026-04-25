@@ -58,75 +58,50 @@ local function createLoadingScreen()
     status.Size = UDim2.new(1, -40, 0, 20)
     status.Position = UDim2.fromOffset(20, 70)
     status.BackgroundTransparency = 1
-    status.Text = "Loading modules..."
+    status.Text = "Loading..."
     status.TextColor3 = Color3.fromRGB(150, 150, 150)
     status.TextSize = 12
     status.Font = Enum.Font.Gotham
     status.TextXAlignment = Enum.TextXAlignment.Left
     status.Parent = container
     
-    local progressBg = Instance.new("Frame")
-    progressBg.Size = UDim2.new(1, -40, 0, 6)
-    progressBg.Position = UDim2.fromOffset(20, 100)
-    progressBg.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    progressBg.BorderSizePixel = 0
-    progressBg.Parent = container
+    -- Spinning loader
+    local spinnerContainer = Instance.new("Frame")
+    spinnerContainer.Size = UDim2.fromOffset(40, 40)
+    spinnerContainer.Position = UDim2.fromOffset(130, 95)
+    spinnerContainer.BackgroundTransparency = 1
+    spinnerContainer.Parent = container
     
-    local progressCorner = Instance.new("UICorner")
-    progressCorner.CornerRadius = UDim.new(1, 0)
-    progressCorner.Parent = progressBg
+    local spinner = Instance.new("ImageLabel")
+    spinner.Size = UDim2.new(1, 0, 1, 0)
+    spinner.BackgroundTransparency = 1
+    spinner.Image = "rbxassetid://106296997072730"
+    spinner.ImageColor3 = Color3.fromRGB(74, 158, 255)
+    spinner.Parent = spinnerContainer
     
-    local progressBar = Instance.new("Frame")
-    progressBar.Size = UDim2.new(0, 0, 1, 0)
-    progressBar.BackgroundColor3 = Color3.fromRGB(74, 158, 255)
-    progressBar.BorderSizePixel = 0
-    progressBar.Parent = progressBg
+    -- Animate spinner
+    local rotation = 0
+    game:GetService("RunService").RenderStepped:Connect(function()
+        rotation = rotation + 5
+        spinner.Rotation = rotation
+    end)
     
-    local barCorner = Instance.new("UICorner")
-    barCorner.CornerRadius = UDim.new(1, 0)
-    barCorner.Parent = progressBar
-    
-    return loadingGui, status, progressBar, blur
+    return loadingGui, blur
 end
 
-local loadingGui, statusLabel, progressBar, loadingBlur = createLoadingScreen()
-
-local function updateProgress(progress)
-    local TweenService = game:GetService("TweenService")
-    TweenService:Create(progressBar, TweenInfo.new(0.3), {
-        Size = UDim2.new(progress, 0, 1, 0)
-    }):Play()
-    
-    statusLabel.Text = string.format("Loading... %d%%", math.floor(progress * 100))
-end
+local loadingGui, loadingBlur = createLoadingScreen()
 
 -- Load core modules
-updateProgress(0.2)
 Ssoly.Window = loadstring(game:HttpGet(baseUrl .. "core/Window.lua"))()
-
-updateProgress(0.3)
 Ssoly.Tab = loadstring(game:HttpGet(baseUrl .. "core/Tab.lua"))()
 
 -- Load elements
-updateProgress(0.4)
 local Toggle = loadstring(game:HttpGet(baseUrl .. "elements/Toggle.lua"))()
-
-updateProgress(0.5)
 local Slider = loadstring(game:HttpGet(baseUrl .. "elements/Slider.lua"))()
-
-updateProgress(0.6)
 local Dropdown = loadstring(game:HttpGet(baseUrl .. "elements/Dropdown.lua"))()
-
-updateProgress(0.7)
 local Button = loadstring(game:HttpGet(baseUrl .. "elements/Button.lua"))()
-
-updateProgress(0.8)
 local Input = loadstring(game:HttpGet(baseUrl .. "elements/Input.lua"))()
-
-updateProgress(0.9)
 local Colorpicker = loadstring(game:HttpGet(baseUrl .. "elements/Colorpicker.lua"))()
-
-updateProgress(1.0)
 local Keybind = loadstring(game:HttpGet(baseUrl .. "elements/Keybind.lua"))()
 
 Ssoly.Elements = {
