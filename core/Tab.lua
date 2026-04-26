@@ -192,10 +192,12 @@ function Tab:Select()
     
     -- Show elements with staggered fade-in
     for i, element in pairs(self.Elements) do
-        -- Store original values before making visible
-        local originalBgTransparency = element.BackgroundTransparency
+        element.Visible = true
         
+        -- Store original values
+        local originalBgTransparency = element.BackgroundTransparency
         local originalValues = {}
+        
         for _, child in pairs(element:GetDescendants()) do
             if child:IsA("GuiObject") then
                 originalValues[child] = {
@@ -228,31 +230,29 @@ function Tab:Select()
             end
         end
         
-        element.Visible = true
-        
         -- Staggered fade-in animation
-        task.delay(i * 0.04, function()
-            if element and element.Parent then
+        task.delay(i * 0.03, function()
+            if element and element.Parent and element.Visible then
                 -- Fade in container
-                TweenService:Create(element, TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                TweenService:Create(element, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
                     BackgroundTransparency = originalBgTransparency
                 }):Play()
                 
                 -- Fade in all children
                 for child, values in pairs(originalValues) do
                     if child and child.Parent then
-                        TweenService:Create(child, TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                        TweenService:Create(child, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
                             BackgroundTransparency = values.BgTransparency
                         }):Play()
                         
                         if values.TextTransparency then
-                            TweenService:Create(child, TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                            TweenService:Create(child, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
                                 TextTransparency = values.TextTransparency
                             }):Play()
                         end
                         
                         if values.ImageTransparency then
-                            TweenService:Create(child, TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                            TweenService:Create(child, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
                                 ImageTransparency = values.ImageTransparency
                             }):Play()
                         end
@@ -260,7 +260,7 @@ function Tab:Select()
                         if values.StrokeTransparency then
                             local stroke = child:FindFirstChildOfClass("UIStroke")
                             if stroke then
-                                TweenService:Create(stroke, TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                                TweenService:Create(stroke, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
                                     Transparency = values.StrokeTransparency
                                 }):Play()
                             end
