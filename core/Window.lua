@@ -880,45 +880,82 @@ end
 function Window:Show()
     if not self._delayShow then return end
     
-    -- Force remove loading screen by name
+    -- Force remove loading screen by name with fade animation
     local coreGui = game:GetService("CoreGui")
     local lighting = game:GetService("Lighting")
     
-    -- Remove loading GUI by name
+    -- Find loading elements
     local loadingGui = coreGui:FindFirstChild("SsolyLoading")
+    local loadingBlur = lighting:FindFirstChild("SsolyLoadingBlur")
+    
+    -- Fade out loading screen
     if loadingGui then
-        loadingGui:Destroy()
+        -- Fade out all elements
+        for _, child in pairs(loadingGui:GetDescendants()) do
+            if child:IsA("GuiObject") then
+                if child:IsA("TextLabel") or child:IsA("TextButton") then
+                    TweenService:Create(child, TweenInfo.new(0.3), {
+                        TextTransparency = 1
+                    }):Play()
+                end
+                TweenService:Create(child, TweenInfo.new(0.3), {
+                    BackgroundTransparency = 1
+                }):Play()
+            end
+        end
+        
+        -- Destroy after animation
+        task.delay(0.35, function()
+            if loadingGui and loadingGui.Parent then
+                loadingGui:Destroy()
+            end
+        end)
     end
     
-    -- Remove loading blur by name
-    local loadingBlur = lighting:FindFirstChild("SsolyLoadingBlur")
+    -- Fade out blur
     if loadingBlur then
-        loadingBlur:Destroy()
+        TweenService:Create(loadingBlur, TweenInfo.new(0.3), {Size = 0}):Play()
+        task.delay(0.35, function()
+            if loadingBlur and loadingBlur.Parent then
+                loadingBlur:Destroy()
+            end
+        end)
     end
     
     -- Also try from config
     if self.Config._loadingGui and self.Config._loadingGui.Parent then
-        self.Config._loadingGui:Destroy()
+        task.delay(0.35, function()
+            if self.Config._loadingGui and self.Config._loadingGui.Parent then
+                self.Config._loadingGui:Destroy()
+            end
+        end)
     end
     
     if self.Config._loadingBlur and self.Config._loadingBlur.Parent then
-        self.Config._loadingBlur:Destroy()
+        task.delay(0.35, function()
+            if self.Config._loadingBlur and self.Config._loadingBlur.Parent then
+                self.Config._loadingBlur:Destroy()
+            end
+        end)
     end
     
     -- Clear references
     self.Config._loadingGui = nil
     self.Config._loadingBlur = nil
     
-    -- Show window
+    -- Wait for loading fade out to start, then show window
+    task.wait(0.15)
+    
+    -- Show window with animation
     self.Container.Visible = true
     self.Container.Size = UDim2.fromOffset(0, 0)
     
-    TweenService:Create(self.Container, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+    TweenService:Create(self.Container, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
         Size = self.Config.Size
     }):Play()
     
     -- Show resize handles after window animation
-    task.delay(0.4, function()
+    task.delay(0.5, function()
         self.ResizeHandle.Visible = true
         self.ResizeHandleV.Visible = true
         self.ResizeHandleH.Visible = true
