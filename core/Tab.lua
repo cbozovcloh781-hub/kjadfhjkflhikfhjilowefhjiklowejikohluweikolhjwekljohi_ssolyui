@@ -470,7 +470,7 @@ end
 function Tab:AddToggle(config)
     local s, r = pcall(function()
         local T = loadstring(game:HttpGet(baseUrl .. "elements/Toggle.lua"))()
-        local t = T.new(self, config)
+        local t = T.new({Tab = self, Window = self.Window, Container = self.Window.ContentContainer}, config)
         t.Container.Visible = false
         table.insert(self.Elements, t.Container)
         return t
@@ -482,7 +482,7 @@ end
 function Tab:AddSlider(config)
     local s, r = pcall(function()
         local S = loadstring(game:HttpGet(baseUrl .. "elements/Slider.lua"))()
-        local sl = S.new(self, config)
+        local sl = S.new({Tab = self, Window = self.Window, Container = self.Window.ContentContainer}, config)
         sl.Container.Visible = false
         table.insert(self.Elements, sl.Container)
         return sl
@@ -494,7 +494,7 @@ end
 function Tab:AddDropdown(config)
     local s, r = pcall(function()
         local D = loadstring(game:HttpGet(baseUrl .. "elements/Dropdown.lua"))()
-        local d = D.new(self, config)
+        local d = D.new({Tab = self, Window = self.Window, Container = self.Window.ContentContainer}, config)
         d.Container.Visible = false
         table.insert(self.Elements, d.Container)
         return d
@@ -506,7 +506,7 @@ end
 function Tab:AddButton(config)
     local s, r = pcall(function()
         local B = loadstring(game:HttpGet(baseUrl .. "elements/Button.lua"))()
-        local b = B.new(self, config)
+        local b = B.new({Tab = self, Window = self.Window, Container = self.Window.ContentContainer}, config)
         b.Container.Visible = false
         table.insert(self.Elements, b.Container)
         return b
@@ -518,7 +518,7 @@ end
 function Tab:AddInput(config)
     local s, r = pcall(function()
         local I = loadstring(game:HttpGet(baseUrl .. "elements/Input.lua"))()
-        local i = I.new(self, config)
+        local i = I.new({Tab = self, Window = self.Window, Container = self.Window.ContentContainer}, config)
         i.Container.Visible = false
         table.insert(self.Elements, i.Container)
         return i
@@ -530,7 +530,7 @@ end
 function Tab:AddColorpicker(config)
     local s, r = pcall(function()
         local C = loadstring(game:HttpGet(baseUrl .. "elements/Colorpicker.lua"))()
-        local c = C.new(self, config)
+        local c = C.new({Tab = self, Window = self.Window, Container = self.Window.ContentContainer}, config)
         c.Container.Visible = false
         table.insert(self.Elements, c.Container)
         return c
@@ -542,7 +542,7 @@ end
 function Tab:AddKeybind(config)
     local s, r = pcall(function()
         local K = loadstring(game:HttpGet(baseUrl .. "elements/Keybind.lua"))()
-        local k = K.new(self, config)
+        local k = K.new({Tab = self, Window = self.Window, Container = self.Window.ContentContainer}, config)
         k.Container.Visible = false
         table.insert(self.Elements, k.Container)
         return k
