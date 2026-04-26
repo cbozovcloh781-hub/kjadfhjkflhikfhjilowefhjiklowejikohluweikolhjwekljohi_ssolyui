@@ -343,8 +343,8 @@ function Window:CreateGUI()
             15 + math.sin(rad) * radius
         )
         bar.AnchorPoint = Vector2.new(0.5, 0.5)
-        bar.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-        bar.BackgroundTransparency = 0.5
+        bar.BackgroundColor3 = self.AccentColor
+        bar.BackgroundTransparency = 0.3
         bar.BorderSizePixel = 0
         bar.Rotation = angle
         bar.Parent = self.ResizeHandle
@@ -354,6 +354,7 @@ function Window:CreateGUI()
         barCorner.Parent = bar
         
         table.insert(self.ResizeBars, bar)
+        table.insert(self.AccentElements, bar)
     end
     
     -- Vertical resize handle (bottom center)
@@ -362,12 +363,14 @@ function Window:CreateGUI()
     self.ResizeHandleV.Size = UDim2.fromOffset(30, 6)
     self.ResizeHandleV.Position = UDim2.new(0, 0, 0, 0)
     self.ResizeHandleV.AnchorPoint = Vector2.new(0.5, 0.5)
-    self.ResizeHandleV.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-    self.ResizeHandleV.BackgroundTransparency = 0.5
+    self.ResizeHandleV.BackgroundColor3 = self.AccentColor
+    self.ResizeHandleV.BackgroundTransparency = 0.3
     self.ResizeHandleV.BorderSizePixel = 0
     self.ResizeHandleV.ZIndex = 5
     self.ResizeHandleV.Visible = false
     self.ResizeHandleV.Parent = self.ScreenGui
+    
+    table.insert(self.AccentElements, self.ResizeHandleV)
     
     local ResizeVCorner = Instance.new("UICorner")
     ResizeVCorner.CornerRadius = UDim.new(1, 0)
@@ -379,12 +382,14 @@ function Window:CreateGUI()
     self.ResizeHandleH.Size = UDim2.fromOffset(6, 30)
     self.ResizeHandleH.Position = UDim2.new(0, 0, 0, 0)
     self.ResizeHandleH.AnchorPoint = Vector2.new(0.5, 0.5)
-    self.ResizeHandleH.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-    self.ResizeHandleH.BackgroundTransparency = 0.5
+    self.ResizeHandleH.BackgroundColor3 = self.AccentColor
+    self.ResizeHandleH.BackgroundTransparency = 0.3
     self.ResizeHandleH.BorderSizePixel = 0
     self.ResizeHandleH.ZIndex = 5
     self.ResizeHandleH.Visible = false
     self.ResizeHandleH.Parent = self.ScreenGui
+    
+    table.insert(self.AccentElements, self.ResizeHandleH)
     
     local ResizeHCorner = Instance.new("UICorner")
     ResizeHCorner.CornerRadius = UDim.new(1, 0)
@@ -658,7 +663,7 @@ function Window:SetupResizing()
     self.ResizeHandle.MouseEnter:Connect(function()
         for _, bar in ipairs(self.ResizeBars) do
             TweenService:Create(bar, TweenInfo.new(0.2), {
-                BackgroundTransparency = 0.2
+                BackgroundTransparency = 0
             }):Play()
         end
     end)
@@ -667,7 +672,7 @@ function Window:SetupResizing()
         if not resizing then
             for _, bar in ipairs(self.ResizeBars) do
                 TweenService:Create(bar, TweenInfo.new(0.2), {
-                    BackgroundTransparency = 0.5
+                    BackgroundTransparency = 0.3
                 }):Play()
             end
         end
@@ -675,28 +680,28 @@ function Window:SetupResizing()
     
     self.ResizeHandleV.MouseEnter:Connect(function()
         TweenService:Create(self.ResizeHandleV, TweenInfo.new(0.2), {
-            BackgroundTransparency = 0.2
+            BackgroundTransparency = 0
         }):Play()
     end)
     
     self.ResizeHandleV.MouseLeave:Connect(function()
         if not resizing then
             TweenService:Create(self.ResizeHandleV, TweenInfo.new(0.2), {
-                BackgroundTransparency = 0.5
+                BackgroundTransparency = 0.3
             }):Play()
         end
     end)
     
     self.ResizeHandleH.MouseEnter:Connect(function()
         TweenService:Create(self.ResizeHandleH, TweenInfo.new(0.2), {
-            BackgroundTransparency = 0.2
+            BackgroundTransparency = 0
         }):Play()
     end)
     
     self.ResizeHandleH.MouseLeave:Connect(function()
         if not resizing then
             TweenService:Create(self.ResizeHandleH, TweenInfo.new(0.2), {
-                BackgroundTransparency = 0.5
+                BackgroundTransparency = 0.3
             }):Play()
         end
     end)

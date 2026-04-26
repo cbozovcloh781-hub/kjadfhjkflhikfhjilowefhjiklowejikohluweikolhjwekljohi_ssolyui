@@ -178,6 +178,16 @@ function Tab:Select()
         Size = UDim2.new(0, 3, 0, 30)
     }):Play()
     
+    -- Show content container
+    self.ContentContainer.Visible = true
+    
+    -- Show sections if they exist
+    for _, section in pairs(self.Sections) do
+        if section.Container then
+            section.Container.Visible = true
+        end
+    end
+    
     -- Show elements with staggered fade-in (no position change)
     for i, element in pairs(self.Elements) do
         element.Visible = true
@@ -266,6 +276,20 @@ function Tab:Deselect()
     TweenService:Create(self.Indicator, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.In), {
         Size = UDim2.new(0, 3, 0, 0)
     }):Play()
+    
+    -- Hide content container
+    task.delay(0.35, function()
+        self.ContentContainer.Visible = false
+    end)
+    
+    -- Hide sections
+    for _, section in pairs(self.Sections) do
+        if section.Container then
+            task.delay(0.35, function()
+                section.Container.Visible = false
+            end)
+        end
+    end
     
     -- Fade out elements smoothly without position change
     for i, element in pairs(self.Elements) do
