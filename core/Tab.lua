@@ -187,16 +187,16 @@ function Tab:Select()
         ImageColor3 = accentColor
     }):Play()
     
-    TweenService:Create(self.TitleLabel, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+    TweenService:Create(self.TitleLabel, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
         TextColor3 = Color3.fromRGB(255, 255, 255)
     }):Play()
     
-    TweenService:Create(self.IconLabel, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+    TweenService:Create(self.IconLabel, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
         ImageColor3 = Color3.fromRGB(255, 255, 255)
     }):Play()
     
     -- Indicator grows with bounce
-    TweenService:Create(self.Indicator, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+    TweenService:Create(self.Indicator, TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
         Size = UDim2.new(0, 3, 0, 30)
     }):Play()
     
@@ -297,7 +297,7 @@ function Tab:Deselect()
     self.Selected = false
     
     -- Animate deselection smoothly
-    TweenService:Create(self.Button, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+    TweenService:Create(self.Button, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
         BackgroundColor3 = Color3.fromRGB(20, 20, 20),
         BackgroundTransparency = 0.2
     }):Play()
@@ -305,20 +305,20 @@ function Tab:Deselect()
     -- Remove glow
     local glow = self.Button:FindFirstChild("Glow")
     if glow then
-        TweenService:Create(glow, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+        TweenService:Create(glow, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
             ImageTransparency = 1
         }):Play()
     end
     
-    TweenService:Create(self.TitleLabel, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+    TweenService:Create(self.TitleLabel, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
         TextColor3 = Color3.fromRGB(150, 150, 150)
     }):Play()
     
-    TweenService:Create(self.IconLabel, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+    TweenService:Create(self.IconLabel, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
         ImageColor3 = Color3.fromRGB(150, 150, 150)
     }):Play()
     
-    TweenService:Create(self.Indicator, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.In), {
+    TweenService:Create(self.Indicator, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.In), {
         Size = UDim2.new(0, 3, 0, 0)
     }):Play()
     

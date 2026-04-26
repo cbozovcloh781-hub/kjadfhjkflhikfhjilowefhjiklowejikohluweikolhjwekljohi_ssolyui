@@ -850,7 +850,7 @@ function Window:SelectTab(tab)
     if self.CurrentTab then
         self.CurrentTab:Deselect()
         -- Wait for deselect animation to complete
-        task.wait(0.15)
+        task.wait(0.25)
     end
     
     -- Select new tab with fade in
@@ -858,7 +858,7 @@ function Window:SelectTab(tab)
     tab:Select()
     
     -- Allow next tab switch
-    task.delay(0.3, function()
+    task.delay(0.5, function()
         self._switchingTab = false
     end)
 end
