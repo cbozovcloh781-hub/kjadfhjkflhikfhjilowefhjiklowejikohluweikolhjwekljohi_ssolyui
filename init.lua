@@ -11,6 +11,29 @@ local function createLoadingScreen()
     local coreGui = game:GetService("CoreGui")
     local lighting = game:GetService("Lighting")
     
+    -- Remove old UI if exists
+    local oldUI = coreGui:FindFirstChild("SsolyUI")
+    if oldUI then
+        oldUI:Destroy()
+    end
+    
+    -- Remove old loading screen if exists
+    local oldLoading = coreGui:FindFirstChild("SsolyLoading")
+    if oldLoading then
+        oldLoading:Destroy()
+    end
+    
+    -- Remove old blurs
+    local oldBlur = lighting:FindFirstChild("SsolyBlur")
+    if oldBlur then
+        oldBlur:Destroy()
+    end
+    
+    local oldLoadingBlur = lighting:FindFirstChild("SsolyLoadingBlur")
+    if oldLoadingBlur then
+        oldLoadingBlur:Destroy()
+    end
+    
     -- Create blur effect
     local blur = Instance.new("BlurEffect")
     blur.Name = "SsolyLoadingBlur"

@@ -164,13 +164,14 @@ function Tab:Select()
         Size = UDim2.new(0, 3, 0, 30)
     }):Play()
     
-    -- Show elements with fade animation
+    -- Show elements with smooth fade animation
     for i, element in pairs(self.Elements) do
         element.Visible = true
         element.BackgroundTransparency = 1
         
-        task.delay(i * 0.01, function()
-            TweenService:Create(element, TweenInfo.new(0.15), {
+        -- Fade in each element with delay
+        task.delay(i * 0.03, function()
+            TweenService:Create(element, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
                 BackgroundTransparency = 0.5
             }):Play()
         end)
