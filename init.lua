@@ -169,36 +169,120 @@ local function createLoadingScreen()
         end
     end)
     
-    return loadingGui, blur
+    return loadingGui, blur, status
 end
 
-local loadingGui, loadingBlur = createLoadingScreen()
+-- Error screen
+local function showErrorScreen()
+    local coreGui = game:GetService("CoreGui")
+    local lighting = game:GetService("Lighting")
+    
+    -- Remove loading screen
+    local oldLoading = coreGui:FindFirstChild("SsolyLoading")
+    if oldLoading then
+        oldLoading:Destroy()
+    end
+    
+    local oldBlur = lighting:FindFirstChild("SsolyLoadingBlur")
+    if oldBlur then
+        oldBlur:Destroy()
+    end
+    
+    -- Create error screen
+    local errorGui = Instance.new("ScreenGui")
+    errorGui.Name = "SsolyError"
+    errorGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    errorGui.ResetOnSpawn = false
+    errorGui.IgnoreGuiInset = true
+    errorGui.Parent = coreGui
+    
+    local container = Instance.new("Frame")
+    container.Size = UDim2.fromOffset(350, 180)
+    container.Position = UDim2.new(0.5, 0, 0.5, 0)
+    container.AnchorPoint = Vector2.new(0.5, 0.5)
+    container.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    container.BackgroundTransparency = 0.1
+    container.BorderSizePixel = 0
+    container.Parent = errorGui
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 8)
+    corner.Parent = container
+    
+    local stroke = Instance.new("UIStroke")
+    stroke.Color = Color3.fromRGB(255, 69, 58)
+    stroke.Thickness = 2
+    stroke.Parent = container
+    
+    local icon = Instance.new("TextLabel")
+    icon.Size = UDim2.fromOffset(60, 60)
+    icon.Position = UDim2.new(0.5, 0, 0, 25)
+    icon.AnchorPoint = Vector2.new(0.5, 0)
+    icon.BackgroundTransparency = 1
+    icon.Text = "⚠️"
+    icon.TextSize = 48
+    icon.Parent = container
+    
+    local title = Instance.new("TextLabel")
+    title.Size = UDim2.new(1, -40, 0, 30)
+    title.Position = UDim2.fromOffset(20, 90)
+    title.BackgroundTransparency = 1
+    title.Text = "Ошибка загрузки"
+    title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    title.TextSize = 18
+    title.Font = Enum.Font.GothamBold
+    title.Parent = container
+    
+    local desc = Instance.new("TextLabel")
+    desc.Size = UDim2.new(1, -40, 0, 40)
+    desc.Position = UDim2.fromOffset(20, 125)
+    desc.BackgroundTransparency = 1
+    desc.Text = "Не удалось загрузить UI библиотеку.\nПроверьте подключение к интернету."
+    desc.TextColor3 = Color3.fromRGB(150, 150, 150)
+    desc.TextSize = 12
+    desc.Font = Enum.Font.Gotham
+    desc.TextWrapped = true
+    desc.Parent = container
+    
+    -- Auto-close after 5 seconds
+    task.delay(5, function()
+        if errorGui and errorGui.Parent then
+            errorGui:Destroy()
+        end
+    end)
+end
 
--- Load core modules
-Ssoly.Window = loadstring(game:HttpGet(baseUrl .. "core/Window.lua"))()
-Ssoly.Tab = loadstring(game:HttpGet(baseUrl .. "core/Tab.lua"))()
+local loadingGui, loadingBlur, statusLabel = createLoadingScreen()
 
--- Load elements
-local Toggle = loadstring(game:HttpGet(baseUrl .. "elements/Toggle.lua"))()
-local Slider = loadstring(game:HttpGet(baseUrl .. "elements/Slider.lua"))()
-local Dropdown = loadstring(game:HttpGet(baseUrl .. "elements/Dropdown.lua"))()
-local Button = loadstring(game:HttpGet(baseUrl .. "elements/Button.lua"))()
-local Input = loadstring(game:HttpGet(baseUrl .. "elements/Input.lua"))()
-local Colorpicker = loadstring(game:HttpGet(baseUrl .. "elements/Colorpicker.lua"))()
-local Keybind = loadstring(game:HttpGet(baseUrl .. "elements/Keybind.lua"))()
+-- Load core modules with error handling
+local success, err = pcall(function()
+    Ssoly.Window = loadstring(game:HttpGet(baseUrl .. "core/Window.lua"))()
+    Ssoly.Tab = loadstring(game:HttpGet(baseUrl .. "core/Tab.lua"))()
+    
+    -- Load elements
+    local Toggle = loadstring(game:HttpGet(baseUrl .. "elements/Toggle.lua"))()
+    local Slider = loadstring(game:HttpGet(baseUrl .. "elements/Slider.lua"))()
+    local Dropdown = loadstring(game:HttpGet(baseUrl .. "elements/Dropdown.lua"))()
+    local Button = loadstring(game:HttpGet(baseUrl .. "elements/Button.lua"))()
+    local Input = loadstring(game:HttpGet(baseUrl .. "elements/Input.lua"))()
+    local Colorpicker = loadstring(game:HttpGet(baseUrl .. "elements/Colorpicker.lua"))()
+    local Keybind = loadstring(game:HttpGet(baseUrl .. "elements/Keybind.lua"))()
+    
+    Ssoly.Elements = {
+        Toggle = Toggle,
+        Slider = Slider,
+        Dropdown = Dropdown,
+        Button = Button,
+        Input = Input,
+        Colorpicker = Colorpicker,
+        Keybind = Keybind,
+    }
+end)
 
-Ssoly.Elements = {
-    Toggle = Toggle,
-    Slider = Slider,
-    Dropdown = Dropdown,
-    Button = Button,
-    Input = Input,
-    Colorpicker = Colorpicker,
-    Keybind = Keybind,
-}
-
--- Don't close loading screen automatically
--- User must call Window:Show() to close it
+if not success then
+    showErrorScreen()
+    error("Failed to load Ssoly UI: " .. tostring(err))
+end
 
 -- Create window
 function Ssoly:CreateWindow(config)

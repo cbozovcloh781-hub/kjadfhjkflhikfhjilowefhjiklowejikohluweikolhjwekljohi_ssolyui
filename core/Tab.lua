@@ -322,8 +322,106 @@ end
 
 -- Section creation
 function Tab:AddSection(side)
-    local Section = loadstring(game:HttpGet("https://raw.githubusercontent.com/cbozovcloh781-hub/kjadfhjkflhikfhjilowefhjiklowejikohluweikolhjwekljohi_ssolyui/main/core/Section.lua"))()
-    local section = Section.new(self, side)
+    side = side or "Left"
+    
+    -- Create section container if not exists
+    local sectionContainer = self.ContentContainer:FindFirstChild(side .. "Section")
+    if not sectionContainer then
+        sectionContainer = Instance.new("ScrollingFrame")
+        sectionContainer.Name = side .. "Section"
+        sectionContainer.Size = UDim2.new(0.5, -7.5, 1, 0)
+        sectionContainer.Position = side == "Left" and UDim2.new(0, 0, 0, 0) or UDim2.new(0.5, 7.5, 0, 0)
+        sectionContainer.BackgroundTransparency = 1
+        sectionContainer.BorderSizePixel = 0
+        sectionContainer.ScrollBarThickness = 4
+        sectionContainer.ScrollBarImageColor3 = Color3.fromRGB(80, 80, 80)
+        sectionContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
+        sectionContainer.AutomaticCanvasSize = Enum.AutomaticSize.Y
+        sectionContainer.Visible = false
+        sectionContainer.Parent = self.ContentContainer
+        
+        local Layout = Instance.new("UIListLayout")
+        Layout.SortOrder = Enum.SortOrder.LayoutOrder
+        Layout.Padding = UDim.new(0, 10)
+        Layout.Parent = sectionContainer
+        
+        local Padding = Instance.new("UIPadding")
+        Padding.PaddingTop = UDim.new(0, 10)
+        Padding.PaddingBottom = UDim.new(0, 10)
+        Padding.Parent = sectionContainer
+    end
+    
+    -- Return section object with element methods
+    local section = {
+        Container = sectionContainer,
+        Tab = self,
+        Side = side
+    }
+    
+    -- Add element methods to section
+    function section:AddToggle(config)
+        local Toggle = loadstring(game:HttpGet(baseUrl .. "elements/Toggle.lua"))()
+        local toggle = Toggle.new(self, config)
+        toggle.Container.Visible = false
+        toggle.Container.Parent = self.Container
+        table.insert(self.Tab.Elements, toggle.Container)
+        return toggle
+    end
+    
+    function section:AddSlider(config)
+        local Slider = loadstring(game:HttpGet(baseUrl .. "elements/Slider.lua"))()
+        local slider = Slider.new(self, config)
+        slider.Container.Visible = false
+        slider.Container.Parent = self.Container
+        table.insert(self.Tab.Elements, slider.Container)
+        return slider
+    end
+    
+    function section:AddDropdown(config)
+        local Dropdown = loadstring(game:HttpGet(baseUrl .. "elements/Dropdown.lua"))()
+        local dropdown = Dropdown.new(self, config)
+        dropdown.Container.Visible = false
+        dropdown.Container.Parent = self.Container
+        table.insert(self.Tab.Elements, dropdown.Container)
+        return dropdown
+    end
+    
+    function section:AddButton(config)
+        local Button = loadstring(game:HttpGet(baseUrl .. "elements/Button.lua"))()
+        local button = Button.new(self, config)
+        button.Container.Visible = false
+        button.Container.Parent = self.Container
+        table.insert(self.Tab.Elements, button.Container)
+        return button
+    end
+    
+    function section:AddInput(config)
+        local Input = loadstring(game:HttpGet(baseUrl .. "elements/Input.lua"))()
+        local input = Input.new(self, config)
+        input.Container.Visible = false
+        input.Container.Parent = self.Container
+        table.insert(self.Tab.Elements, input.Container)
+        return input
+    end
+    
+    function section:AddColorpicker(config)
+        local Colorpicker = loadstring(game:HttpGet(baseUrl .. "elements/Colorpicker.lua"))()
+        local colorpicker = Colorpicker.new(self, config)
+        colorpicker.Container.Visible = false
+        colorpicker.Container.Parent = self.Container
+        table.insert(self.Tab.Elements, colorpicker.Container)
+        return colorpicker
+    end
+    
+    function section:AddKeybind(config)
+        local Keybind = loadstring(game:HttpGet(baseUrl .. "elements/Keybind.lua"))()
+        local keybind = Keybind.new(self, config)
+        keybind.Container.Visible = false
+        keybind.Container.Parent = self.Container
+        table.insert(self.Tab.Elements, keybind.Container)
+        return keybind
+    end
+    
     table.insert(self.Sections, section)
     return section
 end
