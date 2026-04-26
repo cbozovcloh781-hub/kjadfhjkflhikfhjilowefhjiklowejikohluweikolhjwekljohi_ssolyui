@@ -41,7 +41,7 @@ local function createLoadingScreen()
     blur.Parent = lighting
     
     local TweenService = game:GetService("TweenService")
-    TweenService:Create(blur, TweenInfo.new(0.3), {Size = 15}):Play()
+    TweenService:Create(blur, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Size = 15}):Play()
     
     local loadingGui = Instance.new("ScreenGui")
     loadingGui.Name = "SsolyLoading"
@@ -51,10 +51,11 @@ local function createLoadingScreen()
     loadingGui.Parent = coreGui
     
     local container = Instance.new("Frame")
-    container.Size = UDim2.fromOffset(300, 150)
-    container.Position = UDim2.new(0.5, -150, 0.5, -75)
+    container.Size = UDim2.fromOffset(0, 0)
+    container.Position = UDim2.new(0.5, 0, 0.5, 0)
+    container.AnchorPoint = Vector2.new(0.5, 0.5)
     container.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-    container.BackgroundTransparency = 0.1
+    container.BackgroundTransparency = 1
     container.BorderSizePixel = 0
     container.Parent = loadingGui
     
@@ -63,8 +64,9 @@ local function createLoadingScreen()
     corner.Parent = container
     
     local stroke = Instance.new("UIStroke")
-    stroke.Color = Color3.fromRGB(60, 60, 60)
-    stroke.Thickness = 1
+    stroke.Color = Color3.fromRGB(80, 80, 80)
+    stroke.Thickness = 2
+    stroke.Transparency = 1
     stroke.Parent = container
     
     local title = Instance.new("TextLabel")
@@ -75,6 +77,7 @@ local function createLoadingScreen()
     title.TextColor3 = Color3.fromRGB(255, 255, 255)
     title.TextSize = 24
     title.Font = Enum.Font.GothamBold
+    title.TextTransparency = 1
     title.Parent = container
     
     local status = Instance.new("TextLabel")
@@ -86,6 +89,7 @@ local function createLoadingScreen()
     status.TextSize = 12
     status.Font = Enum.Font.Gotham
     status.TextXAlignment = Enum.TextXAlignment.Left
+    status.TextTransparency = 1
     status.Parent = container
     
     -- Spinning loader (3 dots animation)
@@ -102,6 +106,7 @@ local function createLoadingScreen()
         dot.Position = UDim2.fromOffset((i-1) * 20 + 6, 6)
         dot.BackgroundColor3 = Color3.fromRGB(74, 158, 255)
         dot.BorderSizePixel = 0
+        dot.BackgroundTransparency = 1
         dot.Parent = dotsContainer
         
         local dotCorner = Instance.new("UICorner")
@@ -111,6 +116,36 @@ local function createLoadingScreen()
         table.insert(dots, dot)
     end
     
+    -- Animate container appearance
+    TweenService:Create(container, TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+        Size = UDim2.fromOffset(300, 150),
+        BackgroundTransparency = 0.1
+    }):Play()
+    
+    TweenService:Create(stroke, TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+        Transparency = 0
+    }):Play()
+    
+    -- Fade in text elements
+    task.delay(0.3, function()
+        TweenService:Create(title, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+            TextTransparency = 0
+        }):Play()
+        
+        TweenService:Create(status, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+            TextTransparency = 0.3
+        }):Play()
+        
+        -- Fade in dots
+        for i, dot in ipairs(dots) do
+            task.delay(i * 0.1, function()
+                TweenService:Create(dot, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                    BackgroundTransparency = 0
+                }):Play()
+            end)
+        end
+    end)
+    
     -- Animate dots
     local TweenService = game:GetService("TweenService")
     local animationRunning = true
@@ -118,19 +153,21 @@ local function createLoadingScreen()
     -- Store cleanup function
     loadingGui:SetAttribute("StopAnimation", false)
     
-    for i, dot in ipairs(dots) do
-        coroutine.wrap(function()
-            while loadingGui.Parent and not loadingGui:GetAttribute("StopAnimation") do
-                task.wait((i-1) * 0.15)
-                if not loadingGui.Parent then break end
-                TweenService:Create(dot, TweenInfo.new(0.3), {BackgroundTransparency = 0.8}):Play()
-                task.wait(0.3)
-                if not loadingGui.Parent then break end
-                TweenService:Create(dot, TweenInfo.new(0.3), {BackgroundTransparency = 0}):Play()
-                task.wait(0.3 + (3-i) * 0.15)
-            end
-        end)()
-    end
+    task.delay(0.8, function()
+        for i, dot in ipairs(dots) do
+            coroutine.wrap(function()
+                while loadingGui.Parent and not loadingGui:GetAttribute("StopAnimation") do
+                    task.wait((i-1) * 0.15)
+                    if not loadingGui.Parent then break end
+                    TweenService:Create(dot, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundTransparency = 0.8}):Play()
+                    task.wait(0.4)
+                    if not loadingGui.Parent then break end
+                    TweenService:Create(dot, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundTransparency = 0}):Play()
+                    task.wait(0.4 + (3-i) * 0.15)
+                end
+            end)()
+        end
+    end)
     
     return loadingGui, blur
 end

@@ -1009,22 +1009,50 @@ function Window:Show()
     
     -- Fade out loading screen
     if loadingGui then
-        -- Fade out all elements
+        local container = loadingGui:FindFirstChild("Frame")
+        
+        -- Stop dot animations
+        loadingGui:SetAttribute("StopAnimation", true)
+        
+        -- Fade out all text elements first
         for _, child in pairs(loadingGui:GetDescendants()) do
-            if child:IsA("GuiObject") then
-                if child:IsA("TextLabel") or child:IsA("TextButton") then
-                    TweenService:Create(child, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-                        TextTransparency = 1
-                    }):Play()
-                end
-                TweenService:Create(child, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-                    BackgroundTransparency = 1
+            if child:IsA("TextLabel") then
+                TweenService:Create(child, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                    TextTransparency = 1
                 }):Play()
             end
         end
         
+        -- Fade out dots
+        task.delay(0.1, function()
+            for _, child in pairs(loadingGui:GetDescendants()) do
+                if child.Name == "Frame" and child.Parent and child.Parent.Name == "Frame" and child.BackgroundColor3 == Color3.fromRGB(74, 158, 255) then
+                    TweenService:Create(child, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                        BackgroundTransparency = 1
+                    }):Play()
+                end
+            end
+        end)
+        
+        -- Scale down and fade container
+        if container then
+            task.delay(0.2, function()
+                TweenService:Create(container, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.In), {
+                    Size = UDim2.fromOffset(0, 0),
+                    BackgroundTransparency = 1
+                }):Play()
+                
+                local stroke = container:FindFirstChildOfClass("UIStroke")
+                if stroke then
+                    TweenService:Create(stroke, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                        Transparency = 1
+                    }):Play()
+                end
+            end)
+        end
+        
         -- Destroy after animation
-        task.delay(0.55, function()
+        task.delay(0.75, function()
             if loadingGui and loadingGui.Parent then
                 loadingGui:Destroy()
             end
@@ -1033,8 +1061,8 @@ function Window:Show()
     
     -- Fade out blur
     if loadingBlur then
-        TweenService:Create(loadingBlur, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Size = 0}):Play()
-        task.delay(0.55, function()
+        TweenService:Create(loadingBlur, TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Size = 0}):Play()
+        task.delay(0.65, function()
             if loadingBlur and loadingBlur.Parent then
                 loadingBlur:Destroy()
             end
@@ -1043,7 +1071,7 @@ function Window:Show()
     
     -- Also try from config
     if self.Config._loadingGui and self.Config._loadingGui.Parent then
-        task.delay(0.55, function()
+        task.delay(0.75, function()
             if self.Config._loadingGui and self.Config._loadingGui.Parent then
                 self.Config._loadingGui:Destroy()
             end
@@ -1051,7 +1079,7 @@ function Window:Show()
     end
     
     if self.Config._loadingBlur and self.Config._loadingBlur.Parent then
-        task.delay(0.55, function()
+        task.delay(0.65, function()
             if self.Config._loadingBlur and self.Config._loadingBlur.Parent then
                 self.Config._loadingBlur:Destroy()
             end
@@ -1063,7 +1091,7 @@ function Window:Show()
     self.Config._loadingBlur = nil
     
     -- Wait for loading fade out to start, then show window
-    task.wait(0.25)
+    task.wait(0.3)
     
     -- Enable ScreenGui
     self.ScreenGui.Enabled = true
