@@ -178,13 +178,15 @@ function Tab:Select()
         Size = UDim2.new(0, 3, 0, 30)
     }):Play()
     
-    -- Show content container
-    self.ContentContainer.Visible = true
-    
-    -- Show sections if they exist
-    for _, section in pairs(self.Sections) do
-        if section.Container then
-            section.Container.Visible = true
+    -- Show content container for sections
+    if #self.Sections > 0 then
+        self.ContentContainer.Visible = true
+        
+        -- Show sections if they exist
+        for _, section in pairs(self.Sections) do
+            if section.Container then
+                section.Container.Visible = true
+            end
         end
     end
     
@@ -277,17 +279,19 @@ function Tab:Deselect()
         Size = UDim2.new(0, 3, 0, 0)
     }):Play()
     
-    -- Hide content container
-    task.delay(0.35, function()
-        self.ContentContainer.Visible = false
-    end)
-    
-    -- Hide sections
-    for _, section in pairs(self.Sections) do
-        if section.Container then
-            task.delay(0.35, function()
-                section.Container.Visible = false
-            end)
+    -- Hide content container for sections
+    if #self.Sections > 0 then
+        task.delay(0.35, function()
+            self.ContentContainer.Visible = false
+        end)
+        
+        -- Hide sections
+        for _, section in pairs(self.Sections) do
+            if section.Container then
+                task.delay(0.35, function()
+                    section.Container.Visible = false
+                end)
+            end
         end
     end
     
