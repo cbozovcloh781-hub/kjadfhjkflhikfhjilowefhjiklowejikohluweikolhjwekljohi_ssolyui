@@ -874,6 +874,20 @@ end
 function Window:SetAccentColor(color)
     self.AccentColor = color
     
+    -- Update particle system color
+    if self.ParticleSystem then
+        self.ParticleSystem:SetAccentColor(color)
+    end
+    
+    -- Update smoke particles color
+    if self.SmokeParticles then
+        for _, smoke in ipairs(self.SmokeParticles) do
+            if smoke and smoke.Parent then
+                smoke.BackgroundColor3 = color
+            end
+        end
+    end
+    
     -- Update all accent elements safely
     for i = #self.AccentElements, 1, -1 do
         local element = self.AccentElements[i]
@@ -1103,9 +1117,76 @@ function Window:InitParticles()
     local Particles = loadstring(game:HttpGet(baseUrl .. "utils/Particles.lua"))()
     
     -- Create particles for window
-    self.ParticleSystem = Particles.new(self.Container)
+    self.ParticleSystem = Particles.new(self.Container, self.AccentColor)
     self.ParticleSystem.Running = true
     self.ParticleSystem:Start()
+    
+    -- Create smoke effect at bottom
+    self:CreateSmokeEffect()
+end
+
+function Window:CreateSmokeEffect()
+    -- Smoke container at bottom
+    local smokeContainer = Instance.new("Frame")
+    smokeContainer.Name = "SmokeEffect"
+    smokeContainer.Size = UDim2.new(1, 0, 0, 150)
+    smokeContainer.Position = UDim2.new(0, 0, 1, -150)
+    smokeContainer.BackgroundTransparency = 1
+    smokeContainer.ClipsDescendants = true
+    smokeContainer.ZIndex = -50
+    smokeContainer.Parent = self.Container
+    
+    self.SmokeContainer = smokeContainer
+    self.SmokeParticles = {}
+    
+    -- Create smoke particles
+    local function createSmoke()
+        local smoke = Instance.new("Frame")
+        smoke.Size = UDim2.fromOffset(math.random(40, 80), math.random(40, 80))
+        smoke.Position = UDim2.new(math.random(0, 100) / 100, 0, 1, 0)
+        smoke.BackgroundColor3 = self.AccentColor
+        smoke.BackgroundTransparency = 0.85
+        smoke.BorderSizePixel = 0
+        smoke.ZIndex = -49
+        smoke.Parent = smokeContainer
+        
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(1, 0)
+        corner.Parent = smoke
+        
+        table.insert(self.SmokeParticles, smoke)
+        
+        -- Animate upward with fade
+        local duration = math.random(4, 7)
+        local endY = -smoke.AbsoluteSize.Y
+        
+        TweenService:Create(smoke, TweenInfo.new(duration, Enum.EasingStyle.Linear), {
+            Position = UDim2.new(smoke.Position.X.Scale + math.random(-20, 20) / 100, 0, 0, endY),
+            BackgroundTransparency = 1,
+            Size = UDim2.fromOffset(smoke.AbsoluteSize.X * 1.5, smoke.AbsoluteSize.Y * 1.5)
+        }):Play()
+        
+        -- Remove after animation
+        task.delay(duration, function()
+            if smoke and smoke.Parent then
+                smoke:Destroy()
+            end
+            for i, s in ipairs(self.SmokeParticles) do
+                if s == smoke then
+                    table.remove(self.SmokeParticles, i)
+                    break
+                end
+            end
+        end)
+    end
+    
+    -- Spawn smoke continuously
+    task.spawn(function()
+        while self.Container and self.Container.Parent do
+            createSmoke()
+            task.wait(math.random(500, 1000) / 1000)
+        end
+    end)
 end
 
 function Window:SetParticlesEnabled(enabled)

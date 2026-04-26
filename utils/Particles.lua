@@ -8,10 +8,11 @@ local Particles = {}
 Particles.Enabled = true
 Particles.Active = {}
 
-function Particles.new(parent)
+function Particles.new(parent, accentColor)
     local self = setmetatable({}, {__index = Particles})
     
     self.Parent = parent
+    self.AccentColor = accentColor or Color3.fromRGB(74, 158, 255)
     self.Container = Instance.new("Frame")
     self.Container.Name = "ParticlesContainer"
     self.Container.Size = UDim2.fromScale(1, 1)
@@ -42,11 +43,13 @@ function Particles:CreateParticle()
         math.random(0, 100) / 100,
         0
     )
-    particle.BackgroundColor3 = Color3.fromRGB(
-        math.random(200, 255),
-        math.random(200, 255),
-        math.random(255, 255)
-    )
+    
+    -- Use accent color with slight variation
+    local r = math.clamp(self.AccentColor.R * 255 + math.random(-20, 20), 0, 255)
+    local g = math.clamp(self.AccentColor.G * 255 + math.random(-20, 20), 0, 255)
+    local b = math.clamp(self.AccentColor.B * 255 + math.random(-20, 20), 0, 255)
+    
+    particle.BackgroundColor3 = Color3.fromRGB(r, g, b)
     particle.BackgroundTransparency = math.random(30, 70) / 100
     particle.BorderSizePixel = 0
     particle.ZIndex = -99
@@ -165,6 +168,10 @@ function Particles.SetEnabled(enabled)
             end
         end
     end
+end
+
+function Particles:SetAccentColor(color)
+    self.AccentColor = color
 end
 
 return Particles

@@ -11,7 +11,17 @@ Slider.__index = Slider
 function Slider.new(tab, config)
     local self = setmetatable({}, Slider)
     
-    self.Tab = tab
+    -- Extract Tab, Window, and Container from passed object
+    if tab.Tab then
+        self.Tab = tab.Tab
+        self.Window = tab.Window
+        self.ParentContainer = tab.Container
+    else
+        self.Tab = tab
+        self.Window = tab.Window
+        self.ParentContainer = tab.Window.ContentContainer
+    end
+    
     self.Title = config.Title or "Slider"
     self.Description = config.Description
     self.Min = config.Min or 0
@@ -36,7 +46,7 @@ function Slider:CreateElement()
     self.Container.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     self.Container.BackgroundTransparency = 0.5
     self.Container.BorderSizePixel = 0
-    self.Container.Parent = self.Tab.Window.ContentContainer
+    self.Container.Parent = self.ParentContainer
     
     local Corner = Instance.new("UICorner")
     Corner.CornerRadius = UDim.new(0, 8)
@@ -115,8 +125,8 @@ function Slider:CreateElement()
     self.SliderFill.BorderSizePixel = 0
     self.SliderFill.Parent = self.SliderTrack
     
-    if self.Tab.Window.AccentElements then
-        table.insert(self.Tab.Window.AccentElements, self.SliderFill)
+    if self.Window.AccentElements then
+        table.insert(self.Window.AccentElements, self.SliderFill)
     end
     
     local FillCorner = Instance.new("UICorner")

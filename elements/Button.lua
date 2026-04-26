@@ -10,7 +10,17 @@ Button.__index = Button
 function Button.new(tab, config)
     local self = setmetatable({}, Button)
     
-    self.Tab = tab
+    -- Extract Tab, Window, and Container from passed object
+    if tab.Tab then
+        self.Tab = tab.Tab
+        self.Window = tab.Window
+        self.ParentContainer = tab.Container
+    else
+        self.Tab = tab
+        self.Window = tab.Window
+        self.ParentContainer = tab.Window.ContentContainer
+    end
+    
     self.Title = config.Title or "Button"
     self.Description = config.Description
     self.Callback = config.Callback or function() end
@@ -28,7 +38,7 @@ function Button:CreateElement()
     self.Container.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     self.Container.BackgroundTransparency = 0.5
     self.Container.BorderSizePixel = 0
-    self.Container.Parent = self.Tab.Window.ContentContainer
+    self.Container.Parent = self.ParentContainer
     
     local Corner = Instance.new("UICorner")
     Corner.CornerRadius = UDim.new(0, 8)
@@ -39,7 +49,7 @@ function Button:CreateElement()
     self.Button.Name = "Button"
     self.Button.Size = UDim2.new(1, -24, 0, 30)
     self.Button.Position = UDim2.fromOffset(12, 8)
-    self.Button.BackgroundColor3 = self.Tab.Window.AccentColor or Color3.fromRGB(74, 158, 255)
+    self.Button.BackgroundColor3 = self.Window.AccentColor or Color3.fromRGB(74, 158, 255)
     self.Button.BackgroundTransparency = 0.2
     self.Button.BorderSizePixel = 0
     self.Button.Text = ""
@@ -47,8 +57,8 @@ function Button:CreateElement()
     self.Button.SelectionImageObject = nil
     self.Button.Parent = self.Container
     
-    if self.Tab.Window.AccentElements then
-        table.insert(self.Tab.Window.AccentElements, self.Button)
+    if self.Window.AccentElements then
+        table.insert(self.Window.AccentElements, self.Button)
     end
     
     local ButtonCorner = Instance.new("UICorner")

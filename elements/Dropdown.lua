@@ -10,7 +10,17 @@ Dropdown.__index = Dropdown
 function Dropdown.new(tab, config)
     local self = setmetatable({}, Dropdown)
     
-    self.Tab = tab
+    -- Extract Tab, Window, and Container from passed object
+    if tab.Tab then
+        self.Tab = tab.Tab
+        self.Window = tab.Window
+        self.ParentContainer = tab.Container
+    else
+        self.Tab = tab
+        self.Window = tab.Window
+        self.ParentContainer = tab.Window.ContentContainer
+    end
+    
     self.Title = config.Title or "Dropdown"
     self.Description = config.Description
     self.Values = config.Values or {}
@@ -27,7 +37,11 @@ function Dropdown.new(tab, config)
     if self.Default then
         if self.Multi then
             for _, v in pairs(self.Default) do
-                self.Value[v] = true
+                if type(self.Default) == "table" and self.Default[v] then
+                    self.Value[v] = true
+                else
+                    self.Value[v] = true
+                end
             end
         else
             self.Value = self.Default
@@ -48,7 +62,7 @@ function Dropdown:CreateElement()
     self.Container.BorderSizePixel = 0
     self.Container.ClipsDescendants = false
     self.Container.ZIndex = 1
-    self.Container.Parent = self.Tab.Window.ContentContainer
+    self.Container.Parent = self.ParentContainer
     
     local Corner = Instance.new("UICorner")
     Corner.CornerRadius = UDim.new(0, 8)
@@ -150,20 +164,20 @@ function Dropdown:CreateElement()
     self.OptionsContainer.ClipsDescendants = true
     self.OptionsContainer.Visible = false
     self.OptionsContainer.ZIndex = 100
-    self.OptionsContainer.Parent = self.Tab.Window.ScreenGui
+    self.OptionsContainer.Parent = self.Window.ScreenGui
     
     local OptionsCorner = Instance.new("UICorner")
     OptionsCorner.CornerRadius = UDim.new(0, 6)
     OptionsCorner.Parent = self.OptionsContainer
     
     local OptionsStroke = Instance.new("UIStroke")
-    OptionsStroke.Color = self.Tab.Window.AccentColor or Color3.fromRGB(74, 158, 255)
+    OptionsStroke.Color = self.Window.AccentColor or Color3.fromRGB(74, 158, 255)
     OptionsStroke.Thickness = 1
     OptionsStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
     OptionsStroke.Parent = self.OptionsContainer
     
-    if self.Tab.Window.AccentElements then
-        table.insert(self.Tab.Window.AccentElements, OptionsStroke)
+    if self.Window.AccentElements then
+        table.insert(self.Window.AccentElements, OptionsStroke)
     end
     
     -- Scrolling frame for options
@@ -172,12 +186,12 @@ function Dropdown:CreateElement()
     self.OptionsScroll.BackgroundTransparency = 1
     self.OptionsScroll.BorderSizePixel = 0
     self.OptionsScroll.ScrollBarThickness = 4
-    self.OptionsScroll.ScrollBarImageColor3 = self.Tab.Window.AccentColor or Color3.fromRGB(74, 158, 255)
+    self.OptionsScroll.ScrollBarImageColor3 = self.Window.AccentColor or Color3.fromRGB(74, 158, 255)
     self.OptionsScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
     self.OptionsScroll.Parent = self.OptionsContainer
     
-    if self.Tab.Window.AccentElements then
-        table.insert(self.Tab.Window.AccentElements, self.OptionsScroll)
+    if self.Window.AccentElements then
+        table.insert(self.Window.AccentElements, self.OptionsScroll)
     end
     
     local OptionsLayout = Instance.new("UIListLayout")
@@ -360,8 +374,8 @@ function Dropdown:Open()
         local buttonSize = self.DropdownButton.AbsoluteSize
         
         -- Проверяем, чтобы дропдаун не вылезал за границы контейнера
-        local containerPos = self.Tab.Window.ContentContainer.AbsolutePosition
-        local containerSize = self.Tab.Window.ContentContainer.AbsoluteSize
+        local containerPos = self.Window.ContentContainer.AbsolutePosition
+        local containerSize = self.Window.ContentContainer.AbsoluteSize
         local containerBottom = containerPos.Y + containerSize.Y
         local containerTop = containerPos.Y
         
@@ -412,8 +426,8 @@ function Dropdown:Open()
     local buttonSize = self.DropdownButton.AbsoluteSize
     
     -- Проверяем максимальную высоту
-    local containerPos = self.Tab.Window.ContentContainer.AbsolutePosition
-    local containerSize = self.Tab.Window.ContentContainer.AbsoluteSize
+    local containerPos = self.Window.ContentContainer.AbsolutePosition
+    local containerSize = self.Window.ContentContainer.AbsoluteSize
     local containerBottom = containerPos.Y + containerSize.Y
     local containerTop = containerPos.Y
     
@@ -463,7 +477,7 @@ function Dropdown:Open()
     -- Rotate arrow with bounce effect
     TweenService:Create(self.ArrowIcon, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
         Rotation = openUpwards and -180 or 180,
-        TextColor3 = self.Tab.Window.AccentColor or Color3.fromRGB(74, 158, 255)
+        TextColor3 = self.Window.AccentColor or Color3.fromRGB(74, 158, 255)
     }):Play()
 end
 
@@ -513,7 +527,7 @@ function Dropdown:ToggleValue(value)
     
     self.Value[value] = not self.Value[value] or nil
     
-    local accentColor = self.Tab.Window.AccentColor or Color3.fromRGB(74, 158, 255)
+    local accentColor = self.Window.AccentColor or Color3.fromRGB(74, 158, 255)
     
     local option = self.OptionButtons[value]
     if option then
@@ -575,7 +589,7 @@ function Dropdown:UpdateDisplay()
             self.DisplayLabel.Text = selected[1] .. " (+" .. (#selected - 1) .. ")"
         end
         
-        local accentColor = self.Tab.Window.AccentColor or Color3.fromRGB(74, 158, 255)
+        local accentColor = self.Window.AccentColor or Color3.fromRGB(74, 158, 255)
         
         -- Update checkmarks with animations
         for value, option in pairs(self.OptionButtons) do

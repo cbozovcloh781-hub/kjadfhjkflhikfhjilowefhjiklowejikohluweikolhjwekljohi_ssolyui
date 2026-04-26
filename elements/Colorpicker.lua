@@ -11,7 +11,17 @@ Colorpicker.__index = Colorpicker
 function Colorpicker.new(tab, config)
     local self = setmetatable({}, Colorpicker)
     
-    self.Tab = tab
+    -- Extract Tab, Window, and Container from passed object
+    if tab.Tab then
+        self.Tab = tab.Tab
+        self.Window = tab.Window
+        self.ParentContainer = tab.Container
+    else
+        self.Tab = tab
+        self.Window = tab.Window
+        self.ParentContainer = tab.Window.ContentContainer
+    end
+    
     self.Title = config.Title or "Color"
     self.Description = config.Description
     self.Default = config.Default or Color3.fromRGB(255, 255, 255)
@@ -35,7 +45,7 @@ function Colorpicker:CreateElement()
     self.Container.BorderSizePixel = 0
     self.Container.ClipsDescendants = false
     self.Container.ZIndex = 1
-    self.Container.Parent = self.Tab.Window.ContentContainer
+    self.Container.Parent = self.ParentContainer
     
     local Corner = Instance.new("UICorner")
     Corner.CornerRadius = UDim.new(0, 8)
@@ -110,13 +120,13 @@ function Colorpicker:CreateElement()
     PickerCorner.Parent = self.PickerContainer
     
     local PickerStroke = Instance.new("UIStroke")
-    PickerStroke.Color = self.Tab.Window.AccentColor or Color3.fromRGB(74, 158, 255)
+    PickerStroke.Color = self.Window.AccentColor or Color3.fromRGB(74, 158, 255)
     PickerStroke.Thickness = 1
     PickerStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
     PickerStroke.Parent = self.PickerContainer
     
-    if self.Tab.Window.AccentElements then
-        table.insert(self.Tab.Window.AccentElements, PickerStroke)
+    if self.Window.AccentElements then
+        table.insert(self.Window.AccentElements, PickerStroke)
     end
     
     -- HSV Palette
