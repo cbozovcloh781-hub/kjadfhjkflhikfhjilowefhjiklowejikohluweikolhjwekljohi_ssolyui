@@ -14,11 +14,24 @@ function Tab.new(window, config)
     self.Title = config.Title or "Tab"
     self.Icon = config.Icon or "📄"
     self.Elements = {}
+    self.Sections = {}
     self.Selected = false
     
     self:CreateButton()
+    self:CreateContentContainer()
     
     return self
+end
+
+function Tab:CreateContentContainer()
+    -- Content container for sections
+    self.ContentContainer = Instance.new("Frame")
+    self.ContentContainer.Name = "Content_" .. self.Title
+    self.ContentContainer.Size = UDim2.new(1, 0, 1, 0)
+    self.ContentContainer.BackgroundTransparency = 1
+    self.ContentContainer.BorderSizePixel = 0
+    self.ContentContainer.Visible = false
+    self.ContentContainer.Parent = self.Window.ContentContainer
 end
 
 function Tab:CreateButton()
@@ -307,8 +320,16 @@ function Tab:Deselect()
     end)
 end
 
--- Element creation methods
-local baseUrl = "https://raw.githubusercontent.com/cbozovcloh781-hub/kjadfhjkflhikfhjilowefhjiklowejikohluweikolhjwekljohi_ssolyui/main/"
+-- Section creation
+function Tab:AddSection(side)
+    local Section = loadstring(game:HttpGet("https://raw.githubusercontent.com/cbozovcloh781-hub/kjadfhjkflhikfhjilowefhjiklowejikohluweikolhjwekljohi_ssolyui/main/core/Section.lua"))()
+    local section = Section.new(self, side)
+    table.insert(self.Sections, section)
+    return section
+end
+
+-- Element creation methods (backward compatibility - adds to Window.ContentContainer)
+local baseUrl = "https://raw.githubusercontent.com/cbozovcloh781-hub/kjadfhjkflhikfhjilowefhjilowefhjiklowejikohluweikolhjwekljohi_ssolyui/main/"
 
 function Tab:AddToggle(config)
     local Toggle = loadstring(game:HttpGet(baseUrl .. "elements/Toggle.lua"))()
