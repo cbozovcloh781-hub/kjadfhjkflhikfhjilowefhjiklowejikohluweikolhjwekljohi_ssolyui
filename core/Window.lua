@@ -748,11 +748,6 @@ function Window:ToggleMinimize()
             self.ParticleSystem.Container.Visible = false
         end
         
-        -- Hide smoke
-        if self.SmokeContainer then
-            self.SmokeContainer.Visible = false
-        end
-        
         -- Hide resize handles
         self.ResizeHandle.Visible = false
         self.ResizeHandleV.Visible = false
@@ -795,11 +790,6 @@ function Window:ToggleMinimize()
         -- Show particles
         if self.ParticleSystem and self.ParticleSystem.Container then
             self.ParticleSystem.Container.Visible = true
-        end
-        
-        -- Show smoke
-        if self.SmokeContainer then
-            self.SmokeContainer.Visible = true
         end
         
         -- Show profile
@@ -897,17 +887,6 @@ function Window:SetAccentColor(color)
     -- Update particle system color
     if self.ParticleSystem then
         self.ParticleSystem:SetAccentColor(color)
-    end
-    
-    -- Update smoke particles color with smooth transition
-    if self.SmokeParticles then
-        for _, smoke in ipairs(self.SmokeParticles) do
-            if smoke and smoke.Parent then
-                TweenService:Create(smoke, TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-                    BackgroundColor3 = color
-                }):Play()
-            end
-        end
     end
     
     -- Update all accent elements safely with smooth transition
@@ -1168,9 +1147,6 @@ function Window:InitParticles()
     self.ParticleSystem = Particles.new(self.Container, self.AccentColor)
     self.ParticleSystem.Running = true
     self.ParticleSystem:Start()
-    
-    -- Create smoke effect at bottom
-    self:CreateSmokeEffect()
 end
 
 function Window:CreateSmokeEffect()
