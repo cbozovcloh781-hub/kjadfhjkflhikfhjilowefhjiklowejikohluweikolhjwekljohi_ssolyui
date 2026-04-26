@@ -115,7 +115,7 @@ function Dropdown:CreateElement()
     self.DisplayLabel.TextTruncate = Enum.TextTruncate.AtEnd
     self.DisplayLabel.Parent = self.DropdownButton
     
-    -- Arrow icon
+    -- Arrow icon with animation
     self.ArrowIcon = Instance.new("TextLabel")
     self.ArrowIcon.Name = "Arrow"
     self.ArrowIcon.Size = UDim2.fromOffset(16, 16)
@@ -126,6 +126,19 @@ function Dropdown:CreateElement()
     self.ArrowIcon.TextSize = 10
     self.ArrowIcon.Font = Enum.Font.GothamBold
     self.ArrowIcon.Parent = self.DropdownButton
+    
+    -- Hover animation for arrow
+    self.DropdownButton.MouseEnter:Connect(function()
+        TweenService:Create(self.ArrowIcon, TweenInfo.new(0.2), {
+            TextColor3 = Color3.fromRGB(255, 255, 255)
+        }):Play()
+    end)
+    
+    self.DropdownButton.MouseLeave:Connect(function()
+        TweenService:Create(self.ArrowIcon, TweenInfo.new(0.2), {
+            TextColor3 = Color3.fromRGB(150, 150, 150)
+        }):Play()
+    end)
     
     -- Options container (hidden by default) - positioned below button with ZIndex
     self.OptionsContainer = Instance.new("Frame")
@@ -364,13 +377,15 @@ function Dropdown:Open()
     self.OptionsContainer.Size = UDim2.new(0, buttonSize.X, 0, 0)
     self.OptionsContainer.Visible = true
     
-    -- Expand options
+    -- Expand options with smooth animation
     TweenService:Create(self.OptionsContainer, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
         Size = UDim2.new(0, buttonSize.X, 0, targetHeight)
     }):Play()
     
-    TweenService:Create(self.ArrowIcon, TweenInfo.new(0.25), {
-        Rotation = 180
+    -- Rotate arrow with bounce effect
+    TweenService:Create(self.ArrowIcon, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+        Rotation = 180,
+        TextColor3 = self.Tab.Window.AccentColor or Color3.fromRGB(74, 158, 255)
     }):Play()
 end
 
@@ -383,13 +398,15 @@ function Dropdown:Close()
         self.UpdateConnection = nil
     end
     
-    -- Close options
+    -- Close options with smooth animation
     TweenService:Create(self.OptionsContainer, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
         Size = UDim2.new(0, self.DropdownButton.AbsoluteSize.X, 0, 0)
     }):Play()
     
-    TweenService:Create(self.ArrowIcon, TweenInfo.new(0.2), {
-        Rotation = 0
+    -- Rotate arrow back with bounce effect
+    TweenService:Create(self.ArrowIcon, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+        Rotation = 0,
+        TextColor3 = Color3.fromRGB(150, 150, 150)
     }):Play()
     
     task.delay(0.2, function()
@@ -423,13 +440,36 @@ function Dropdown:ToggleValue(value)
     local option = self.OptionButtons[value]
     if option then
         if self.Value[value] then
-            option.Check.BackgroundColor3 = accentColor
+            -- Smooth color transition and scale animation
+            TweenService:Create(option.Check, TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+                BackgroundColor3 = accentColor
+            }):Play()
+            TweenService:Create(option.Check:FindFirstChildOfClass("UIStroke"), TweenInfo.new(0.2), {
+                Color = accentColor
+            }):Play()
+            
+            -- Checkmark appears with scale animation
+            option.CheckIcon.TextTransparency = 1
             option.CheckIcon.Text = "✓"
-            option.Check:FindFirstChildOfClass("UIStroke").Color = accentColor
+            TweenService:Create(option.CheckIcon, TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+                TextTransparency = 0
+            }):Play()
         else
-            option.Check.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-            option.CheckIcon.Text = ""
-            option.Check:FindFirstChildOfClass("UIStroke").Color = Color3.fromRGB(70, 70, 70)
+            -- Smooth color transition back
+            TweenService:Create(option.Check, TweenInfo.new(0.2), {
+                BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+            }):Play()
+            TweenService:Create(option.Check:FindFirstChildOfClass("UIStroke"), TweenInfo.new(0.2), {
+                Color = Color3.fromRGB(70, 70, 70)
+            }):Play()
+            
+            -- Checkmark disappears with fade
+            TweenService:Create(option.CheckIcon, TweenInfo.new(0.15), {
+                TextTransparency = 1
+            }):Play()
+            task.delay(0.15, function()
+                option.CheckIcon.Text = ""
+            end)
         end
     end
     
@@ -459,16 +499,26 @@ function Dropdown:UpdateDisplay()
         
         local accentColor = self.Tab.Window.AccentColor or Color3.fromRGB(74, 158, 255)
         
-        -- Update checkmarks
+        -- Update checkmarks with animations
         for value, option in pairs(self.OptionButtons) do
             if self.Value[value] then
-                option.Check.BackgroundColor3 = accentColor
+                TweenService:Create(option.Check, TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+                    BackgroundColor3 = accentColor
+                }):Play()
+                TweenService:Create(option.Check:FindFirstChildOfClass("UIStroke"), TweenInfo.new(0.2), {
+                    Color = accentColor
+                }):Play()
                 option.CheckIcon.Text = "✓"
-                option.Check:FindFirstChildOfClass("UIStroke").Color = accentColor
+                option.CheckIcon.TextTransparency = 0
             else
-                option.Check.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+                TweenService:Create(option.Check, TweenInfo.new(0.2), {
+                    BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+                }):Play()
+                TweenService:Create(option.Check:FindFirstChildOfClass("UIStroke"), TweenInfo.new(0.2), {
+                    Color = Color3.fromRGB(70, 70, 70)
+                }):Play()
                 option.CheckIcon.Text = ""
-                option.Check:FindFirstChildOfClass("UIStroke").Color = Color3.fromRGB(70, 70, 70)
+                option.CheckIcon.TextTransparency = 1
             end
         end
     else

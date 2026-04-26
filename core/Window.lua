@@ -49,6 +49,9 @@ function Window.new(config)
     self:SetupResizing()
     self:SetupMinimize()
     
+    -- Initialize particles system
+    self:InitParticles()
+    
     -- Initialize notification system (will be loaded separately)
     self.Notification = nil
     
@@ -423,8 +426,8 @@ function Window:CreateGUI()
     MinIndLabel.Font = Enum.Font.SourceSansBold
     MinIndLabel.Parent = self.MinimizedIndicator
     
-    -- Snow particles effect
-    self:CreateSnowEffect()
+    -- Snow particles effect (deprecated, use new particles system)
+    -- self:CreateSnowEffect()
 end
 
 function Window:CreateSnowEffect()
@@ -1071,7 +1074,31 @@ function Window:Show()
     end)
 end
 
+function Window:InitParticles()
+    -- Load particles system
+    local baseUrl = "https://raw.githubusercontent.com/cbozovcloh781-hub/kjadfhjkflhikfhjilowefhjiklowejikohluweikolhjwekljohi_ssolyui/main/"
+    local Particles = loadstring(game:HttpGet(baseUrl .. "utils/Particles.lua"))()
+    
+    -- Create particles for window
+    self.ParticleSystem = Particles.new(self.Container)
+    self.ParticleSystem:Start()
+end
+
+function Window:SetParticlesEnabled(enabled)
+    -- Load particles module if not loaded
+    if not self.ParticleSystem then
+        self:InitParticles()
+    end
+    
+    local baseUrl = "https://raw.githubusercontent.com/cbozovcloh781-hub/kjadfhjkflhikfhjilowefhjiklowejikohluweikolhjwekljohi_ssolyui/main/"
+    local Particles = loadstring(game:HttpGet(baseUrl .. "utils/Particles.lua"))()
+    Particles.SetEnabled(enabled)
+end
+
 function Window:Destroy()
+    if self.ParticleSystem then
+        self.ParticleSystem:Destroy()
+    end
     if self.Blur then
         self.Blur:Destroy()
     end

@@ -280,6 +280,16 @@ SettingsTab:AddSlider({
     end
 })
 
+-- Particles Settings
+SettingsTab:AddToggle({
+    Title = "Particles Effect",
+    Description = "Enable/disable animated particles",
+    Default = true,
+    Callback = function(Value)
+        Window:SetParticlesEnabled(Value)
+    end
+})
+
 -- Theme Settings
 SettingsTab:AddDropdown({
     Title = "Theme",
