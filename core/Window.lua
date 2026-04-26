@@ -233,6 +233,7 @@ function Window:CreateGUI()
     local ContentLayout = Instance.new("UIListLayout")
     ContentLayout.SortOrder = Enum.SortOrder.LayoutOrder
     ContentLayout.Padding = UDim.new(0, 8)
+    ContentLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
     ContentLayout.Parent = self.ContentContainer
     
     -- Auto-update canvas size
@@ -243,8 +244,8 @@ function Window:CreateGUI()
     local ContentPadding = Instance.new("UIPadding")
     ContentPadding.PaddingTop = UDim.new(0, 10)
     ContentPadding.PaddingBottom = UDim.new(0, 10)
-    ContentPadding.PaddingLeft = UDim.new(0, 10)
-    ContentPadding.PaddingRight = UDim.new(0, 10)
+    ContentPadding.PaddingLeft = UDim.new(0, 15)
+    ContentPadding.PaddingRight = UDim.new(0, 15)
     ContentPadding.Parent = self.ContentContainer
     
     -- Player profile (bottom-left corner)
@@ -1140,6 +1141,7 @@ function Window:InitParticles()
     
     -- Create particles for window
     self.ParticleSystem = Particles.new(self.Container)
+    self.ParticleSystem.Running = true
     self.ParticleSystem:Start()
 end
 
@@ -1147,6 +1149,20 @@ function Window:SetParticlesEnabled(enabled)
     -- Load particles module if not loaded
     if not self.ParticleSystem then
         self:InitParticles()
+    end
+    
+    if enabled then
+        self.ParticleSystem.Running = true
+    else
+        self.ParticleSystem.Running = false
+        -- Удаляем все существующие частицы
+        for i = #self.ParticleSystem.Particles, 1, -1 do
+            if self.ParticleSystem.Particles[i] and self.ParticleSystem.Particles[i].Parent then
+                self.ParticleSystem.Particles[i]:Destroy()
+            end
+            table.remove(self.ParticleSystem.Particles, i)
+        end
+        self.ParticleSystem.Container.Visible = false
     end
     
     local baseUrl = "https://raw.githubusercontent.com/cbozovcloh781-hub/kjadfhjkflhikfhjilowefhjiklowejikohluweikolhjwekljohi_ssolyui/main/"

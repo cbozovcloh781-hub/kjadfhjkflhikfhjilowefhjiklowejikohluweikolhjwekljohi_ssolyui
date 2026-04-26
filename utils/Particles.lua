@@ -16,19 +16,21 @@ function Particles.new(parent)
     self.Container.Name = "ParticlesContainer"
     self.Container.Size = UDim2.fromScale(1, 1)
     self.Container.BackgroundTransparency = 1
-    self.Container.ZIndex = 1000
+    self.Container.ZIndex = -100
     self.Container.Parent = parent
     
     self.Particles = {}
     self.MaxParticles = 30
     self.SpawnRate = 0.3
     self.LastSpawn = 0
+    self.Running = false
     
     return self
 end
 
 function Particles:CreateParticle()
     if not Particles.Enabled then return end
+    if not self.Running then return end
     if not self.Container or not self.Container.Parent then return end
     if #self.Particles >= self.MaxParticles then return end
     
@@ -47,7 +49,7 @@ function Particles:CreateParticle()
     )
     particle.BackgroundTransparency = math.random(30, 70) / 100
     particle.BorderSizePixel = 0
-    particle.ZIndex = 1001
+    particle.ZIndex = -99
     particle.Parent = self.Container
     
     local corner = Instance.new("UICorner")

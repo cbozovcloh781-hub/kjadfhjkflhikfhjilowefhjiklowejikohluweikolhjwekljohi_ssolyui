@@ -28,7 +28,7 @@ function Input:CreateElement()
     -- Main container
     self.Container = Instance.new("Frame")
     self.Container.Name = "Input"
-    self.Container.Size = UDim2.new(1, -20, 0, self.Description and 90 or 70)
+    self.Container.Size = UDim2.new(1, -30, 0, self.Description and 90 or 70)
     self.Container.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     self.Container.BackgroundTransparency = 0.5
     self.Container.BorderSizePixel = 0

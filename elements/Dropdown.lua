@@ -42,7 +42,7 @@ function Dropdown:CreateElement()
     -- Main container
     self.Container = Instance.new("Frame")
     self.Container.Name = "Dropdown"
-    self.Container.Size = UDim2.new(1, -20, 0, 85)
+    self.Container.Size = UDim2.new(1, -30, 0, 85)
     self.Container.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     self.Container.BackgroundTransparency = 0.5
     self.Container.BorderSizePixel = 0
