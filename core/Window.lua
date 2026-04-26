@@ -97,21 +97,21 @@ function Window:CreateGUI()
     self.Container.Name = "Container"
     self.Container.Size = self.Config.Size
     self.Container.Position = self.Config.Position
-    self.Container.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    self.Container.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
     self.Container.BackgroundTransparency = self.Config.Transparency
     self.Container.BorderSizePixel = 0
     self.Container.ClipsDescendants = true
     self.Container.SelectionImageObject = nil
     self.Container.Parent = self.ScreenGui
     
-    -- Rounded corners
+    -- Rounded corners (bigger radius)
     local UICorner = Instance.new("UICorner")
-    UICorner.CornerRadius = UDim.new(0, 8)
+    UICorner.CornerRadius = UDim.new(0, 12)
     UICorner.Parent = self.Container
     
-    -- Border (stroke)
+    -- Border (stroke) - thinner and darker
     local UIStroke = Instance.new("UIStroke")
-    UIStroke.Color = Color3.fromRGB(60, 60, 60)
+    UIStroke.Color = Color3.fromRGB(40, 40, 40)
     UIStroke.Thickness = 1
     UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
     UIStroke.Parent = self.Container
@@ -120,20 +120,20 @@ function Window:CreateGUI()
     self.TitleBar = Instance.new("Frame")
     self.TitleBar.Name = "TitleBar"
     self.TitleBar.Size = UDim2.new(1, 0, 0, 35)
-    self.TitleBar.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+    self.TitleBar.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
     self.TitleBar.BackgroundTransparency = 0
     self.TitleBar.BorderSizePixel = 0
     self.TitleBar.Parent = self.Container
     
     local TitleCorner = Instance.new("UICorner")
-    TitleCorner.CornerRadius = UDim.new(0, 8)
+    TitleCorner.CornerRadius = UDim.new(0, 12)
     TitleCorner.Parent = self.TitleBar
     
-    -- Divider line
+    -- Divider line (thinner)
     local Divider = Instance.new("Frame")
     Divider.Size = UDim2.new(1, 0, 0, 1)
     Divider.Position = UDim2.new(0, 0, 1, 0)
-    Divider.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    Divider.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
     Divider.BorderSizePixel = 0
     Divider.Parent = self.TitleBar
     
@@ -182,22 +182,22 @@ function Window:CreateGUI()
     TabLayout.Padding = UDim.new(0, 5)
     TabLayout.Parent = self.TabContainer
     
-    -- Content container (right side) - with visible scrollbar
+    -- Content container (right side) - darker with card style
     self.ContentContainer = Instance.new("ScrollingFrame")
     self.ContentContainer.Name = "ContentContainer"
     self.ContentContainer.Size = UDim2.new(1, -160, 1, -45)
     self.ContentContainer.Position = UDim2.fromOffset(152, 40)
-    self.ContentContainer.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-    self.ContentContainer.BackgroundTransparency = 0.5
+    self.ContentContainer.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
+    self.ContentContainer.BackgroundTransparency = 0.3
     self.ContentContainer.BorderSizePixel = 0
     self.ContentContainer.ScrollBarThickness = 4
-    self.ContentContainer.ScrollBarImageColor3 = Color3.fromRGB(60, 60, 60)
+    self.ContentContainer.ScrollBarImageColor3 = Color3.fromRGB(80, 80, 80)
     self.ContentContainer.ScrollBarImageTransparency = 0
     self.ContentContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
     self.ContentContainer.Parent = self.Container
     
     local ContentCorner = Instance.new("UICorner")
-    ContentCorner.CornerRadius = UDim.new(0, 6)
+    ContentCorner.CornerRadius = UDim.new(0, 10)
     ContentCorner.Parent = self.ContentContainer
     
     local ContentLayout = Instance.new("UIListLayout")
@@ -218,22 +218,22 @@ function Window:CreateGUI()
     ContentPadding.PaddingRight = UDim.new(0, 15)
     ContentPadding.Parent = self.ContentContainer
     
-    -- Player profile (bottom-left corner)
+    -- Player profile (bottom-left corner) - card style
     self.ProfileContainer = Instance.new("Frame")
     self.ProfileContainer.Name = "Profile"
     self.ProfileContainer.Size = UDim2.new(0, 140, 0, 50)
     self.ProfileContainer.Position = UDim2.new(0, 8, 1, -58)
-    self.ProfileContainer.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+    self.ProfileContainer.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
     self.ProfileContainer.BackgroundTransparency = 0
     self.ProfileContainer.BorderSizePixel = 0
     self.ProfileContainer.Parent = self.Container
     
     local ProfileCorner = Instance.new("UICorner")
-    ProfileCorner.CornerRadius = UDim.new(0, 6)
+    ProfileCorner.CornerRadius = UDim.new(0, 10)
     ProfileCorner.Parent = self.ProfileContainer
     
     local ProfileStroke = Instance.new("UIStroke")
-    ProfileStroke.Color = Color3.fromRGB(60, 60, 60)
+    ProfileStroke.Color = Color3.fromRGB(40, 40, 40)
     ProfileStroke.Thickness = 1
     ProfileStroke.Parent = self.ProfileContainer
     

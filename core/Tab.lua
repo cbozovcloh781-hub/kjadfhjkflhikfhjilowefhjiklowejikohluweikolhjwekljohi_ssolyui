@@ -35,12 +35,12 @@ function Tab:CreateContentContainer()
 end
 
 function Tab:CreateButton()
-    -- Tab button
+    -- Tab button with card style
     self.Button = Instance.new("TextButton")
     self.Button.Name = self.Title
     self.Button.Size = UDim2.new(1, 0, 0, 40)
-    self.Button.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-    self.Button.BackgroundTransparency = 0.3
+    self.Button.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    self.Button.BackgroundTransparency = 0.2
     self.Button.BorderSizePixel = 0
     self.Button.Text = ""
     self.Button.AutoButtonColor = false
@@ -48,7 +48,7 @@ function Tab:CreateButton()
     self.Button.Parent = self.Window.TabContainer
     
     local Corner = Instance.new("UICorner")
-    Corner.CornerRadius = UDim.new(0, 8)
+    Corner.CornerRadius = UDim.new(0, 10)
     Corner.Parent = self.Button
     
     -- Icon (Roblox Studio style with ImageLabel)
@@ -159,10 +159,32 @@ function Tab:Select()
     
     local accentColor = self.Window.AccentColor or Color3.fromRGB(74, 158, 255)
     
-    -- Animate selection with bounce effect
+    -- Animate selection with glow effect
     TweenService:Create(self.Button, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
         BackgroundColor3 = accentColor,
-        BackgroundTransparency = 0.8
+        BackgroundTransparency = 0.85
+    }):Play()
+    
+    -- Add glow effect
+    local glow = self.Button:FindFirstChild("Glow")
+    if not glow then
+        glow = Instance.new("ImageLabel")
+        glow.Name = "Glow"
+        glow.Size = UDim2.new(1, 40, 1, 40)
+        glow.Position = UDim2.fromOffset(-20, -20)
+        glow.BackgroundTransparency = 1
+        glow.Image = "rbxassetid://5028857084"
+        glow.ImageColor3 = accentColor
+        glow.ImageTransparency = 1
+        glow.ScaleType = Enum.ScaleType.Slice
+        glow.SliceCenter = Rect.new(24, 24, 276, 276)
+        glow.ZIndex = 0
+        glow.Parent = self.Button
+    end
+    
+    TweenService:Create(glow, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+        ImageTransparency = 0.7,
+        ImageColor3 = accentColor
     }):Play()
     
     TweenService:Create(self.TitleLabel, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
@@ -276,9 +298,17 @@ function Tab:Deselect()
     
     -- Animate deselection smoothly
     TweenService:Create(self.Button, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-        BackgroundColor3 = Color3.fromRGB(35, 35, 35),
-        BackgroundTransparency = 0.3
+        BackgroundColor3 = Color3.fromRGB(20, 20, 20),
+        BackgroundTransparency = 0.2
     }):Play()
+    
+    -- Remove glow
+    local glow = self.Button:FindFirstChild("Glow")
+    if glow then
+        TweenService:Create(glow, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+            ImageTransparency = 1
+        }):Play()
+    end
     
     TweenService:Create(self.TitleLabel, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
         TextColor3 = Color3.fromRGB(150, 150, 150)
