@@ -122,10 +122,21 @@ function Particles:Stop()
         self.Connection = nil
     end
     
-    -- Удаляем все частицы
+    -- Плавно исчезаем все частицы
     for i = #self.Particles, 1, -1 do
-        if self.Particles[i] and self.Particles[i].Parent then
-            self.Particles[i]:Destroy()
+        local particle = self.Particles[i]
+        if particle and particle.Parent then
+            -- Анимация исчезновения
+            TweenService:Create(particle, TweenInfo.new(0.8, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                BackgroundTransparency = 1
+            }):Play()
+            
+            -- Удаляем после анимации
+            task.delay(0.8, function()
+                if particle and particle.Parent then
+                    particle:Destroy()
+                end
+            end)
         end
         table.remove(self.Particles, i)
     end
@@ -149,15 +160,24 @@ function Particles.SetEnabled(enabled)
     
     for _, particleSystem in ipairs(Particles.Active) do
         if not enabled then
-            -- Останавливаем систему и удаляем все частицы
+            -- Останавливаем систему и плавно удаляем все частицы
             particleSystem.Running = false
             if particleSystem.Container then
                 particleSystem.Container.Visible = false
             end
-            -- Удаляем все частицы
+            -- Плавно исчезаем все частицы
             for i = #particleSystem.Particles, 1, -1 do
-                if particleSystem.Particles[i] and particleSystem.Particles[i].Parent then
-                    particleSystem.Particles[i]:Destroy()
+                local particle = particleSystem.Particles[i]
+                if particle and particle.Parent then
+                    TweenService:Create(particle, TweenInfo.new(0.8, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                        BackgroundTransparency = 1
+                    }):Play()
+                    
+                    task.delay(0.8, function()
+                        if particle and particle.Parent then
+                            particle:Destroy()
+                        end
+                    end)
                 end
                 table.remove(particleSystem.Particles, i)
             end

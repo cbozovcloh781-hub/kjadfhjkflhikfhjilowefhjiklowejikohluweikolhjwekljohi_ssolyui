@@ -188,7 +188,7 @@ function Tab:Select()
     end
     
     TweenService:Create(glow, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-        ImageTransparency = 0.75,
+        ImageTransparency = 0.85,
         ImageColor3 = accentColor
     }):Play()
     
