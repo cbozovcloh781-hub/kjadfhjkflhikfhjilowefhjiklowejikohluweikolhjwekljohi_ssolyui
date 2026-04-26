@@ -880,30 +880,34 @@ end
 function Window:Show()
     if not self._delayShow then return end
     
-    -- Close loading screen first
-    if self.Config._loadingGui then
-        local loadingGui = self.Config._loadingGui
-        local loadingBlur = self.Config._loadingBlur
-        
-        -- Stop animation immediately
-        if loadingGui.Parent then
-            loadingGui:SetAttribute("StopAnimation", true)
-        end
-        
-        -- Destroy blur immediately
-        if loadingBlur and loadingBlur.Parent then
-            loadingBlur:Destroy()
-        end
-        
-        -- Destroy loading GUI immediately
-        if loadingGui.Parent then
-            loadingGui:Destroy()
-        end
-        
-        -- Clear references
-        self.Config._loadingGui = nil
-        self.Config._loadingBlur = nil
+    -- Force remove loading screen by name
+    local coreGui = game:GetService("CoreGui")
+    local lighting = game:GetService("Lighting")
+    
+    -- Remove loading GUI by name
+    local loadingGui = coreGui:FindFirstChild("SsolyLoading")
+    if loadingGui then
+        loadingGui:Destroy()
     end
+    
+    -- Remove loading blur by name
+    local loadingBlur = lighting:FindFirstChild("SsolyLoadingBlur")
+    if loadingBlur then
+        loadingBlur:Destroy()
+    end
+    
+    -- Also try from config
+    if self.Config._loadingGui and self.Config._loadingGui.Parent then
+        self.Config._loadingGui:Destroy()
+    end
+    
+    if self.Config._loadingBlur and self.Config._loadingBlur.Parent then
+        self.Config._loadingBlur:Destroy()
+    end
+    
+    -- Clear references
+    self.Config._loadingGui = nil
+    self.Config._loadingBlur = nil
     
     -- Show window
     self.Container.Visible = true
