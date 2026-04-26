@@ -109,42 +109,12 @@ function Window:CreateGUI()
     UICorner.CornerRadius = UDim.new(0, 8)
     UICorner.Parent = self.Container
     
-    -- Glow effect behind container
-    local GlowFrame = Instance.new("Frame")
-    GlowFrame.Name = "Glow"
-    GlowFrame.Size = UDim2.new(1, 40, 1, 40)
-    GlowFrame.Position = UDim2.fromOffset(-20, -20)
-    GlowFrame.BackgroundColor3 = self.AccentColor
-    GlowFrame.BackgroundTransparency = 0.7
-    GlowFrame.BorderSizePixel = 0
-    GlowFrame.ZIndex = -1
-    GlowFrame.Parent = self.Container
-    
-    local GlowCorner = Instance.new("UICorner")
-    GlowCorner.CornerRadius = UDim.new(0, 20)
-    GlowCorner.Parent = GlowFrame
-    
-    table.insert(self.AccentElements, GlowFrame)
-    
-    -- Neon border with glow effect
+    -- Border (stroke)
     local UIStroke = Instance.new("UIStroke")
-    UIStroke.Color = self.AccentColor
-    UIStroke.Thickness = 1.5
-    UIStroke.Transparency = 0.3
+    UIStroke.Color = Color3.fromRGB(60, 60, 60)
+    UIStroke.Thickness = 1
     UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
     UIStroke.Parent = self.Container
-    
-    table.insert(self.AccentElements, UIStroke)
-    
-    -- Inner glow stroke
-    local InnerGlow = Instance.new("UIStroke")
-    InnerGlow.Color = self.AccentColor
-    InnerGlow.Thickness = 2
-    InnerGlow.Transparency = 0.8
-    InnerGlow.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-    InnerGlow.Parent = self.Container
-    
-    table.insert(self.AccentElements, InnerGlow)
     
     -- Title bar
     self.TitleBar = Instance.new("Frame")
@@ -218,7 +188,7 @@ function Window:CreateGUI()
     self.ContentContainer.Size = UDim2.new(1, -160, 1, -45)
     self.ContentContainer.Position = UDim2.fromOffset(152, 40)
     self.ContentContainer.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-    self.ContentContainer.BackgroundTransparency = 0
+    self.ContentContainer.BackgroundTransparency = 0.5
     self.ContentContainer.BorderSizePixel = 0
     self.ContentContainer.ScrollBarThickness = 4
     self.ContentContainer.ScrollBarImageColor3 = Color3.fromRGB(60, 60, 60)
