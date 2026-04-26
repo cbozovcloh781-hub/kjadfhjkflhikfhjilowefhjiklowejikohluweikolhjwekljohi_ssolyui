@@ -165,30 +165,67 @@ function Tab:Select()
         Size = UDim2.new(0, 3, 0, 30)
     }):Play()
     
-    -- Show elements with staggered fade-in and slide animation
+    -- Show elements with staggered fade-in (no position change)
     for i, element in pairs(self.Elements) do
         element.Visible = true
         element.BackgroundTransparency = 1
-        element.Position = UDim2.new(element.Position.X.Scale, element.Position.X.Offset - 20, element.Position.Y.Scale, element.Position.Y.Offset)
+        
+        -- Store original transparencies
+        local originalTransparencies = {}
+        for _, child in pairs(element:GetDescendants()) do
+            if child:IsA("GuiObject") then
+                originalTransparencies[child] = {
+                    Background = child.BackgroundTransparency,
+                    Text = (child:IsA("TextLabel") or child:IsA("TextButton")) and 0 or nil,
+                    Image = (child:IsA("ImageLabel") or child:IsA("ImageButton")) and child.ImageTransparency or nil,
+                    Stroke = child:FindFirstChildOfClass("UIStroke") and child:FindFirstChildOfClass("UIStroke").Transparency or nil
+                }
+            end
+        end
         
         -- Staggered animation for each element
-        task.delay(i * 0.04, function()
+        task.delay(i * 0.03, function()
             if element and element.Parent then
-                local originalPos = UDim2.new(element.Position.X.Scale, element.Position.X.Offset + 20, element.Position.Y.Scale, element.Position.Y.Offset)
-                
-                -- Slide in from left with fade
-                TweenService:Create(element, TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-                    BackgroundTransparency = 0.5,
-                    Position = originalPos
+                -- Fade in container background
+                TweenService:Create(element, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                    BackgroundTransparency = 0.5
                 }):Play()
                 
-                -- Fade in text elements
-                for _, child in pairs(element:GetDescendants()) do
-                    if child:IsA("TextLabel") or child:IsA("TextButton") then
-                        child.TextTransparency = 1
-                        TweenService:Create(child, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-                            TextTransparency = child.Name == "Title" and 0 or (child.Name == "Description" and 0.3 or 0.2)
-                        }):Play()
+                -- Fade in all descendants
+                for child, transparencies in pairs(originalTransparencies) do
+                    if child and child.Parent then
+                        -- Fade in backgrounds
+                        if transparencies.Background < 1 then
+                            TweenService:Create(child, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                                BackgroundTransparency = transparencies.Background
+                            }):Play()
+                        end
+                        
+                        -- Fade in text
+                        if transparencies.Text and (child:IsA("TextLabel") or child:IsA("TextButton")) then
+                            child.TextTransparency = 1
+                            local targetTransparency = child.Name == "Title" and 0 or (child.Name == "Description" and 0.3 or 0.2)
+                            TweenService:Create(child, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                                TextTransparency = targetTransparency
+                            }):Play()
+                        end
+                        
+                        -- Fade in images
+                        if transparencies.Image and (child:IsA("ImageLabel") or child:IsA("ImageButton")) then
+                            child.ImageTransparency = 1
+                            TweenService:Create(child, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                                ImageTransparency = transparencies.Image
+                            }):Play()
+                        end
+                        
+                        -- Fade in strokes
+                        local stroke = child:FindFirstChildOfClass("UIStroke")
+                        if stroke and transparencies.Stroke then
+                            stroke.Transparency = 1
+                            TweenService:Create(stroke, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                                Transparency = transparencies.Stroke
+                            }):Play()
+                        end
                     end
                 end
             end
@@ -217,23 +254,44 @@ function Tab:Deselect()
         Size = UDim2.new(0, 3, 0, 0)
     }):Play()
     
-    -- Fade out and slide elements to the right
+    -- Fade out elements smoothly without position change
     for i, element in pairs(self.Elements) do
         if element and element.Parent then
-            local targetPos = UDim2.new(element.Position.X.Scale, element.Position.X.Offset + 20, element.Position.Y.Scale, element.Position.Y.Offset)
-            
-            -- Slide out to right with fade
-            TweenService:Create(element, TweenInfo.new(0.35, Enum.EasingStyle.Quint, Enum.EasingDirection.In), {
-                BackgroundTransparency = 1,
-                Position = targetPos
+            -- Fade out background
+            TweenService:Create(element, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                BackgroundTransparency = 1
             }):Play()
             
-            -- Fade out text
+            -- Fade out all descendants
             for _, child in pairs(element:GetDescendants()) do
-                if child:IsA("TextLabel") or child:IsA("TextButton") then
-                    TweenService:Create(child, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-                        TextTransparency = 1
-                    }):Play()
+                if child:IsA("GuiObject") then
+                    -- Fade backgrounds
+                    if child.BackgroundTransparency < 1 then
+                        TweenService:Create(child, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                            BackgroundTransparency = 1
+                        }):Play()
+                    end
+                    
+                    -- Fade text
+                    if child:IsA("TextLabel") or child:IsA("TextButton") then
+                        TweenService:Create(child, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                            TextTransparency = 1
+                        }):Play()
+                    end
+                    
+                    -- Fade images
+                    if child:IsA("ImageLabel") or child:IsA("ImageButton") then
+                        TweenService:Create(child, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                            ImageTransparency = 1
+                        }):Play()
+                    end
+                    
+                    -- Fade strokes
+                    if child:IsA("UIStroke") then
+                        TweenService:Create(child, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                            Transparency = 1
+                        }):Play()
+                    end
                 end
             end
         end

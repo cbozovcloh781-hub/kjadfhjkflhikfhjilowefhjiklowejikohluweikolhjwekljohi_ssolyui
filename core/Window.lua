@@ -109,12 +109,60 @@ function Window:CreateGUI()
     UICorner.CornerRadius = UDim.new(0, 8)
     UICorner.Parent = self.Container
     
-    -- Border (stroke)
+    -- Acrylic blur effect for container background
+    local ContainerBlur = Instance.new("ImageLabel")
+    ContainerBlur.Name = "AcrylicBlur"
+    ContainerBlur.Size = UDim2.new(1, 0, 1, 0)
+    ContainerBlur.Position = UDim2.fromOffset(0, 0)
+    ContainerBlur.BackgroundTransparency = 1
+    ContainerBlur.Image = "rbxasset://textures/ui/GuiImagePlaceholder.png"
+    ContainerBlur.ImageColor3 = Color3.fromRGB(15, 15, 15)
+    ContainerBlur.ImageTransparency = 0.3
+    ContainerBlur.ScaleType = Enum.ScaleType.Tile
+    ContainerBlur.TileSize = UDim2.fromOffset(128, 128)
+    ContainerBlur.ZIndex = 0
+    ContainerBlur.Parent = self.Container
+    
+    local BlurCorner = Instance.new("UICorner")
+    BlurCorner.CornerRadius = UDim.new(0, 8)
+    BlurCorner.Parent = ContainerBlur
+    
+    -- Glow effect behind container
+    local GlowFrame = Instance.new("Frame")
+    GlowFrame.Name = "Glow"
+    GlowFrame.Size = UDim2.new(1, 40, 1, 40)
+    GlowFrame.Position = UDim2.fromOffset(-20, -20)
+    GlowFrame.BackgroundColor3 = self.AccentColor
+    GlowFrame.BackgroundTransparency = 0.7
+    GlowFrame.BorderSizePixel = 0
+    GlowFrame.ZIndex = -1
+    GlowFrame.Parent = self.Container
+    
+    local GlowCorner = Instance.new("UICorner")
+    GlowCorner.CornerRadius = UDim.new(0, 20)
+    GlowCorner.Parent = GlowFrame
+    
+    table.insert(self.AccentElements, GlowFrame)
+    
+    -- Neon border with glow effect
     local UIStroke = Instance.new("UIStroke")
-    UIStroke.Color = Color3.fromRGB(80, 80, 80)
-    UIStroke.Thickness = 2
+    UIStroke.Color = self.AccentColor
+    UIStroke.Thickness = 1.5
+    UIStroke.Transparency = 0.3
     UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
     UIStroke.Parent = self.Container
+    
+    table.insert(self.AccentElements, UIStroke)
+    
+    -- Inner glow stroke
+    local InnerGlow = Instance.new("UIStroke")
+    InnerGlow.Color = self.AccentColor
+    InnerGlow.Thickness = 2
+    InnerGlow.Transparency = 0.8
+    InnerGlow.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    InnerGlow.Parent = self.Container
+    
+    table.insert(self.AccentElements, InnerGlow)
     
     -- Title bar
     self.TitleBar = Instance.new("Frame")
@@ -131,9 +179,9 @@ function Window:CreateGUI()
     
     -- Divider line
     local Divider = Instance.new("Frame")
-    Divider.Size = UDim2.new(1, 0, 0, 2)
+    Divider.Size = UDim2.new(1, 0, 0, 1)
     Divider.Position = UDim2.new(0, 0, 1, 0)
-    Divider.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+    Divider.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
     Divider.BorderSizePixel = 0
     Divider.Parent = self.TitleBar
     
@@ -232,8 +280,8 @@ function Window:CreateGUI()
     ProfileCorner.Parent = self.ProfileContainer
     
     local ProfileStroke = Instance.new("UIStroke")
-    ProfileStroke.Color = Color3.fromRGB(80, 80, 80)
-    ProfileStroke.Thickness = 2
+    ProfileStroke.Color = Color3.fromRGB(60, 60, 60)
+    ProfileStroke.Thickness = 1
     ProfileStroke.Parent = self.ProfileContainer
     
     -- Get player info

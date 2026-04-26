@@ -89,8 +89,10 @@ end
 function Particles:Start()
     if self.Connection then return end
     
+    self.Running = true
+    
     self.Connection = RunService.Heartbeat:Connect(function()
-        if not Particles.Enabled then
+        if not Particles.Enabled or not self.Running then
             self.Container.Visible = false
             return
         end
@@ -107,9 +109,19 @@ function Particles:Start()
 end
 
 function Particles:Stop()
+    self.Running = false
+    
     if self.Connection then
         self.Connection:Disconnect()
         self.Connection = nil
+    end
+    
+    -- Удаляем все частицы
+    for i = #self.Particles, 1, -1 do
+        if self.Particles[i] and self.Particles[i].Parent then
+            self.Particles[i]:Destroy()
+        end
+        table.remove(self.Particles, i)
     end
     
     for i, p in ipairs(Particles.Active) do
@@ -129,22 +141,23 @@ end
 function Particles.SetEnabled(enabled)
     Particles.Enabled = enabled
     
-    if not enabled then
-        -- Удаляем все частицы при выключении
-        for _, particleSystem in ipairs(Particles.Active) do
+    for _, particleSystem in ipairs(Particles.Active) do
+        if not enabled then
+            -- Останавливаем систему и удаляем все частицы
+            particleSystem.Running = false
             if particleSystem.Container then
                 particleSystem.Container.Visible = false
-                -- Удаляем все частицы
-                for i = #particleSystem.Particles, 1, -1 do
-                    if particleSystem.Particles[i] and particleSystem.Particles[i].Parent then
-                        particleSystem.Particles[i]:Destroy()
-                    end
-                    table.remove(particleSystem.Particles, i)
-                end
             end
-        end
-    else
-        for _, particleSystem in ipairs(Particles.Active) do
+            -- Удаляем все частицы
+            for i = #particleSystem.Particles, 1, -1 do
+                if particleSystem.Particles[i] and particleSystem.Particles[i].Parent then
+                    particleSystem.Particles[i]:Destroy()
+                end
+                table.remove(particleSystem.Particles, i)
+            end
+        else
+            -- Включаем систему
+            particleSystem.Running = true
             if particleSystem.Container then
                 particleSystem.Container.Visible = true
             end

@@ -443,6 +443,8 @@ function Dropdown:Open()
     
     -- Expand options with smooth animation
     if openUpwards then
+        -- Начинаем снизу кнопки и растем вверх
+        self.OptionsContainer.Position = UDim2.fromOffset(buttonPos.X, buttonPos.Y - 5)
         TweenService:Create(self.OptionsContainer, TweenInfo.new(0.35, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
             Size = UDim2.new(0, buttonSize.X, 0, targetHeight),
             Position = UDim2.fromOffset(buttonPos.X, buttonPos.Y - targetHeight - 5)
