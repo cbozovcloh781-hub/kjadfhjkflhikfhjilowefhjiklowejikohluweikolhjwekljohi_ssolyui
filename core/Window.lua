@@ -831,26 +831,27 @@ function Window:AddTab(config)
 end
 
 function Window:SelectTab(tab)
-    -- Deselect current tab
+    -- Prevent rapid tab switching
+    if self._switchingTab then return end
+    if self.CurrentTab == tab then return end
+    
+    self._switchingTab = true
+    
+    -- Deselect current tab with fade out
     if self.CurrentTab then
         self.CurrentTab:Deselect()
+        -- Wait for deselect animation to complete
+        task.wait(0.15)
     end
     
-    -- Select new tab
+    -- Select new tab with fade in
     self.CurrentTab = tab
     tab:Select()
     
-    -- Clear content container
-    for _, child in pairs(self.ContentContainer:GetChildren()) do
-        if child:IsA("GuiObject") and child.Name ~= "UIListLayout" and child.Name ~= "UIPadding" then
-            child.Visible = false
-        end
-    end
-    
-    -- Show tab content
-    for _, element in pairs(tab.Elements) do
-        element.Visible = true
-    end
+    -- Allow next tab switch
+    task.delay(0.3, function()
+        self._switchingTab = false
+    end)
 end
 
 function Window:Notify(config)

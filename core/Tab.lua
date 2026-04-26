@@ -146,8 +146,8 @@ function Tab:Select()
     
     local accentColor = self.Window.AccentColor or Color3.fromRGB(74, 158, 255)
     
-    -- Animate selection
-    TweenService:Create(self.Button, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+    -- Animate selection with bounce effect
+    TweenService:Create(self.Button, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
         BackgroundColor3 = accentColor,
         BackgroundTransparency = 0.8
     }):Play()
@@ -160,20 +160,38 @@ function Tab:Select()
         ImageColor3 = Color3.fromRGB(255, 255, 255)
     }):Play()
     
-    TweenService:Create(self.Indicator, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+    -- Indicator grows with bounce
+    TweenService:Create(self.Indicator, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
         Size = UDim2.new(0, 3, 0, 30)
     }):Play()
     
-    -- Show elements with smooth fade animation
+    -- Show elements with staggered fade-in and slide animation
     for i, element in pairs(self.Elements) do
         element.Visible = true
         element.BackgroundTransparency = 1
+        element.Position = UDim2.new(element.Position.X.Scale, element.Position.X.Offset - 20, element.Position.Y.Scale, element.Position.Y.Offset)
         
-        -- Fade in each element with delay
-        task.delay(i * 0.03, function()
-            TweenService:Create(element, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-                BackgroundTransparency = 0.5
-            }):Play()
+        -- Staggered animation for each element
+        task.delay(i * 0.04, function()
+            if element and element.Parent then
+                local originalPos = UDim2.new(element.Position.X.Scale, element.Position.X.Offset + 20, element.Position.Y.Scale, element.Position.Y.Offset)
+                
+                -- Slide in from left with fade
+                TweenService:Create(element, TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+                    BackgroundTransparency = 0.5,
+                    Position = originalPos
+                }):Play()
+                
+                -- Fade in text elements
+                for _, child in pairs(element:GetDescendants()) do
+                    if child:IsA("TextLabel") or child:IsA("TextButton") then
+                        child.TextTransparency = 1
+                        TweenService:Create(child, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                            TextTransparency = child.Name == "Title" and 0 or (child.Name == "Description" and 0.3 or 0.2)
+                        }):Play()
+                    end
+                end
+            end
         end)
     end
 end
@@ -181,7 +199,7 @@ end
 function Tab:Deselect()
     self.Selected = false
     
-    -- Animate deselection
+    -- Animate deselection smoothly
     TweenService:Create(self.Button, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
         BackgroundColor3 = Color3.fromRGB(35, 35, 35),
         BackgroundTransparency = 0.3
@@ -199,10 +217,36 @@ function Tab:Deselect()
         Size = UDim2.new(0, 3, 0, 0)
     }):Play()
     
-    -- Hide elements
-    for _, element in pairs(self.Elements) do
-        element.Visible = false
+    -- Fade out and slide elements to the right
+    for i, element in pairs(self.Elements) do
+        if element and element.Parent then
+            local targetPos = UDim2.new(element.Position.X.Scale, element.Position.X.Offset + 20, element.Position.Y.Scale, element.Position.Y.Offset)
+            
+            -- Slide out to right with fade
+            TweenService:Create(element, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+                BackgroundTransparency = 1,
+                Position = targetPos
+            }):Play()
+            
+            -- Fade out text
+            for _, child in pairs(element:GetDescendants()) do
+                if child:IsA("TextLabel") or child:IsA("TextButton") then
+                    TweenService:Create(child, TweenInfo.new(0.2), {
+                        TextTransparency = 1
+                    }):Play()
+                end
+            end
+        end
     end
+    
+    -- Hide elements after animation
+    task.delay(0.25, function()
+        for _, element in pairs(self.Elements) do
+            if element and element.Parent then
+                element.Visible = false
+            end
+        end
+    end)
 end
 
 -- Element creation methods

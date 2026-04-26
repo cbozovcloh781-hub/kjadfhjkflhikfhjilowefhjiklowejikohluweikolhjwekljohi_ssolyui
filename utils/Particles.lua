@@ -89,6 +89,13 @@ function Particles:Start()
     self.Connection = RunService.Heartbeat:Connect(function()
         if not Particles.Enabled then
             self.Container.Visible = false
+            -- Удаляем существующие частицы при выключении
+            for i = #self.Particles, 1, -1 do
+                if self.Particles[i] and self.Particles[i].Parent then
+                    self.Particles[i]:Destroy()
+                end
+                table.remove(self.Particles, i)
+            end
             return
         end
         
