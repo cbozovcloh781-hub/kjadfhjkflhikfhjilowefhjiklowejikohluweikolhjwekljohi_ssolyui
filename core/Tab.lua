@@ -379,6 +379,19 @@ function Tab:AddSection(side)
         Padding.PaddingTop = UDim.new(0, 10)
         Padding.PaddingBottom = UDim.new(0, 10)
         Padding.Parent = sectionContainer
+        
+        -- Add divider line between sections
+        if side == "Right" then
+            local divider = Instance.new("Frame")
+            divider.Name = "Divider"
+            divider.Size = UDim2.new(0, 1, 1, 0)
+            divider.Position = UDim2.new(0.5, 0, 0, 0)
+            divider.AnchorPoint = Vector2.new(0.5, 0)
+            divider.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+            divider.BorderSizePixel = 0
+            divider.ZIndex = 2
+            divider.Parent = self.ContentContainer
+        end
     end
     
     local section = {Container = sectionContainer, Tab = self, Side = side, Window = self.Window}

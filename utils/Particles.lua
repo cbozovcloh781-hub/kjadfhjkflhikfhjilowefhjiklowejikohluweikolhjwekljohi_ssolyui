@@ -36,7 +36,7 @@ function Particles:CreateParticle()
     if #self.Particles >= self.MaxParticles then return end
     
     local particle = Instance.new("Frame")
-    particle.Size = UDim2.fromOffset(math.random(2, 4), math.random(2, 4))
+    particle.Size = UDim2.fromOffset(math.random(1, 3), math.random(1, 3))
     particle.Position = UDim2.new(
         math.random(0, 100) / 100,
         0,
@@ -45,12 +45,12 @@ function Particles:CreateParticle()
     )
     
     -- Use accent color with slight variation
-    local r = math.clamp(self.AccentColor.R * 255 + math.random(-20, 20), 0, 255)
-    local g = math.clamp(self.AccentColor.G * 255 + math.random(-20, 20), 0, 255)
-    local b = math.clamp(self.AccentColor.B * 255 + math.random(-20, 20), 0, 255)
+    local r = math.clamp(self.AccentColor.R * 255 + math.random(-15, 15), 0, 255)
+    local g = math.clamp(self.AccentColor.G * 255 + math.random(-15, 15), 0, 255)
+    local b = math.clamp(self.AccentColor.B * 255 + math.random(-15, 15), 0, 255)
     
     particle.BackgroundColor3 = Color3.fromRGB(r, g, b)
-    particle.BackgroundTransparency = math.random(30, 70) / 100
+    particle.BackgroundTransparency = math.random(40, 80) / 100
     particle.BorderSizePixel = 0
     particle.ZIndex = -99
     particle.Parent = self.Container

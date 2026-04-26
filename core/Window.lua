@@ -879,16 +879,18 @@ function Window:SetAccentColor(color)
         self.ParticleSystem:SetAccentColor(color)
     end
     
-    -- Update smoke particles color
+    -- Update smoke particles color with smooth transition
     if self.SmokeParticles then
         for _, smoke in ipairs(self.SmokeParticles) do
             if smoke and smoke.Parent then
-                smoke.BackgroundColor3 = color
+                TweenService:Create(smoke, TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                    BackgroundColor3 = color
+                }):Play()
             end
         end
     end
     
-    -- Update all accent elements safely
+    -- Update all accent elements safely with smooth transition
     for i = #self.AccentElements, 1, -1 do
         local element = self.AccentElements[i]
         if not element or not element.Parent then
@@ -896,26 +898,36 @@ function Window:SetAccentColor(color)
         else
             pcall(function()
                 if element:IsA("UIStroke") then
-                    element.Color = color
+                    TweenService:Create(element, TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                        Color = color
+                    }):Play()
                 elseif element:IsA("ImageLabel") or element:IsA("ImageButton") then
-                    element.ImageColor3 = color
+                    TweenService:Create(element, TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                        ImageColor3 = color
+                    }):Play()
                 elseif element:IsA("ScrollingFrame") then
-                    element.ScrollBarImageColor3 = color
+                    TweenService:Create(element, TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                        ScrollBarImageColor3 = color
+                    }):Play()
                 elseif element:IsA("Frame") or element:IsA("TextButton") then
-                    element.BackgroundColor3 = color
+                    TweenService:Create(element, TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                        BackgroundColor3 = color
+                    }):Play()
                 end
             end)
         end
     end
     
-    -- Update active tab background
+    -- Update active tab background with smooth transition
     if self.CurrentTab and self.CurrentTab.Button then
         pcall(function()
-            self.CurrentTab.Button.BackgroundColor3 = color
+            TweenService:Create(self.CurrentTab.Button, TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                BackgroundColor3 = color
+            }):Play()
         end)
     end
     
-    -- Update all active toggles and dropdowns
+    -- Update all active toggles and dropdowns with smooth transition
     for _, tab in pairs(self.Tabs) do
         for _, element in pairs(tab.Elements) do
             if element and element.Parent then
@@ -923,16 +935,22 @@ function Window:SetAccentColor(color)
                     -- Toggle switches
                     local switchBg = element:FindFirstChild("SwitchBg", true)
                     if switchBg and switchBg.BackgroundColor3 ~= Color3.fromRGB(50, 50, 50) then
-                        switchBg.BackgroundColor3 = color
+                        TweenService:Create(switchBg, TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                            BackgroundColor3 = color
+                        }):Play()
                     end
                     
                     -- Dropdown checkmarks
                     for _, child in pairs(element:GetDescendants()) do
-                        if child.Name == "Check" and child:IsA("TextLabel") then
+                        if child.Name == "Check" and child:IsA("Frame") then
                             local stroke = child:FindFirstChildOfClass("UIStroke")
-                            if stroke and child.BackgroundColor3 ~= Color3.fromRGB(35, 35, 35) then
-                                child.BackgroundColor3 = color
-                                stroke.Color = color
+                            if stroke and child.BackgroundColor3 ~= Color3.fromRGB(25, 25, 25) then
+                                TweenService:Create(child, TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                                    BackgroundColor3 = color
+                                }):Play()
+                                TweenService:Create(stroke, TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                                    Color = color
+                                }):Play()
                             end
                         end
                     end
@@ -1126,18 +1144,35 @@ function Window:InitParticles()
 end
 
 function Window:CreateSmokeEffect()
-    -- Smoke container at bottom
+    -- Smoke container at bottom (OUTSIDE main container to avoid clipping)
     local smokeContainer = Instance.new("Frame")
     smokeContainer.Name = "SmokeEffect"
-    smokeContainer.Size = UDim2.new(1, 0, 0, 150)
-    smokeContainer.Position = UDim2.new(0, 0, 1, -150)
+    smokeContainer.Size = UDim2.new(0, self.Container.AbsoluteSize.X, 0, 150)
+    smokeContainer.Position = UDim2.fromOffset(
+        self.Container.AbsolutePosition.X,
+        self.Container.AbsolutePosition.Y + self.Container.AbsoluteSize.Y - 150
+    )
     smokeContainer.BackgroundTransparency = 1
-    smokeContainer.ClipsDescendants = true
+    smokeContainer.ClipsDescendants = false
     smokeContainer.ZIndex = -50
-    smokeContainer.Parent = self.Container
+    smokeContainer.Parent = self.ScreenGui
     
     self.SmokeContainer = smokeContainer
     self.SmokeParticles = {}
+    
+    -- Update smoke position when window moves/resizes
+    local function updateSmokePosition()
+        if smokeContainer and smokeContainer.Parent then
+            smokeContainer.Size = UDim2.new(0, self.Container.AbsoluteSize.X, 0, 150)
+            smokeContainer.Position = UDim2.fromOffset(
+                self.Container.AbsolutePosition.X,
+                self.Container.AbsolutePosition.Y + self.Container.AbsoluteSize.Y - 150
+            )
+        end
+    end
+    
+    self.Container:GetPropertyChangedSignal("AbsolutePosition"):Connect(updateSmokePosition)
+    self.Container:GetPropertyChangedSignal("AbsoluteSize"):Connect(updateSmokePosition)
     
     -- Create smoke particles
     local function createSmoke()
