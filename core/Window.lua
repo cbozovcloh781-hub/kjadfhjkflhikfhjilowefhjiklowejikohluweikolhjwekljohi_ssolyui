@@ -947,6 +947,16 @@ function Window:SetAccentColor(color)
         end)
     end
     
+    -- Update minimized indicator border
+    if self.MinimizedIndicator then
+        local stroke = self.MinimizedIndicator:FindFirstChildOfClass("UIStroke")
+        if stroke then
+            TweenService:Create(stroke, TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                Color = color
+            }):Play()
+        end
+    end
+    
     -- Update all active toggles and dropdowns with smooth transition
     for _, tab in pairs(self.Tabs) do
         for _, element in pairs(tab.Elements) do
@@ -1222,11 +1232,11 @@ function Window:CreateSmokeEffect()
     
     -- Spawn smoke continuously
     self.SmokeSpawnLoop = task.spawn(function()
-        while self.Container and self.Container.Parent do
+        while self.Container and self.Container.Parent and smokeContainer and smokeContainer.Parent do
             if smokeContainer.Visible then
                 createSmoke()
             end
-            task.wait(math.random(800, 1500) / 1000)
+            task.wait(math.random(600, 1200) / 1000)
         end
     end)
 end

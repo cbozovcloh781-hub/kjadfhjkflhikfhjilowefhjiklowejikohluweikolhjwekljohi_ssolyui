@@ -219,8 +219,21 @@ function Tab:Select()
                 -- Fade in all descendants
                 for child, transparencies in pairs(originalTransparencies) do
                     if child and child.Parent then
+                        -- Skip accent-colored elements (buttons, sliders)
+                        local isAccentElement = false
+                        if child:IsA("Frame") and (child.Name == "Fill" or child.Name == "SwitchBg") then
+                            isAccentElement = true
+                        elseif child:IsA("TextButton") and child.Parent and child.Parent.Name == "Button" then
+                            isAccentElement = true
+                        end
+                        
                         -- Fade in backgrounds
-                        if transparencies.Background < 1 then
+                        if transparencies.Background < 1 and not isAccentElement then
+                            TweenService:Create(child, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                                BackgroundTransparency = transparencies.Background
+                            }):Play()
+                        elseif isAccentElement then
+                            -- For accent elements, restore their color
                             TweenService:Create(child, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
                                 BackgroundTransparency = transparencies.Background
                             }):Play()
@@ -298,54 +311,10 @@ function Tab:Deselect()
     -- Fade out elements smoothly without position change
     for i, element in pairs(self.Elements) do
         if element and element.Parent then
-            -- Fade out background
-            TweenService:Create(element, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-                BackgroundTransparency = 1
-            }):Play()
-            
-            -- Fade out all descendants
-            for _, child in pairs(element:GetDescendants()) do
-                if child:IsA("GuiObject") then
-                    -- Fade backgrounds
-                    if child.BackgroundTransparency < 1 then
-                        TweenService:Create(child, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-                            BackgroundTransparency = 1
-                        }):Play()
-                    end
-                    
-                    -- Fade text
-                    if child:IsA("TextLabel") or child:IsA("TextButton") then
-                        TweenService:Create(child, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-                            TextTransparency = 1
-                        }):Play()
-                    end
-                    
-                    -- Fade images
-                    if child:IsA("ImageLabel") or child:IsA("ImageButton") then
-                        TweenService:Create(child, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-                            ImageTransparency = 1
-                        }):Play()
-                    end
-                    
-                    -- Fade strokes
-                    if child:IsA("UIStroke") then
-                        TweenService:Create(child, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-                            Transparency = 1
-                        }):Play()
-                    end
-                end
-            end
+            -- Immediately hide to prevent ghosting
+            element.Visible = false
         end
     end
-    
-    -- Hide elements after animation
-    task.delay(0.35, function()
-        for _, element in pairs(self.Elements) do
-            if element and element.Parent then
-                element.Visible = false
-            end
-        end
-    end)
 end
 
 -- Section creation

@@ -36,11 +36,12 @@ function Dropdown.new(tab, config)
     -- Set default value
     if self.Default then
         if self.Multi then
-            for _, v in pairs(self.Default) do
-                if type(self.Default) == "table" and self.Default[v] then
-                    self.Value[v] = true
-                else
-                    self.Value[v] = true
+            -- For multi-select, check if Default is a table with boolean values
+            if type(self.Default) == "table" then
+                for key, value in pairs(self.Default) do
+                    if type(key) == "string" and value == true then
+                        self.Value[key] = true
+                    end
                 end
             end
         else
