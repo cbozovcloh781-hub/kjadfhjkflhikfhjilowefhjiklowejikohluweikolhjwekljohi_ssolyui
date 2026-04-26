@@ -578,10 +578,10 @@ function Window:SetupResizing()
         local containerPos = self.Container.AbsolutePosition
         local containerSize = self.Container.AbsoluteSize
         
-        -- Corner handle (close to menu edge, matching side handles)
+        -- Corner handle (very close to menu corner)
         self.ResizeHandle.Position = UDim2.fromOffset(
-            containerPos.X + containerSize.X - 15,
-            containerPos.Y + containerSize.Y - 15
+            containerPos.X + containerSize.X - 25,
+            containerPos.Y + containerSize.Y - 25
         )
         
         -- Vertical handle (bottom center)
