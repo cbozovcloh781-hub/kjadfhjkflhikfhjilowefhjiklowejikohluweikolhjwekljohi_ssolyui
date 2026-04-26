@@ -71,7 +71,7 @@ local function createLoadingScreen()
     title.Size = UDim2.new(1, 0, 0, 40)
     title.Position = UDim2.fromOffset(0, 20)
     title.BackgroundTransparency = 1
-    title.Text = "Ssoly UI"
+    title.Text = "Sosalkin Hub"
     title.TextColor3 = Color3.fromRGB(255, 255, 255)
     title.TextSize = 24
     title.Font = Enum.Font.GothamBold

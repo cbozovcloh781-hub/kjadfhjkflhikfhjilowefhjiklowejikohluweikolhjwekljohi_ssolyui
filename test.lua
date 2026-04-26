@@ -6,13 +6,18 @@ local Ssoly = loadstring(game:HttpGet("https://raw.githubusercontent.com/cbozovc
 
 -- Create window (hidden during loading)
 local Window = Ssoly:CreateWindow({
-    Title = "Ssoly UI Demo",
+    Title = "Sosalkin Hub - YBA",
     Size = UDim2.fromOffset(700, 500),
     MinSize = Vector2.new(500, 400),
     MaxSize = Vector2.new(1200, 800),
     Transparency = 0.1,
     BlurEnabled = true,
-    MinimizeKey = Enum.KeyCode.RightControl
+    MinimizeKey = Enum.KeyCode.RightControl,
+    -- Hub Status Options:
+    -- HubStatus = "shub" -- Free version (gray)
+    -- HubStatus = "shub+", PremiumExpiry = os.time() + (30 * 86400) -- Premium with 30 days left (gold)
+    -- HubStatus = "dev" -- Developer (cyan)
+    HubStatus = "dev", -- Change this based on user
 })
 
 -- Create tabs
@@ -331,6 +336,22 @@ SettingsTab:AddButton({
         })
         task.wait(2)
         Window:Destroy()
+    end
+})
+
+-- Example: Change hub status dynamically
+SettingsTab:AddDropdown({
+    Title = "Hub Status",
+    Description = "Change your hub status (demo only)",
+    Values = {"shub", "shub+", "dev"},
+    Default = "dev",
+    Callback = function(Value)
+        if Value == "shub+" then
+            -- Premium with 30 days left
+            Window:SetHubStatus("shub+", os.time() + (30 * 86400))
+        else
+            Window:SetHubStatus(Value)
+        end
     end
 })
 

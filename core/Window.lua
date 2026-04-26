@@ -11,7 +11,7 @@ Window.__index = Window
 
 -- Default configuration
 local DEFAULT_CONFIG = {
-    Title = "Ssoly UI",
+    Title = "Sosalkin Hub",
     Size = UDim2.fromOffset(700, 500),
     MinSize = Vector2.new(500, 400),
     MaxSize = Vector2.new(1200, 800),
@@ -21,6 +21,9 @@ local DEFAULT_CONFIG = {
     Draggable = true,
     Resizable = true,
     MinimizeKey = Enum.KeyCode.RightControl,
+    HubStatus = "shub", -- "shub", "shub+", or "dev"
+    StatusColor = Color3.fromRGB(150, 150, 150),
+    PremiumExpiry = nil, -- Unix timestamp for shub+ expiry
 }
 
 function Window.new(config)
@@ -291,6 +294,24 @@ function Window:CreateGUI()
         self.UsernameLabel.Text = player.DisplayName
     end
     
+    -- Hub status label
+    self.StatusLabel = Instance.new("TextLabel")
+    self.StatusLabel.Name = "Status"
+    self.StatusLabel.Size = UDim2.new(1, -52, 0, 12)
+    self.StatusLabel.Position = UDim2.fromOffset(48, player.DisplayName ~= player.Name and 38 or 28)
+    self.StatusLabel.BackgroundTransparency = 1
+    self.StatusLabel.Text = "shub"
+    self.StatusLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
+    self.StatusLabel.TextSize = 9
+    self.StatusLabel.Font = Enum.Font.GothamBold
+    self.StatusLabel.TextXAlignment = Enum.TextXAlignment.Left
+    self.StatusLabel.Parent = self.ProfileContainer
+    
+    -- Set initial status
+    task.defer(function()
+        self:SetHubStatus(self.Config.HubStatus, self.Config.PremiumExpiry)
+    end)
+    
     -- Resize handle (curved bar around bottom-right corner) - OUTSIDE container
     self.ResizeHandle = Instance.new("Frame")
     self.ResizeHandle.Name = "ResizeHandle"
@@ -401,6 +422,58 @@ function Window:CreateGUI()
     MinIndLabel.TextSize = 24
     MinIndLabel.Font = Enum.Font.SourceSansBold
     MinIndLabel.Parent = self.MinimizedIndicator
+    
+    -- Snow particles effect
+    self:CreateSnowEffect()
+end
+
+function Window:CreateSnowEffect()
+    -- Snow container
+    local snowContainer = Instance.new("Frame")
+    snowContainer.Name = "SnowEffect"
+    snowContainer.Size = UDim2.new(1, 0, 1, 0)
+    snowContainer.BackgroundTransparency = 1
+    snowContainer.ClipsDescendants = true
+    snowContainer.ZIndex = 0
+    snowContainer.Parent = self.Container
+    
+    -- Create snowflakes
+    local function createSnowflake()
+        local snowflake = Instance.new("Frame")
+        snowflake.Size = UDim2.fromOffset(math.random(2, 4), math.random(2, 4))
+        snowflake.Position = UDim2.new(math.random(0, 100) / 100, 0, 0, -10)
+        snowflake.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+        snowflake.BackgroundTransparency = math.random(30, 70) / 100
+        snowflake.BorderSizePixel = 0
+        snowflake.Parent = snowContainer
+        
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(1, 0)
+        corner.Parent = snowflake
+        
+        -- Animate falling
+        local duration = math.random(8, 15)
+        local endY = self.Container.AbsoluteSize.Y + 10
+        
+        TweenService:Create(snowflake, TweenInfo.new(duration, Enum.EasingStyle.Linear), {
+            Position = UDim2.new(snowflake.Position.X.Scale + math.random(-10, 10) / 100, 0, 1, endY)
+        }):Play()
+        
+        -- Remove after animation
+        task.delay(duration, function()
+            if snowflake and snowflake.Parent then
+                snowflake:Destroy()
+            end
+        end)
+    end
+    
+    -- Spawn snowflakes continuously
+    task.spawn(function()
+        while self.Container and self.Container.Parent do
+            createSnowflake()
+            task.wait(math.random(100, 300) / 1000)
+        end
+    end)
 end
 
 function Window:SetupDragging()
@@ -871,6 +944,38 @@ function Window:SetTheme(themeName)
     
     local color = themes[themeName] or themes.Blue
     self:SetAccentColor(color)
+end
+
+function Window:SetHubStatus(status, expiryDate)
+    if not self.StatusLabel then return end
+    
+    local statusText = ""
+    local statusColor = Color3.fromRGB(150, 150, 150)
+    
+    if status == "dev" then
+        statusText = "👑 Developer"
+        statusColor = Color3.fromRGB(90, 200, 250) -- Cyan/Light Blue
+    elseif status == "shub+" then
+        if expiryDate then
+            local daysLeft = math.floor((expiryDate - os.time()) / 86400)
+            if daysLeft > 0 then
+                statusText = "⭐ shub+ (" .. daysLeft .. "d left)"
+            else
+                statusText = "⭐ shub+ (expires today)"
+            end
+        else
+            statusText = "⭐ shub+"
+        end
+        statusColor = Color3.fromRGB(255, 215, 0) -- Gold
+    else -- "shub" or default
+        statusText = "shub"
+        statusColor = Color3.fromRGB(150, 150, 150) -- Gray
+    end
+    
+    self.StatusLabel.Text = statusText
+    TweenService:Create(self.StatusLabel, TweenInfo.new(0.3), {
+        TextColor3 = statusColor
+    }):Play()
 end
 
 function Window:Show()

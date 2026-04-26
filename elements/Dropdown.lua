@@ -42,7 +42,7 @@ function Dropdown:CreateElement()
     -- Main container
     self.Container = Instance.new("Frame")
     self.Container.Name = "Dropdown"
-    self.Container.Size = UDim2.new(1, -20, 0, 70)
+    self.Container.Size = UDim2.new(1, -20, 0, 85)
     self.Container.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     self.Container.BackgroundTransparency = 0.5
     self.Container.BorderSizePixel = 0
@@ -63,22 +63,21 @@ function Dropdown:CreateElement()
     self.TitleLabel.Text = self.Title
     self.TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
     self.TitleLabel.TextSize = 14
-    self.TitleLabel.Font = Enum.Font.SourceSans
+    self.TitleLabel.Font = Enum.Font.GothamBold
     self.TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
-    self.TitleLabel.TextStrokeTransparency = 0.8
     self.TitleLabel.Parent = self.Container
     
     -- Description (optional)
-    local dropdownY = 38
+    local dropdownY = 50
     if self.Description then
         self.DescLabel = Instance.new("TextLabel")
         self.DescLabel.Name = "Description"
-        self.DescLabel.Size = UDim2.new(1, -20, 0, 10)
-        self.DescLabel.Position = UDim2.fromOffset(12, 24)
+        self.DescLabel.Size = UDim2.new(1, -24, 0, 14)
+        self.DescLabel.Position = UDim2.fromOffset(12, 28)
         self.DescLabel.BackgroundTransparency = 1
         self.DescLabel.Text = self.Description
         self.DescLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
-        self.DescLabel.TextSize = 9
+        self.DescLabel.TextSize = 11
         self.DescLabel.Font = Enum.Font.Gotham
         self.DescLabel.TextXAlignment = Enum.TextXAlignment.Left
         self.DescLabel.TextWrapped = true
