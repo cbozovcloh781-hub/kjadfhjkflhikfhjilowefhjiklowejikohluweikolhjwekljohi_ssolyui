@@ -351,138 +351,95 @@ function Tab:AddSection(side)
         Padding.Parent = sectionContainer
     end
     
-    -- Return section object with element methods
-    local section = {
-        Container = sectionContainer,
-        Tab = self,
-        Side = side
-    }
-    
-    -- Add element methods to section
-    function section:AddToggle(config)
-        local Toggle = loadstring(game:HttpGet(baseUrl .. "elements/Toggle.lua"))()
-        local toggle = Toggle.new(self, config)
-        toggle.Container.Visible = false
-        toggle.Container.Parent = self.Container
-        table.insert(self.Tab.Elements, toggle.Container)
-        return toggle
-    end
-    
-    function section:AddSlider(config)
-        local Slider = loadstring(game:HttpGet(baseUrl .. "elements/Slider.lua"))()
-        local slider = Slider.new(self, config)
-        slider.Container.Visible = false
-        slider.Container.Parent = self.Container
-        table.insert(self.Tab.Elements, slider.Container)
-        return slider
-    end
-    
-    function section:AddDropdown(config)
-        local Dropdown = loadstring(game:HttpGet(baseUrl .. "elements/Dropdown.lua"))()
-        local dropdown = Dropdown.new(self, config)
-        dropdown.Container.Visible = false
-        dropdown.Container.Parent = self.Container
-        table.insert(self.Tab.Elements, dropdown.Container)
-        return dropdown
-    end
-    
-    function section:AddButton(config)
-        local Button = loadstring(game:HttpGet(baseUrl .. "elements/Button.lua"))()
-        local button = Button.new(self, config)
-        button.Container.Visible = false
-        button.Container.Parent = self.Container
-        table.insert(self.Tab.Elements, button.Container)
-        return button
-    end
-    
-    function section:AddInput(config)
-        local Input = loadstring(game:HttpGet(baseUrl .. "elements/Input.lua"))()
-        local input = Input.new(self, config)
-        input.Container.Visible = false
-        input.Container.Parent = self.Container
-        table.insert(self.Tab.Elements, input.Container)
-        return input
-    end
-    
-    function section:AddColorpicker(config)
-        local Colorpicker = loadstring(game:HttpGet(baseUrl .. "elements/Colorpicker.lua"))()
-        local colorpicker = Colorpicker.new(self, config)
-        colorpicker.Container.Visible = false
-        colorpicker.Container.Parent = self.Container
-        table.insert(self.Tab.Elements, colorpicker.Container)
-        return colorpicker
-    end
-    
-    function section:AddKeybind(config)
-        local Keybind = loadstring(game:HttpGet(baseUrl .. "elements/Keybind.lua"))()
-        local keybind = Keybind.new(self, config)
-        keybind.Container.Visible = false
-        keybind.Container.Parent = self.Container
-        table.insert(self.Tab.Elements, keybind.Container)
-        return keybind
-    end
-    
+    local section = {Container = sectionContainer, Tab = self, Side = side}
     table.insert(self.Sections, section)
     return section
 end
 
--- Element creation methods (backward compatibility - adds to Window.ContentContainer)
-local baseUrl = "https://raw.githubusercontent.com/cbozovcloh781-hub/kjadfhjkflhikfhjilowefhjilowefhjiklowejikohluweikolhjwekljohi_ssolyui/main/"
+local baseUrl = "https://raw.githubusercontent.com/cbozovcloh781-hub/kjadfhjkflhikfhjilowefhjiklowejikohluweikolhjwekljohi_ssolyui/main/"
 
 function Tab:AddToggle(config)
-    local Toggle = loadstring(game:HttpGet(baseUrl .. "elements/Toggle.lua"))()
-    local toggle = Toggle.new(self, config)
-    toggle.Container.Visible = false
-    table.insert(self.Elements, toggle.Container)
-    return toggle
+    local s, r = pcall(function()
+        local T = loadstring(game:HttpGet(baseUrl .. "elements/Toggle.lua"))()
+        local t = T.new(self, config)
+        t.Container.Visible = false
+        table.insert(self.Elements, t.Container)
+        return t
+    end)
+    if not s then warn("Toggle failed: " .. tostring(r)) return nil end
+    return r
 end
 
 function Tab:AddSlider(config)
-    local Slider = loadstring(game:HttpGet(baseUrl .. "elements/Slider.lua"))()
-    local slider = Slider.new(self, config)
-    slider.Container.Visible = false
-    table.insert(self.Elements, slider.Container)
-    return slider
+    local s, r = pcall(function()
+        local S = loadstring(game:HttpGet(baseUrl .. "elements/Slider.lua"))()
+        local sl = S.new(self, config)
+        sl.Container.Visible = false
+        table.insert(self.Elements, sl.Container)
+        return sl
+    end)
+    if not s then warn("Slider failed: " .. tostring(r)) return nil end
+    return r
 end
 
 function Tab:AddDropdown(config)
-    local Dropdown = loadstring(game:HttpGet(baseUrl .. "elements/Dropdown.lua"))()
-    local dropdown = Dropdown.new(self, config)
-    dropdown.Container.Visible = false
-    table.insert(self.Elements, dropdown.Container)
-    return dropdown
+    local s, r = pcall(function()
+        local D = loadstring(game:HttpGet(baseUrl .. "elements/Dropdown.lua"))()
+        local d = D.new(self, config)
+        d.Container.Visible = false
+        table.insert(self.Elements, d.Container)
+        return d
+    end)
+    if not s then warn("Dropdown failed: " .. tostring(r)) return nil end
+    return r
 end
 
 function Tab:AddButton(config)
-    local Button = loadstring(game:HttpGet(baseUrl .. "elements/Button.lua"))()
-    local button = Button.new(self, config)
-    button.Container.Visible = false
-    table.insert(self.Elements, button.Container)
-    return button
+    local s, r = pcall(function()
+        local B = loadstring(game:HttpGet(baseUrl .. "elements/Button.lua"))()
+        local b = B.new(self, config)
+        b.Container.Visible = false
+        table.insert(self.Elements, b.Container)
+        return b
+    end)
+    if not s then warn("Button failed: " .. tostring(r)) return nil end
+    return r
 end
 
 function Tab:AddInput(config)
-    local Input = loadstring(game:HttpGet(baseUrl .. "elements/Input.lua"))()
-    local input = Input.new(self, config)
-    input.Container.Visible = false
-    table.insert(self.Elements, input.Container)
-    return input
+    local s, r = pcall(function()
+        local I = loadstring(game:HttpGet(baseUrl .. "elements/Input.lua"))()
+        local i = I.new(self, config)
+        i.Container.Visible = false
+        table.insert(self.Elements, i.Container)
+        return i
+    end)
+    if not s then warn("Input failed: " .. tostring(r)) return nil end
+    return r
 end
 
 function Tab:AddColorpicker(config)
-    local Colorpicker = loadstring(game:HttpGet(baseUrl .. "elements/Colorpicker.lua"))()
-    local colorpicker = Colorpicker.new(self, config)
-    colorpicker.Container.Visible = false
-    table.insert(self.Elements, colorpicker.Container)
-    return colorpicker
+    local s, r = pcall(function()
+        local C = loadstring(game:HttpGet(baseUrl .. "elements/Colorpicker.lua"))()
+        local c = C.new(self, config)
+        c.Container.Visible = false
+        table.insert(self.Elements, c.Container)
+        return c
+    end)
+    if not s then warn("Colorpicker failed: " .. tostring(r)) return nil end
+    return r
 end
 
 function Tab:AddKeybind(config)
-    local Keybind = loadstring(game:HttpGet(baseUrl .. "elements/Keybind.lua"))()
-    local keybind = Keybind.new(self, config)
-    keybind.Container.Visible = false
-    table.insert(self.Elements, keybind.Container)
-    return keybind
+    local s, r = pcall(function()
+        local K = loadstring(game:HttpGet(baseUrl .. "elements/Keybind.lua"))()
+        local k = K.new(self, config)
+        k.Container.Visible = false
+        table.insert(self.Elements, k.Container)
+        return k
+    end)
+    if not s then warn("Keybind failed: " .. tostring(r)) return nil end
+    return r
 end
 
 return Tab

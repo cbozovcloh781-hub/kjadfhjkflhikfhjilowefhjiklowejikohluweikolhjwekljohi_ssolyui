@@ -258,25 +258,6 @@ local loadingGui, loadingBlur, statusLabel = createLoadingScreen()
 local success, err = pcall(function()
     Ssoly.Window = loadstring(game:HttpGet(baseUrl .. "core/Window.lua"))()
     Ssoly.Tab = loadstring(game:HttpGet(baseUrl .. "core/Tab.lua"))()
-    
-    -- Load elements
-    local Toggle = loadstring(game:HttpGet(baseUrl .. "elements/Toggle.lua"))()
-    local Slider = loadstring(game:HttpGet(baseUrl .. "elements/Slider.lua"))()
-    local Dropdown = loadstring(game:HttpGet(baseUrl .. "elements/Dropdown.lua"))()
-    local Button = loadstring(game:HttpGet(baseUrl .. "elements/Button.lua"))()
-    local Input = loadstring(game:HttpGet(baseUrl .. "elements/Input.lua"))()
-    local Colorpicker = loadstring(game:HttpGet(baseUrl .. "elements/Colorpicker.lua"))()
-    local Keybind = loadstring(game:HttpGet(baseUrl .. "elements/Keybind.lua"))()
-    
-    Ssoly.Elements = {
-        Toggle = Toggle,
-        Slider = Slider,
-        Dropdown = Dropdown,
-        Button = Button,
-        Input = Input,
-        Colorpicker = Colorpicker,
-        Keybind = Keybind,
-    }
 end)
 
 if not success then
