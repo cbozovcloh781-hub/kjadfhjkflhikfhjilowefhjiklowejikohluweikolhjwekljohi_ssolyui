@@ -382,9 +382,8 @@ function Tab:AddSection(side)
     function section:AddToggle(config)
         local s, r = pcall(function()
             local T = loadstring(game:HttpGet(baseUrl .. "elements/Toggle.lua"))()
-            local t = T.new(self, config)
+            local t = T.new(section, config)
             t.Container.Visible = false
-            t.Container.Parent = self.Container
             table.insert(self.Tab.Elements, t.Container)
             return t
         end)
@@ -395,9 +394,8 @@ function Tab:AddSection(side)
     function section:AddSlider(config)
         local s, r = pcall(function()
             local S = loadstring(game:HttpGet(baseUrl .. "elements/Slider.lua"))()
-            local sl = S.new(self, config)
+            local sl = S.new(section, config)
             sl.Container.Visible = false
-            sl.Container.Parent = self.Container
             table.insert(self.Tab.Elements, sl.Container)
             return sl
         end)
@@ -408,9 +406,8 @@ function Tab:AddSection(side)
     function section:AddDropdown(config)
         local s, r = pcall(function()
             local D = loadstring(game:HttpGet(baseUrl .. "elements/Dropdown.lua"))()
-            local d = D.new(self, config)
+            local d = D.new(section, config)
             d.Container.Visible = false
-            d.Container.Parent = self.Container
             table.insert(self.Tab.Elements, d.Container)
             return d
         end)
@@ -421,9 +418,8 @@ function Tab:AddSection(side)
     function section:AddButton(config)
         local s, r = pcall(function()
             local B = loadstring(game:HttpGet(baseUrl .. "elements/Button.lua"))()
-            local b = B.new(self, config)
+            local b = B.new(section, config)
             b.Container.Visible = false
-            b.Container.Parent = self.Container
             table.insert(self.Tab.Elements, b.Container)
             return b
         end)
@@ -434,9 +430,8 @@ function Tab:AddSection(side)
     function section:AddInput(config)
         local s, r = pcall(function()
             local I = loadstring(game:HttpGet(baseUrl .. "elements/Input.lua"))()
-            local i = I.new(self, config)
+            local i = I.new(section, config)
             i.Container.Visible = false
-            i.Container.Parent = self.Container
             table.insert(self.Tab.Elements, i.Container)
             return i
         end)
@@ -447,9 +442,8 @@ function Tab:AddSection(side)
     function section:AddColorpicker(config)
         local s, r = pcall(function()
             local C = loadstring(game:HttpGet(baseUrl .. "elements/Colorpicker.lua"))()
-            local c = C.new(self, config)
+            local c = C.new(section, config)
             c.Container.Visible = false
-            c.Container.Parent = self.Container
             table.insert(self.Tab.Elements, c.Container)
             return c
         end)
@@ -460,9 +454,8 @@ function Tab:AddSection(side)
     function section:AddKeybind(config)
         local s, r = pcall(function()
             local K = loadstring(game:HttpGet(baseUrl .. "elements/Keybind.lua"))()
-            local k = K.new(self, config)
+            local k = K.new(section, config)
             k.Container.Visible = false
-            k.Container.Parent = self.Container
             table.insert(self.Tab.Elements, k.Container)
             return k
         end)

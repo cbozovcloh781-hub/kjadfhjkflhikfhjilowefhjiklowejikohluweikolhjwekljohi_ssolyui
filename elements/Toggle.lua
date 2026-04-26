@@ -10,14 +10,15 @@ Toggle.__index = Toggle
 function Toggle.new(tab, config)
     local self = setmetatable({}, Toggle)
     
-    self.Tab = tab
+    self.Tab = tab.Tab or tab
+    self.Window = tab.Window or (tab.Tab and tab.Tab.Window)
     self.Title = config.Title or "Toggle"
     self.Description = config.Description
     self.Default = config.Default or false
     self.Callback = config.Callback or function() end
     self.Value = self.Default
     
-    self:CreateElement()
+    self:CreateElement(tab.Container)
     
     -- Set initial state
     if self.Default then
@@ -27,7 +28,7 @@ function Toggle.new(tab, config)
     return self
 end
 
-function Toggle:CreateElement()
+function Toggle:CreateElement(parent)
     -- Main container
     self.Container = Instance.new("Frame")
     self.Container.Name = "Toggle"
@@ -35,7 +36,7 @@ function Toggle:CreateElement()
     self.Container.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     self.Container.BackgroundTransparency = 0.5
     self.Container.BorderSizePixel = 0
-    self.Container.Parent = self.Tab.Window.ContentContainer
+    self.Container.Parent = parent or self.Window.ContentContainer
     
     local Corner = Instance.new("UICorner")
     Corner.CornerRadius = UDim.new(0, 8)
@@ -133,7 +134,7 @@ end
 function Toggle:SetValue(value, silent)
     self.Value = value
     
-    local accentColor = self.Tab.Window.AccentColor or Color3.fromRGB(74, 158, 255)
+    local accentColor = self.Window.AccentColor or Color3.fromRGB(74, 158, 255)
     
     if value then
         -- ON state
