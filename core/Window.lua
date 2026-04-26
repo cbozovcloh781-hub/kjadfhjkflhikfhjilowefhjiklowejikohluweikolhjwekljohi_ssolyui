@@ -578,10 +578,10 @@ function Window:SetupResizing()
         local containerPos = self.Container.AbsolutePosition
         local containerSize = self.Container.AbsoluteSize
         
-        -- Corner handle (aligned with side handles)
+        -- Corner handle (aligned with side handles, close to menu edge)
         self.ResizeHandle.Position = UDim2.fromOffset(
-            containerPos.X + containerSize.X + 3,
-            containerPos.Y + containerSize.Y + 3
+            containerPos.X + containerSize.X - 18,
+            containerPos.Y + containerSize.Y - 18
         )
         
         -- Vertical handle (bottom center)
@@ -858,61 +858,25 @@ function Window:SelectTab(tab)
     
     self._switchingTab = true
     
-    -- Fade out current tab content smoothly
+    -- Fade out current tab content quickly
     if self.CurrentTab then
-        -- Fade out all elements with slower animation
+        -- Immediately hide elements without animation to prevent bugs
         for _, element in pairs(self.CurrentTab.Elements) do
-            if element and element.Parent and element.Visible then
-                -- Fade out container and all children
-                TweenService:Create(element, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-                    BackgroundTransparency = 1
-                }):Play()
-                
-                for _, child in pairs(element:GetDescendants()) do
-                    if child:IsA("GuiObject") then
-                        TweenService:Create(child, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-                            BackgroundTransparency = 1
-                        }):Play()
-                        
-                        if child:IsA("TextLabel") or child:IsA("TextButton") then
-                            TweenService:Create(child, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-                                TextTransparency = 1
-                            }):Play()
-                        end
-                        
-                        if child:IsA("ImageLabel") or child:IsA("ImageButton") then
-                            TweenService:Create(child, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-                                ImageTransparency = 1
-                            }):Play()
-                        end
-                        
-                        local stroke = child:FindFirstChildOfClass("UIStroke")
-                        if stroke then
-                            TweenService:Create(stroke, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-                                Transparency = 1
-                            }):Play()
-                        end
-                    end
-                end
+            if element and element.Parent then
+                element.Visible = false
             end
         end
         
-        -- Wait for fade out to complete
-        task.wait(0.4)
-        
-        -- Now deselect tab
+        -- Deselect tab
         self.CurrentTab:Deselect()
-        
-        -- Small pause between tabs
-        task.wait(0.1)
     end
     
     -- Select new tab with fade in
     self.CurrentTab = tab
     tab:Select()
     
-    -- Allow next tab switch after all animations complete
-    task.delay(0.8, function()
+    -- Allow next tab switch quickly
+    task.delay(0.3, function()
         self._switchingTab = false
     end)
 end

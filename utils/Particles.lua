@@ -22,8 +22,8 @@ function Particles.new(parent, accentColor)
     self.Container.Parent = parent
     
     self.Particles = {}
-    self.MaxParticles = 30
-    self.SpawnRate = 0.3
+    self.MaxParticles = 50
+    self.SpawnRate = 0.2
     self.LastSpawn = 0
     self.Running = false
     
