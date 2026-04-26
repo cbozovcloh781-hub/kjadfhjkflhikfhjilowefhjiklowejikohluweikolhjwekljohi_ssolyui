@@ -159,37 +159,10 @@ function Tab:Select()
     
     local accentColor = self.Window.AccentColor or Color3.fromRGB(74, 158, 255)
     
-    -- Animate selection with glow effect
+    -- Animate selection
     TweenService:Create(self.Button, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
         BackgroundColor3 = accentColor,
         BackgroundTransparency = 0.85
-    }):Play()
-    
-    -- Add glow effect
-    local glow = self.Button:FindFirstChild("Glow")
-    if not glow then
-        glow = Instance.new("ImageLabel")
-        glow.Name = "Glow"
-        glow.Size = UDim2.new(1, 20, 1, 20)
-        glow.Position = UDim2.new(0.5, 0, 0.5, 0)
-        glow.AnchorPoint = Vector2.new(0.5, 0.5)
-        glow.BackgroundTransparency = 1
-        glow.Image = "rbxassetid://5028857084"
-        glow.ImageColor3 = accentColor
-        glow.ImageTransparency = 1
-        glow.ScaleType = Enum.ScaleType.Slice
-        glow.SliceCenter = Rect.new(24, 24, 276, 276)
-        glow.ZIndex = 0
-        glow.Parent = self.Button
-        
-        if self.Window.AccentElements then
-            table.insert(self.Window.AccentElements, glow)
-        end
-    end
-    
-    TweenService:Create(glow, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-        ImageTransparency = 0.85,
-        ImageColor3 = accentColor
     }):Play()
     
     TweenService:Create(self.TitleLabel, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
@@ -311,9 +284,7 @@ function Tab:Deselect()
     -- Fade out glow
     local glow = self.Button:FindFirstChild("Glow")
     if glow then
-        TweenService:Create(glow, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.In), {
-            ImageTransparency = 1
-        }):Play()
+        glow:Destroy()
     end
     
     TweenService:Create(self.TitleLabel, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
