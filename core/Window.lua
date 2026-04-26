@@ -150,11 +150,30 @@ function Window:CreateGUI()
     self.TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
     self.TitleLabel.Parent = self.TitleBar
     
+    -- Close button (X)
+    self.CloseButton = Instance.new("TextButton")
+    self.CloseButton.Name = "Close"
+    self.CloseButton.Size = UDim2.fromOffset(25, 25)
+    self.CloseButton.Position = UDim2.new(1, -32, 0.5, -12.5)
+    self.CloseButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    self.CloseButton.BackgroundTransparency = 0
+    self.CloseButton.BorderSizePixel = 0
+    self.CloseButton.Text = "×"
+    self.CloseButton.TextColor3 = Color3.fromRGB(200, 200, 200)
+    self.CloseButton.TextSize = 18
+    self.CloseButton.Font = Enum.Font.GothamBold
+    self.CloseButton.AutoButtonColor = false
+    self.CloseButton.Parent = self.TitleBar
+    
+    local CloseCorner = Instance.new("UICorner")
+    CloseCorner.CornerRadius = UDim.new(0, 4)
+    CloseCorner.Parent = self.CloseButton
+    
     -- Minimize button
     self.MinimizeButton = Instance.new("TextButton")
     self.MinimizeButton.Name = "Minimize"
     self.MinimizeButton.Size = UDim2.fromOffset(25, 25)
-    self.MinimizeButton.Position = UDim2.new(1, -32, 0.5, -12.5)
+    self.MinimizeButton.Position = UDim2.new(1, -62, 0.5, -12.5)
     self.MinimizeButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
     self.MinimizeButton.BackgroundTransparency = 0
     self.MinimizeButton.BorderSizePixel = 0
@@ -419,10 +438,10 @@ function Window:CreateGUI()
     local MinIndLabel = Instance.new("TextLabel")
     MinIndLabel.Size = UDim2.new(1, 0, 1, 0)
     MinIndLabel.BackgroundTransparency = 1
-    MinIndLabel.Text = self.Config.Title:sub(1, 1)
+    MinIndLabel.Text = self.Config.Title:sub(1, 1):upper()
     MinIndLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    MinIndLabel.TextSize = 24
-    MinIndLabel.Font = Enum.Font.SourceSansBold
+    MinIndLabel.TextSize = 26
+    MinIndLabel.Font = Enum.Font.GothamBold
     MinIndLabel.Parent = self.MinimizedIndicator
     
     -- Snow particles effect (deprecated, use new particles system)
@@ -708,7 +727,25 @@ function Window:SetupResizing()
 end
 
 function Window:SetupMinimize()
-    -- Button click
+    -- Close button click
+    self.CloseButton.MouseButton1Click:Connect(function()
+        self:Destroy()
+    end)
+    
+    -- Close button hover
+    self.CloseButton.MouseEnter:Connect(function()
+        TweenService:Create(self.CloseButton, TweenInfo.new(0.15), {
+            BackgroundColor3 = Color3.fromRGB(220, 50, 50)
+        }):Play()
+    end)
+    
+    self.CloseButton.MouseLeave:Connect(function()
+        TweenService:Create(self.CloseButton, TweenInfo.new(0.15), {
+            BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+        }):Play()
+    end)
+    
+    -- Minimize button click
     self.MinimizeButton.MouseButton1Click:Connect(function()
         self:ToggleMinimize()
     end)
@@ -720,7 +757,7 @@ function Window:SetupMinimize()
         end
     end)
     
-    -- Hover effect
+    -- Minimize button hover
     self.MinimizeButton.MouseEnter:Connect(function()
         TweenService:Create(self.MinimizeButton, TweenInfo.new(0.15), {
             BackgroundColor3 = Color3.fromRGB(60, 60, 60)
@@ -731,6 +768,37 @@ function Window:SetupMinimize()
         TweenService:Create(self.MinimizeButton, TweenInfo.new(0.15), {
             BackgroundColor3 = Color3.fromRGB(40, 40, 40)
         }):Play()
+    end)
+    
+    -- Minimized indicator hover animation
+    self.MinimizedIndicator.MouseEnter:Connect(function()
+        TweenService:Create(self.MinimizedIndicator, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+            Size = UDim2.fromOffset(60, 60),
+            BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+        }):Play()
+        
+        local stroke = self.MinimizedIndicator:FindFirstChildOfClass("UIStroke")
+        if stroke then
+            TweenService:Create(stroke, TweenInfo.new(0.3), {
+                Color = self.AccentColor,
+                Thickness = 2
+            }):Play()
+        end
+    end)
+    
+    self.MinimizedIndicator.MouseLeave:Connect(function()
+        TweenService:Create(self.MinimizedIndicator, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+            Size = UDim2.fromOffset(50, 50),
+            BackgroundColor3 = Color3.fromRGB(26, 26, 26)
+        }):Play()
+        
+        local stroke = self.MinimizedIndicator:FindFirstChildOfClass("UIStroke")
+        if stroke then
+            TweenService:Create(stroke, TweenInfo.new(0.3), {
+                Color = Color3.fromRGB(60, 60, 60),
+                Thickness = 1
+            }):Play()
+        end
     end)
 end
 
