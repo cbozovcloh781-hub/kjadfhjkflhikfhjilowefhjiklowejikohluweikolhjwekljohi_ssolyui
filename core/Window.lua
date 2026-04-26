@@ -46,11 +46,6 @@ function Window.new(config)
     self:SetupResizing()
     self:SetupMinimize()
     
-    -- Always hide initially if delayed
-    if self._delayShow then
-        self.Container.Visible = false
-    end
-    
     -- Initialize notification system (will be loaded separately)
     self.Notification = nil
     
@@ -78,13 +73,14 @@ function Window:CreateGUI()
     self.ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     self.ScreenGui.ResetOnSpawn = false
     self.ScreenGui.IgnoreGuiInset = false
+    self.ScreenGui.Enabled = not self._delayShow  -- Hide if delayed
     self.ScreenGui.Parent = coreGui
     
     -- Blur effect
     if self.Config.BlurEnabled then
         self.Blur = Instance.new("BlurEffect")
         self.Blur.Name = "SsolyBlur"
-        self.Blur.Size = 10
+        self.Blur.Size = self._delayShow and 0 or 10  -- Start at 0 if delayed
         self.Blur.Parent = lighting
     end
     
@@ -945,6 +941,14 @@ function Window:Show()
     
     -- Wait for loading fade out to start, then show window
     task.wait(0.15)
+    
+    -- Enable ScreenGui
+    self.ScreenGui.Enabled = true
+    
+    -- Fade in main blur
+    if self.Blur then
+        TweenService:Create(self.Blur, TweenInfo.new(0.4), {Size = self.BlurSize}):Play()
+    end
     
     -- Show window with animation
     self.Container.Visible = true
