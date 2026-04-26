@@ -114,13 +114,13 @@ function Tab:CreateButton()
     -- Hover effects
     self.Button.MouseEnter:Connect(function()
         if not self.Selected then
-            TweenService:Create(self.Button, TweenInfo.new(0.2), {
+            TweenService:Create(self.Button, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
                 BackgroundTransparency = 0.1
             }):Play()
-            TweenService:Create(self.TitleLabel, TweenInfo.new(0.2), {
+            TweenService:Create(self.TitleLabel, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
                 TextColor3 = Color3.fromRGB(200, 200, 200)
             }):Play()
-            TweenService:Create(self.IconLabel, TweenInfo.new(0.2), {
+            TweenService:Create(self.IconLabel, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
                 ImageColor3 = Color3.fromRGB(200, 200, 200)
             }):Play()
         end
@@ -128,13 +128,13 @@ function Tab:CreateButton()
     
     self.Button.MouseLeave:Connect(function()
         if not self.Selected then
-            TweenService:Create(self.Button, TweenInfo.new(0.2), {
+            TweenService:Create(self.Button, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
                 BackgroundTransparency = 0.3
             }):Play()
-            TweenService:Create(self.TitleLabel, TweenInfo.new(0.2), {
+            TweenService:Create(self.TitleLabel, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
                 TextColor3 = Color3.fromRGB(150, 150, 150)
             }):Play()
-            TweenService:Create(self.IconLabel, TweenInfo.new(0.2), {
+            TweenService:Create(self.IconLabel, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
                 ImageColor3 = Color3.fromRGB(150, 150, 150)
             }):Play()
         end
@@ -147,21 +147,21 @@ function Tab:Select()
     local accentColor = self.Window.AccentColor or Color3.fromRGB(74, 158, 255)
     
     -- Animate selection with bounce effect
-    TweenService:Create(self.Button, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+    TweenService:Create(self.Button, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
         BackgroundColor3 = accentColor,
         BackgroundTransparency = 0.8
     }):Play()
     
-    TweenService:Create(self.TitleLabel, TweenInfo.new(0.3), {
+    TweenService:Create(self.TitleLabel, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
         TextColor3 = Color3.fromRGB(255, 255, 255)
     }):Play()
     
-    TweenService:Create(self.IconLabel, TweenInfo.new(0.3), {
+    TweenService:Create(self.IconLabel, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
         ImageColor3 = Color3.fromRGB(255, 255, 255)
     }):Play()
     
     -- Indicator grows with bounce
-    TweenService:Create(self.Indicator, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+    TweenService:Create(self.Indicator, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
         Size = UDim2.new(0, 3, 0, 30)
     }):Play()
     
@@ -177,7 +177,7 @@ function Tab:Select()
                 local originalPos = UDim2.new(element.Position.X.Scale, element.Position.X.Offset + 20, element.Position.Y.Scale, element.Position.Y.Offset)
                 
                 -- Slide in from left with fade
-                TweenService:Create(element, TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+                TweenService:Create(element, TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
                     BackgroundTransparency = 0.5,
                     Position = originalPos
                 }):Play()
@@ -186,7 +186,7 @@ function Tab:Select()
                 for _, child in pairs(element:GetDescendants()) do
                     if child:IsA("TextLabel") or child:IsA("TextButton") then
                         child.TextTransparency = 1
-                        TweenService:Create(child, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                        TweenService:Create(child, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
                             TextTransparency = child.Name == "Title" and 0 or (child.Name == "Description" and 0.3 or 0.2)
                         }):Play()
                     end
@@ -200,20 +200,20 @@ function Tab:Deselect()
     self.Selected = false
     
     -- Animate deselection smoothly
-    TweenService:Create(self.Button, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+    TweenService:Create(self.Button, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
         BackgroundColor3 = Color3.fromRGB(35, 35, 35),
         BackgroundTransparency = 0.3
     }):Play()
     
-    TweenService:Create(self.TitleLabel, TweenInfo.new(0.3), {
+    TweenService:Create(self.TitleLabel, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
         TextColor3 = Color3.fromRGB(150, 150, 150)
     }):Play()
     
-    TweenService:Create(self.IconLabel, TweenInfo.new(0.3), {
+    TweenService:Create(self.IconLabel, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
         ImageColor3 = Color3.fromRGB(150, 150, 150)
     }):Play()
     
-    TweenService:Create(self.Indicator, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+    TweenService:Create(self.Indicator, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.In), {
         Size = UDim2.new(0, 3, 0, 0)
     }):Play()
     
@@ -223,7 +223,7 @@ function Tab:Deselect()
             local targetPos = UDim2.new(element.Position.X.Scale, element.Position.X.Offset + 20, element.Position.Y.Scale, element.Position.Y.Offset)
             
             -- Slide out to right with fade
-            TweenService:Create(element, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+            TweenService:Create(element, TweenInfo.new(0.35, Enum.EasingStyle.Quint, Enum.EasingDirection.In), {
                 BackgroundTransparency = 1,
                 Position = targetPos
             }):Play()
@@ -231,7 +231,7 @@ function Tab:Deselect()
             -- Fade out text
             for _, child in pairs(element:GetDescendants()) do
                 if child:IsA("TextLabel") or child:IsA("TextButton") then
-                    TweenService:Create(child, TweenInfo.new(0.2), {
+                    TweenService:Create(child, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
                         TextTransparency = 1
                     }):Play()
                 end
@@ -240,7 +240,7 @@ function Tab:Deselect()
     end
     
     -- Hide elements after animation
-    task.delay(0.25, function()
+    task.delay(0.35, function()
         for _, element in pairs(self.Elements) do
             if element and element.Parent then
                 element.Visible = false

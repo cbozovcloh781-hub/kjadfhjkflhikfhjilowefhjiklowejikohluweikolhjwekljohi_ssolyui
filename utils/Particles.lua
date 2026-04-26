@@ -89,13 +89,6 @@ function Particles:Start()
     self.Connection = RunService.Heartbeat:Connect(function()
         if not Particles.Enabled then
             self.Container.Visible = false
-            -- Удаляем существующие частицы при выключении
-            for i = #self.Particles, 1, -1 do
-                if self.Particles[i] and self.Particles[i].Parent then
-                    self.Particles[i]:Destroy()
-                end
-                table.remove(self.Particles, i)
-            end
             return
         end
         
@@ -133,9 +126,25 @@ end
 function Particles.SetEnabled(enabled)
     Particles.Enabled = enabled
     
-    for _, particleSystem in ipairs(Particles.Active) do
-        if particleSystem.Container then
-            particleSystem.Container.Visible = enabled
+    if not enabled then
+        -- Удаляем все частицы при выключении
+        for _, particleSystem in ipairs(Particles.Active) do
+            if particleSystem.Container then
+                particleSystem.Container.Visible = false
+                -- Удаляем все частицы
+                for i = #particleSystem.Particles, 1, -1 do
+                    if particleSystem.Particles[i] and particleSystem.Particles[i].Parent then
+                        particleSystem.Particles[i]:Destroy()
+                    end
+                    table.remove(particleSystem.Particles, i)
+                end
+            end
+        end
+    else
+        for _, particleSystem in ipairs(Particles.Active) do
+            if particleSystem.Container then
+                particleSystem.Container.Visible = true
+            end
         end
     end
 end

@@ -129,13 +129,13 @@ function Dropdown:CreateElement()
     
     -- Hover animation for arrow
     self.DropdownButton.MouseEnter:Connect(function()
-        TweenService:Create(self.ArrowIcon, TweenInfo.new(0.2), {
+        TweenService:Create(self.ArrowIcon, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
             TextColor3 = Color3.fromRGB(255, 255, 255)
         }):Play()
     end)
     
     self.DropdownButton.MouseLeave:Connect(function()
-        TweenService:Create(self.ArrowIcon, TweenInfo.new(0.2), {
+        TweenService:Create(self.ArrowIcon, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
             TextColor3 = Color3.fromRGB(150, 150, 150)
         }):Play()
     end)
@@ -229,13 +229,13 @@ function Dropdown:CreateElement()
     
     -- Hover effects
     self.DropdownButton.MouseEnter:Connect(function()
-        TweenService:Create(self.DropdownButton, TweenInfo.new(0.2), {
+        TweenService:Create(self.DropdownButton, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
             BackgroundTransparency = 0.1
         }):Play()
     end)
     
     self.DropdownButton.MouseLeave:Connect(function()
-        TweenService:Create(self.DropdownButton, TweenInfo.new(0.2), {
+        TweenService:Create(self.DropdownButton, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
             BackgroundTransparency = 0.3
         }):Play()
     end)
@@ -318,13 +318,13 @@ function Dropdown:CreateOptions()
         
         -- Hover effects
         optionButton.MouseEnter:Connect(function()
-            TweenService:Create(optionButton, TweenInfo.new(0.2), {
+            TweenService:Create(optionButton, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
                 BackgroundTransparency = 0.2
             }):Play()
         end)
         
         optionButton.MouseLeave:Connect(function()
-            TweenService:Create(optionButton, TweenInfo.new(0.2), {
+            TweenService:Create(optionButton, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
                 BackgroundTransparency = 0.5
             }):Play()
         end)
@@ -357,11 +357,29 @@ function Dropdown:Open()
         local buttonPos = self.DropdownButton.AbsolutePosition
         local buttonSize = self.DropdownButton.AbsoluteSize
         
+        -- Проверяем, чтобы дропдаун не вылезал за границы контейнера
+        local containerPos = self.Tab.Window.ContentContainer.AbsolutePosition
+        local containerSize = self.Tab.Window.ContentContainer.AbsoluteSize
+        local containerBottom = containerPos.Y + containerSize.Y
+        
+        local dropdownBottom = buttonPos.Y + buttonSize.Y + 5 + targetHeight
+        local maxHeight = targetHeight
+        
+        -- Если дропдаун вылезает за низ, уменьшаем его высоту
+        if dropdownBottom > containerBottom then
+            maxHeight = math.max(60, containerBottom - (buttonPos.Y + buttonSize.Y + 5) - 10)
+        end
+        
         self.OptionsContainer.Position = UDim2.fromOffset(
             buttonPos.X,
             buttonPos.Y + buttonSize.Y + 5
         )
         self.OptionsContainer.Size = UDim2.new(0, buttonSize.X, 0, self.OptionsContainer.AbsoluteSize.Y)
+        
+        -- Обновляем максимальную высоту
+        if self.OptionsContainer.AbsoluteSize.Y > maxHeight then
+            self.OptionsContainer.Size = UDim2.new(0, buttonSize.X, 0, maxHeight)
+        end
     end
     
     self.UpdateConnection = game:GetService("RunService").RenderStepped:Connect(updatePosition)
@@ -369,6 +387,16 @@ function Dropdown:Open()
     -- Initial position
     local buttonPos = self.DropdownButton.AbsolutePosition
     local buttonSize = self.DropdownButton.AbsoluteSize
+    
+    -- Проверяем максимальную высоту
+    local containerPos = self.Tab.Window.ContentContainer.AbsolutePosition
+    local containerSize = self.Tab.Window.ContentContainer.AbsoluteSize
+    local containerBottom = containerPos.Y + containerSize.Y
+    local dropdownBottom = buttonPos.Y + buttonSize.Y + 5 + targetHeight
+    
+    if dropdownBottom > containerBottom then
+        targetHeight = math.max(60, containerBottom - (buttonPos.Y + buttonSize.Y + 5) - 10)
+    end
     
     self.OptionsContainer.Position = UDim2.fromOffset(
         buttonPos.X,
@@ -378,12 +406,12 @@ function Dropdown:Open()
     self.OptionsContainer.Visible = true
     
     -- Expand options with smooth animation
-    TweenService:Create(self.OptionsContainer, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+    TweenService:Create(self.OptionsContainer, TweenInfo.new(0.35, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
         Size = UDim2.new(0, buttonSize.X, 0, targetHeight)
     }):Play()
     
     -- Rotate arrow with bounce effect
-    TweenService:Create(self.ArrowIcon, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+    TweenService:Create(self.ArrowIcon, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
         Rotation = 180,
         TextColor3 = self.Tab.Window.AccentColor or Color3.fromRGB(74, 158, 255)
     }):Play()
@@ -399,17 +427,17 @@ function Dropdown:Close()
     end
     
     -- Close options with smooth animation
-    TweenService:Create(self.OptionsContainer, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+    TweenService:Create(self.OptionsContainer, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.In), {
         Size = UDim2.new(0, self.DropdownButton.AbsoluteSize.X, 0, 0)
     }):Play()
     
     -- Rotate arrow back with bounce effect
-    TweenService:Create(self.ArrowIcon, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+    TweenService:Create(self.ArrowIcon, TweenInfo.new(0.35, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
         Rotation = 0,
         TextColor3 = Color3.fromRGB(150, 150, 150)
     }):Play()
     
-    task.delay(0.2, function()
+    task.delay(0.3, function()
         self.OptionsContainer.Visible = false
     end)
 end
@@ -441,33 +469,33 @@ function Dropdown:ToggleValue(value)
     if option then
         if self.Value[value] then
             -- Smooth color transition and scale animation
-            TweenService:Create(option.Check, TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+            TweenService:Create(option.Check, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
                 BackgroundColor3 = accentColor
             }):Play()
-            TweenService:Create(option.Check:FindFirstChildOfClass("UIStroke"), TweenInfo.new(0.2), {
+            TweenService:Create(option.Check:FindFirstChildOfClass("UIStroke"), TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
                 Color = accentColor
             }):Play()
             
             -- Checkmark appears with scale animation
             option.CheckIcon.TextTransparency = 1
             option.CheckIcon.Text = "✓"
-            TweenService:Create(option.CheckIcon, TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+            TweenService:Create(option.CheckIcon, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
                 TextTransparency = 0
             }):Play()
         else
             -- Smooth color transition back
-            TweenService:Create(option.Check, TweenInfo.new(0.2), {
+            TweenService:Create(option.Check, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
                 BackgroundColor3 = Color3.fromRGB(25, 25, 25)
             }):Play()
-            TweenService:Create(option.Check:FindFirstChildOfClass("UIStroke"), TweenInfo.new(0.2), {
+            TweenService:Create(option.Check:FindFirstChildOfClass("UIStroke"), TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
                 Color = Color3.fromRGB(70, 70, 70)
             }):Play()
             
             -- Checkmark disappears with fade
-            TweenService:Create(option.CheckIcon, TweenInfo.new(0.15), {
+            TweenService:Create(option.CheckIcon, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
                 TextTransparency = 1
             }):Play()
-            task.delay(0.15, function()
+            task.delay(0.25, function()
                 option.CheckIcon.Text = ""
             end)
         end
@@ -502,19 +530,19 @@ function Dropdown:UpdateDisplay()
         -- Update checkmarks with animations
         for value, option in pairs(self.OptionButtons) do
             if self.Value[value] then
-                TweenService:Create(option.Check, TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+                TweenService:Create(option.Check, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
                     BackgroundColor3 = accentColor
                 }):Play()
-                TweenService:Create(option.Check:FindFirstChildOfClass("UIStroke"), TweenInfo.new(0.2), {
+                TweenService:Create(option.Check:FindFirstChildOfClass("UIStroke"), TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
                     Color = accentColor
                 }):Play()
                 option.CheckIcon.Text = "✓"
                 option.CheckIcon.TextTransparency = 0
             else
-                TweenService:Create(option.Check, TweenInfo.new(0.2), {
+                TweenService:Create(option.Check, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
                     BackgroundColor3 = Color3.fromRGB(25, 25, 25)
                 }):Play()
-                TweenService:Create(option.Check:FindFirstChildOfClass("UIStroke"), TweenInfo.new(0.2), {
+                TweenService:Create(option.Check:FindFirstChildOfClass("UIStroke"), TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
                     Color = Color3.fromRGB(70, 70, 70)
                 }):Play()
                 option.CheckIcon.Text = ""

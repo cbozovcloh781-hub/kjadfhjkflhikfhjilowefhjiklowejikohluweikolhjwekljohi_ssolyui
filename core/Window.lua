@@ -111,10 +111,24 @@ function Window:CreateGUI()
     
     -- Border (stroke)
     local UIStroke = Instance.new("UIStroke")
-    UIStroke.Color = Color3.fromRGB(60, 60, 60)
-    UIStroke.Thickness = 1
+    UIStroke.Color = Color3.fromRGB(80, 80, 80)
+    UIStroke.Thickness = 2
     UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
     UIStroke.Parent = self.Container
+    
+    -- Shadow effect
+    local Shadow = Instance.new("ImageLabel")
+    Shadow.Name = "Shadow"
+    Shadow.Size = UDim2.new(1, 30, 1, 30)
+    Shadow.Position = UDim2.fromOffset(-15, -15)
+    Shadow.BackgroundTransparency = 1
+    Shadow.Image = "rbxasset://textures/ui/GuiImagePlaceholder.png"
+    Shadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
+    Shadow.ImageTransparency = 0.5
+    Shadow.ScaleType = Enum.ScaleType.Slice
+    Shadow.SliceCenter = Rect.new(10, 10, 118, 118)
+    Shadow.ZIndex = 0
+    Shadow.Parent = self.Container
     
     -- Title bar
     self.TitleBar = Instance.new("Frame")
@@ -131,9 +145,9 @@ function Window:CreateGUI()
     
     -- Divider line
     local Divider = Instance.new("Frame")
-    Divider.Size = UDim2.new(1, 0, 0, 1)
+    Divider.Size = UDim2.new(1, 0, 0, 2)
     Divider.Position = UDim2.new(0, 0, 1, 0)
-    Divider.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    Divider.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
     Divider.BorderSizePixel = 0
     Divider.Parent = self.TitleBar
     
@@ -232,8 +246,8 @@ function Window:CreateGUI()
     ProfileCorner.Parent = self.ProfileContainer
     
     local ProfileStroke = Instance.new("UIStroke")
-    ProfileStroke.Color = Color3.fromRGB(60, 60, 60)
-    ProfileStroke.Thickness = 1
+    ProfileStroke.Color = Color3.fromRGB(80, 80, 80)
+    ProfileStroke.Thickness = 2
     ProfileStroke.Parent = self.ProfileContainer
     
     -- Get player info
@@ -500,7 +514,7 @@ function Window:SetupDragging()
             local delta = input.Position - dragStart
             
             -- Smooth animation
-            TweenService:Create(self.Container, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            TweenService:Create(self.Container, TweenInfo.new(0.15, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
                 Position = UDim2.new(
                     startPos.X.Scale,
                     startPos.X.Offset + delta.X,
@@ -741,7 +755,7 @@ function Window:ToggleMinimize()
     if self.Minimized then
         -- Hide blur
         if self.Blur then
-            TweenService:Create(self.Blur, TweenInfo.new(0.3), {Size = 0}):Play()
+            TweenService:Create(self.Blur, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Size = 0}):Play()
         end
         
         -- Hide resize handles
@@ -759,7 +773,7 @@ function Window:ToggleMinimize()
         self.Config.Position = UDim2.new(currentPos.X.Scale, currentPos.X.Offset, currentPos.Y.Scale, currentPos.Y.Offset)
         
         -- Minimize animation to center
-        local tween = TweenService:Create(self.Container, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
+        local tween = TweenService:Create(self.Container, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.In), {
             Size = UDim2.fromOffset(0, 0),
             Position = UDim2.new(currentPos.X.Scale, currentPos.X.Offset + currentSize.X.Offset/2, currentPos.Y.Scale, currentPos.Y.Offset + currentSize.Y.Offset/2)
         })
@@ -773,14 +787,14 @@ function Window:ToggleMinimize()
             self.MinimizedIndicator.Visible = true
             self.MinimizedIndicator.Size = UDim2.fromOffset(0, 0)
             
-            TweenService:Create(self.MinimizedIndicator, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+            TweenService:Create(self.MinimizedIndicator, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
                 Size = UDim2.fromOffset(50, 50)
             }):Play()
         end)
     else
         -- Show blur
         if self.Blur then
-            TweenService:Create(self.Blur, TweenInfo.new(0.3), {Size = self.BlurSize}):Play()
+            TweenService:Create(self.Blur, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Size = self.BlurSize}):Play()
         end
         
         -- Show profile
@@ -790,11 +804,11 @@ function Window:ToggleMinimize()
         local indPos = self.MinimizedIndicator.Position
         
         -- Hide indicator
-        TweenService:Create(self.MinimizedIndicator, TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
+        TweenService:Create(self.MinimizedIndicator, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.In), {
             Size = UDim2.fromOffset(0, 0)
         }):Play()
         
-        task.wait(0.2)
+        task.wait(0.4)
         self.MinimizedIndicator.Visible = false
         
         -- Restore window from indicator position with saved size
@@ -802,13 +816,13 @@ function Window:ToggleMinimize()
         self.Container.Size = UDim2.fromOffset(0, 0)
         self.Container.Position = indPos
         
-        TweenService:Create(self.Container, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+        TweenService:Create(self.Container, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
             Size = self.Config.Size,
             Position = UDim2.new(indPos.X.Scale, indPos.X.Offset - self.Config.Size.X.Offset/2, indPos.Y.Scale, indPos.Y.Offset - self.Config.Size.Y.Offset/2)
         }):Play()
         
         -- Show resize handles AFTER animation completes
-        task.delay(0.3, function()
+        task.delay(0.5, function()
             self.ResizeHandle.Visible = true
             self.ResizeHandleV.Visible = true
             self.ResizeHandleH.Visible = true
@@ -957,7 +971,7 @@ function Window:SetHubStatus(status, expiryDate)
     local statusColor = Color3.fromRGB(150, 150, 150)
     
     if status == "dev" then
-        statusText = "👑 Developer"
+        statusText = "👑 dev"
         statusColor = Color3.fromRGB(90, 200, 250) -- Cyan/Light Blue
     elseif status == "shub+" then
         if expiryDate then
@@ -999,18 +1013,18 @@ function Window:Show()
         for _, child in pairs(loadingGui:GetDescendants()) do
             if child:IsA("GuiObject") then
                 if child:IsA("TextLabel") or child:IsA("TextButton") then
-                    TweenService:Create(child, TweenInfo.new(0.3), {
+                    TweenService:Create(child, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
                         TextTransparency = 1
                     }):Play()
                 end
-                TweenService:Create(child, TweenInfo.new(0.3), {
+                TweenService:Create(child, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
                     BackgroundTransparency = 1
                 }):Play()
             end
         end
         
         -- Destroy after animation
-        task.delay(0.35, function()
+        task.delay(0.55, function()
             if loadingGui and loadingGui.Parent then
                 loadingGui:Destroy()
             end
@@ -1019,8 +1033,8 @@ function Window:Show()
     
     -- Fade out blur
     if loadingBlur then
-        TweenService:Create(loadingBlur, TweenInfo.new(0.3), {Size = 0}):Play()
-        task.delay(0.35, function()
+        TweenService:Create(loadingBlur, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Size = 0}):Play()
+        task.delay(0.55, function()
             if loadingBlur and loadingBlur.Parent then
                 loadingBlur:Destroy()
             end
@@ -1029,7 +1043,7 @@ function Window:Show()
     
     -- Also try from config
     if self.Config._loadingGui and self.Config._loadingGui.Parent then
-        task.delay(0.35, function()
+        task.delay(0.55, function()
             if self.Config._loadingGui and self.Config._loadingGui.Parent then
                 self.Config._loadingGui:Destroy()
             end
@@ -1037,7 +1051,7 @@ function Window:Show()
     end
     
     if self.Config._loadingBlur and self.Config._loadingBlur.Parent then
-        task.delay(0.35, function()
+        task.delay(0.55, function()
             if self.Config._loadingBlur and self.Config._loadingBlur.Parent then
                 self.Config._loadingBlur:Destroy()
             end
@@ -1049,26 +1063,26 @@ function Window:Show()
     self.Config._loadingBlur = nil
     
     -- Wait for loading fade out to start, then show window
-    task.wait(0.15)
+    task.wait(0.25)
     
     -- Enable ScreenGui
     self.ScreenGui.Enabled = true
     
     -- Fade in main blur
     if self.Blur then
-        TweenService:Create(self.Blur, TweenInfo.new(0.4), {Size = self.BlurSize}):Play()
+        TweenService:Create(self.Blur, TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Size = self.BlurSize}):Play()
     end
     
     -- Show window with animation
     self.Container.Visible = true
     self.Container.Size = UDim2.fromOffset(0, 0)
     
-    TweenService:Create(self.Container, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+    TweenService:Create(self.Container, TweenInfo.new(0.7, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
         Size = self.Config.Size
     }):Play()
     
     -- Show resize handles after window animation
-    task.delay(0.5, function()
+    task.delay(0.7, function()
         self.ResizeHandle.Visible = true
         self.ResizeHandleV.Visible = true
         self.ResizeHandleH.Visible = true

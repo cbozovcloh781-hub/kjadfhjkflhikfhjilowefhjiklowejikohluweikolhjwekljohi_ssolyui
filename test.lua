@@ -321,6 +321,18 @@ SettingsTab:AddToggle({
     end
 })
 
+SettingsTab:AddSlider({
+    Title = "Blur Strength",
+    Description = "Adjust blur intensity",
+    Min = 0,
+    Max = 30,
+    Default = 10,
+    Rounding = 0,
+    Callback = function(Value)
+        Window:SetBlurSize(Value)
+    end
+})
+
 SettingsTab:AddButton({
     Title = "Test Notifications",
     Callback = function()
