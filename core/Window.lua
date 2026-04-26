@@ -109,24 +109,6 @@ function Window:CreateGUI()
     UICorner.CornerRadius = UDim.new(0, 8)
     UICorner.Parent = self.Container
     
-    -- Acrylic blur effect for container background
-    local ContainerBlur = Instance.new("ImageLabel")
-    ContainerBlur.Name = "AcrylicBlur"
-    ContainerBlur.Size = UDim2.new(1, 0, 1, 0)
-    ContainerBlur.Position = UDim2.fromOffset(0, 0)
-    ContainerBlur.BackgroundTransparency = 1
-    ContainerBlur.Image = "rbxasset://textures/ui/GuiImagePlaceholder.png"
-    ContainerBlur.ImageColor3 = Color3.fromRGB(15, 15, 15)
-    ContainerBlur.ImageTransparency = 0.3
-    ContainerBlur.ScaleType = Enum.ScaleType.Tile
-    ContainerBlur.TileSize = UDim2.fromOffset(128, 128)
-    ContainerBlur.ZIndex = 0
-    ContainerBlur.Parent = self.Container
-    
-    local BlurCorner = Instance.new("UICorner")
-    BlurCorner.CornerRadius = UDim.new(0, 8)
-    BlurCorner.Parent = ContainerBlur
-    
     -- Glow effect behind container
     local GlowFrame = Instance.new("Frame")
     GlowFrame.Name = "Glow"

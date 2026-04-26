@@ -379,9 +379,10 @@ function Dropdown:Open()
             if spaceAbove < targetHeight then
                 maxHeight = math.max(60, spaceAbove - 10)
             end
+            self.OptionsContainer.AnchorPoint = Vector2.new(0, 1)
             self.OptionsContainer.Position = UDim2.fromOffset(
                 buttonPos.X,
-                buttonPos.Y - maxHeight - 5
+                buttonPos.Y - 5
             )
         else
             -- Открываем вниз
@@ -389,6 +390,7 @@ function Dropdown:Open()
             if dropdownBottom > containerBottom then
                 maxHeight = math.max(60, spaceBelow - 10)
             end
+            self.OptionsContainer.AnchorPoint = Vector2.new(0, 0)
             self.OptionsContainer.Position = UDim2.fromOffset(
                 buttonPos.X,
                 buttonPos.Y + buttonSize.Y + 5
@@ -443,13 +445,16 @@ function Dropdown:Open()
     
     -- Expand options with smooth animation
     if openUpwards then
-        -- Начинаем снизу кнопки и растем вверх
-        self.OptionsContainer.Position = UDim2.fromOffset(buttonPos.X, buttonPos.Y - 5)
+        -- Начинаем снизу кнопки (на уровне верха кнопки) и растем вверх
+        self.OptionsContainer.Position = UDim2.fromOffset(buttonPos.X, buttonPos.Y)
+        self.OptionsContainer.AnchorPoint = Vector2.new(0, 1)
         TweenService:Create(self.OptionsContainer, TweenInfo.new(0.35, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
             Size = UDim2.new(0, buttonSize.X, 0, targetHeight),
-            Position = UDim2.fromOffset(buttonPos.X, buttonPos.Y - targetHeight - 5)
+            Position = UDim2.fromOffset(buttonPos.X, buttonPos.Y - 5)
         }):Play()
     else
+        -- Обычное открытие вниз
+        self.OptionsContainer.AnchorPoint = Vector2.new(0, 0)
         TweenService:Create(self.OptionsContainer, TweenInfo.new(0.35, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
             Size = UDim2.new(0, buttonSize.X, 0, targetHeight)
         }):Play()
