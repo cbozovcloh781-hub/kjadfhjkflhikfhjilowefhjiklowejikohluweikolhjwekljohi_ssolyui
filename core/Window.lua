@@ -729,7 +729,7 @@ end
 function Window:SetupMinimize()
     -- Close button click
     self.CloseButton.MouseButton1Click:Connect(function()
-        self:Destroy()
+        self:ToggleMinimize()
     end)
     
     -- Close button hover
