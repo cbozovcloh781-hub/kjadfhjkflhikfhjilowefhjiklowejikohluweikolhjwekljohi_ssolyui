@@ -352,6 +352,8 @@ function Dropdown:Open()
         self.UpdateConnection:Disconnect()
     end
     
+    local openUpwards = false
+    
     local function updatePosition()
         if not self.Opened then return end
         local buttonPos = self.DropdownButton.AbsolutePosition
@@ -361,19 +363,38 @@ function Dropdown:Open()
         local containerPos = self.Tab.Window.ContentContainer.AbsolutePosition
         local containerSize = self.Tab.Window.ContentContainer.AbsoluteSize
         local containerBottom = containerPos.Y + containerSize.Y
+        local containerTop = containerPos.Y
         
         local dropdownBottom = buttonPos.Y + buttonSize.Y + 5 + targetHeight
+        local dropdownTop = buttonPos.Y - 5 - targetHeight
         local maxHeight = targetHeight
         
-        -- Если дропдаун вылезает за низ, уменьшаем его высоту
-        if dropdownBottom > containerBottom then
-            maxHeight = math.max(60, containerBottom - (buttonPos.Y + buttonSize.Y + 5) - 10)
+        -- Определяем, открывать вверх или вниз
+        local spaceBelow = containerBottom - (buttonPos.Y + buttonSize.Y + 5)
+        local spaceAbove = buttonPos.Y - containerTop - 5
+        
+        if spaceBelow < targetHeight and spaceAbove > spaceBelow then
+            -- Открываем вверх
+            openUpwards = true
+            if spaceAbove < targetHeight then
+                maxHeight = math.max(60, spaceAbove - 10)
+            end
+            self.OptionsContainer.Position = UDim2.fromOffset(
+                buttonPos.X,
+                buttonPos.Y - maxHeight - 5
+            )
+        else
+            -- Открываем вниз
+            openUpwards = false
+            if dropdownBottom > containerBottom then
+                maxHeight = math.max(60, spaceBelow - 10)
+            end
+            self.OptionsContainer.Position = UDim2.fromOffset(
+                buttonPos.X,
+                buttonPos.Y + buttonSize.Y + 5
+            )
         end
         
-        self.OptionsContainer.Position = UDim2.fromOffset(
-            buttonPos.X,
-            buttonPos.Y + buttonSize.Y + 5
-        )
         self.OptionsContainer.Size = UDim2.new(0, buttonSize.X, 0, self.OptionsContainer.AbsoluteSize.Y)
         
         -- Обновляем максимальную высоту
@@ -392,27 +413,49 @@ function Dropdown:Open()
     local containerPos = self.Tab.Window.ContentContainer.AbsolutePosition
     local containerSize = self.Tab.Window.ContentContainer.AbsoluteSize
     local containerBottom = containerPos.Y + containerSize.Y
-    local dropdownBottom = buttonPos.Y + buttonSize.Y + 5 + targetHeight
+    local containerTop = containerPos.Y
     
-    if dropdownBottom > containerBottom then
-        targetHeight = math.max(60, containerBottom - (buttonPos.Y + buttonSize.Y + 5) - 10)
+    local spaceBelow = containerBottom - (buttonPos.Y + buttonSize.Y + 5)
+    local spaceAbove = buttonPos.Y - containerTop - 5
+    
+    if spaceBelow < targetHeight and spaceAbove > spaceBelow then
+        openUpwards = true
+        if spaceAbove < targetHeight then
+            targetHeight = math.max(60, spaceAbove - 10)
+        end
+        self.OptionsContainer.Position = UDim2.fromOffset(
+            buttonPos.X,
+            buttonPos.Y - 5
+        )
+    else
+        openUpwards = false
+        if spaceBelow < targetHeight then
+            targetHeight = math.max(60, spaceBelow - 10)
+        end
+        self.OptionsContainer.Position = UDim2.fromOffset(
+            buttonPos.X,
+            buttonPos.Y + buttonSize.Y + 5
+        )
     end
     
-    self.OptionsContainer.Position = UDim2.fromOffset(
-        buttonPos.X,
-        buttonPos.Y + buttonSize.Y + 5
-    )
     self.OptionsContainer.Size = UDim2.new(0, buttonSize.X, 0, 0)
     self.OptionsContainer.Visible = true
     
     -- Expand options with smooth animation
-    TweenService:Create(self.OptionsContainer, TweenInfo.new(0.35, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-        Size = UDim2.new(0, buttonSize.X, 0, targetHeight)
-    }):Play()
+    if openUpwards then
+        TweenService:Create(self.OptionsContainer, TweenInfo.new(0.35, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+            Size = UDim2.new(0, buttonSize.X, 0, targetHeight),
+            Position = UDim2.fromOffset(buttonPos.X, buttonPos.Y - targetHeight - 5)
+        }):Play()
+    else
+        TweenService:Create(self.OptionsContainer, TweenInfo.new(0.35, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+            Size = UDim2.new(0, buttonSize.X, 0, targetHeight)
+        }):Play()
+    end
     
     -- Rotate arrow with bounce effect
     TweenService:Create(self.ArrowIcon, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-        Rotation = 180,
+        Rotation = openUpwards and -180 or 180,
         TextColor3 = self.Tab.Window.AccentColor or Color3.fromRGB(74, 158, 255)
     }):Play()
 end

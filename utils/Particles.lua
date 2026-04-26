@@ -29,6 +29,7 @@ end
 
 function Particles:CreateParticle()
     if not Particles.Enabled then return end
+    if not self.Container or not self.Container.Parent then return end
     if #self.Particles >= self.MaxParticles then return end
     
     local particle = Instance.new("Frame")
@@ -71,7 +72,9 @@ function Particles:CreateParticle()
     )
     
     tween.Completed:Connect(function()
-        particle:Destroy()
+        if particle and particle.Parent then
+            particle:Destroy()
+        end
         for i, p in ipairs(self.Particles) do
             if p == particle then
                 table.remove(self.Particles, i)
