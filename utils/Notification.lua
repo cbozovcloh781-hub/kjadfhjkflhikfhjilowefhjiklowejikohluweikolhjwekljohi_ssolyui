@@ -159,7 +159,7 @@ function Notification:Show(config)
     ProgressCorner.CornerRadius = UDim.new(1, 0)
     ProgressCorner.Parent = progress
     
-    -- Slide in animation from right edge of screen (smooth)
+    -- Slide in animation from right edge of screen (smooth and synchronized)
     notif.Size = UDim2.new(1, 0, 0, totalHeight)
     notif.Position = UDim2.new(1, 50, 0, 0)
     notif.BackgroundTransparency = 1
@@ -184,28 +184,27 @@ function Notification:Show(config)
     })
     slideTween:Play()
     
+    -- Fade in background and all elements at the same time
     local fadeTween = TweenService:Create(notif, TweenInfo.new(0.8, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
         BackgroundTransparency = 0
     })
     fadeTween:Play()
     
-    -- Fade in all text and elements with delay
-    task.delay(0.2, function()
-        for child, trans in pairs(originalTransparencies) do
-            if child and child.Parent then
-                if child:IsA("TextLabel") or child:IsA("TextButton") then
-                    TweenService:Create(child, TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-                        TextTransparency = trans.text or 0
-                    }):Play()
-                end
-                if child:IsA("GuiObject") and child.Name ~= "Progress" then
-                    TweenService:Create(child, TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-                        BackgroundTransparency = trans.bg or 0
-                    }):Play()
-                end
+    -- Fade in all text and elements simultaneously with background
+    for child, trans in pairs(originalTransparencies) do
+        if child and child.Parent then
+            if child:IsA("TextLabel") or child:IsA("TextButton") then
+                TweenService:Create(child, TweenInfo.new(0.8, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                    TextTransparency = trans.text or 0
+                }):Play()
+            end
+            if child:IsA("GuiObject") and child.Name ~= "Progress" then
+                TweenService:Create(child, TweenInfo.new(0.8, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                    BackgroundTransparency = trans.bg or 0
+                }):Play()
             end
         end
-    end)
+    end
     
     -- Progress bar animation (starts after fade in)
     task.delay(0.3, function()
