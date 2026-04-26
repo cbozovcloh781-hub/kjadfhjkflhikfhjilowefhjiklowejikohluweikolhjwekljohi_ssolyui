@@ -743,6 +743,16 @@ function Window:ToggleMinimize()
             TweenService:Create(self.Blur, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Size = 0}):Play()
         end
         
+        -- Hide particles
+        if self.ParticleSystem and self.ParticleSystem.Container then
+            self.ParticleSystem.Container.Visible = false
+        end
+        
+        -- Hide smoke
+        if self.SmokeContainer then
+            self.SmokeContainer.Visible = false
+        end
+        
         -- Hide resize handles
         self.ResizeHandle.Visible = false
         self.ResizeHandleV.Visible = false
@@ -780,6 +790,16 @@ function Window:ToggleMinimize()
         -- Show blur
         if self.Blur then
             TweenService:Create(self.Blur, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Size = self.BlurSize}):Play()
+        end
+        
+        -- Show particles
+        if self.ParticleSystem and self.ParticleSystem.Container then
+            self.ParticleSystem.Container.Visible = true
+        end
+        
+        -- Show smoke
+        if self.SmokeContainer then
+            self.SmokeContainer.Visible = true
         end
         
         -- Show profile
@@ -1144,45 +1164,30 @@ function Window:InitParticles()
 end
 
 function Window:CreateSmokeEffect()
-    -- Smoke container at bottom (OUTSIDE main container to avoid clipping)
+    -- Smoke container at bottom (INSIDE Container but with proper ZIndex)
     local smokeContainer = Instance.new("Frame")
     smokeContainer.Name = "SmokeEffect"
-    smokeContainer.Size = UDim2.new(0, self.Container.AbsoluteSize.X, 0, 150)
-    smokeContainer.Position = UDim2.fromOffset(
-        self.Container.AbsolutePosition.X,
-        self.Container.AbsolutePosition.Y + self.Container.AbsoluteSize.Y - 150
-    )
+    smokeContainer.Size = UDim2.new(1, 0, 0, 200)
+    smokeContainer.Position = UDim2.new(0, 0, 1, -200)
     smokeContainer.BackgroundTransparency = 1
     smokeContainer.ClipsDescendants = false
-    smokeContainer.ZIndex = -50
-    smokeContainer.Parent = self.ScreenGui
+    smokeContainer.ZIndex = 1
+    smokeContainer.Parent = self.Container
     
     self.SmokeContainer = smokeContainer
     self.SmokeParticles = {}
     
-    -- Update smoke position when window moves/resizes
-    local function updateSmokePosition()
-        if smokeContainer and smokeContainer.Parent then
-            smokeContainer.Size = UDim2.new(0, self.Container.AbsoluteSize.X, 0, 150)
-            smokeContainer.Position = UDim2.fromOffset(
-                self.Container.AbsolutePosition.X,
-                self.Container.AbsolutePosition.Y + self.Container.AbsoluteSize.Y - 150
-            )
-        end
-    end
-    
-    self.Container:GetPropertyChangedSignal("AbsolutePosition"):Connect(updateSmokePosition)
-    self.Container:GetPropertyChangedSignal("AbsoluteSize"):Connect(updateSmokePosition)
-    
     -- Create smoke particles
     local function createSmoke()
+        if not smokeContainer or not smokeContainer.Parent then return end
+        
         local smoke = Instance.new("Frame")
-        smoke.Size = UDim2.fromOffset(math.random(40, 80), math.random(40, 80))
+        smoke.Size = UDim2.fromOffset(math.random(60, 100), math.random(60, 100))
         smoke.Position = UDim2.new(math.random(0, 100) / 100, 0, 1, 0)
         smoke.BackgroundColor3 = self.AccentColor
-        smoke.BackgroundTransparency = 0.85
+        smoke.BackgroundTransparency = 0.9
         smoke.BorderSizePixel = 0
-        smoke.ZIndex = -49
+        smoke.ZIndex = 2
         smoke.Parent = smokeContainer
         
         local corner = Instance.new("UICorner")
@@ -1192,13 +1197,13 @@ function Window:CreateSmokeEffect()
         table.insert(self.SmokeParticles, smoke)
         
         -- Animate upward with fade
-        local duration = math.random(4, 7)
-        local endY = -smoke.AbsoluteSize.Y
+        local duration = math.random(5, 8)
+        local endY = -200
         
         TweenService:Create(smoke, TweenInfo.new(duration, Enum.EasingStyle.Linear), {
-            Position = UDim2.new(smoke.Position.X.Scale + math.random(-20, 20) / 100, 0, 0, endY),
+            Position = UDim2.new(smoke.Position.X.Scale + math.random(-30, 30) / 100, 0, 0, endY),
             BackgroundTransparency = 1,
-            Size = UDim2.fromOffset(smoke.AbsoluteSize.X * 1.5, smoke.AbsoluteSize.Y * 1.5)
+            Size = UDim2.fromOffset(smoke.AbsoluteSize.X * 1.8, smoke.AbsoluteSize.Y * 1.8)
         }):Play()
         
         -- Remove after animation
@@ -1216,10 +1221,12 @@ function Window:CreateSmokeEffect()
     end
     
     -- Spawn smoke continuously
-    task.spawn(function()
+    self.SmokeSpawnLoop = task.spawn(function()
         while self.Container and self.Container.Parent do
-            createSmoke()
-            task.wait(math.random(500, 1000) / 1000)
+            if smokeContainer.Visible then
+                createSmoke()
+            end
+            task.wait(math.random(800, 1500) / 1000)
         end
     end)
 end

@@ -61,6 +61,9 @@ function Button:CreateElement()
         table.insert(self.Window.AccentElements, self.Button)
     end
     
+    -- Store reference for color updates
+    self.AccentElement = self.Button
+    
     local ButtonCorner = Instance.new("UICorner")
     ButtonCorner.CornerRadius = UDim.new(0, 6)
     ButtonCorner.Parent = self.Button

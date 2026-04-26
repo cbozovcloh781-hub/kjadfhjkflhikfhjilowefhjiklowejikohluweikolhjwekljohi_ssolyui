@@ -129,6 +129,9 @@ function Slider:CreateElement()
         table.insert(self.Window.AccentElements, self.SliderFill)
     end
     
+    -- Store reference for color updates
+    self.AccentElement = self.SliderFill
+    
     local FillCorner = Instance.new("UICorner")
     FillCorner.CornerRadius = UDim.new(1, 0)
     FillCorner.Parent = self.SliderFill

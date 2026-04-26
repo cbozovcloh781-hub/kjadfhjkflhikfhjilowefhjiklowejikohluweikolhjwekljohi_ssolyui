@@ -17,7 +17,8 @@ function Particles.new(parent, accentColor)
     self.Container.Name = "ParticlesContainer"
     self.Container.Size = UDim2.fromScale(1, 1)
     self.Container.BackgroundTransparency = 1
-    self.Container.ZIndex = -100
+    self.Container.ZIndex = 1
+    self.Container.ClipsDescendants = true
     self.Container.Parent = parent
     
     self.Particles = {}
@@ -52,7 +53,7 @@ function Particles:CreateParticle()
     particle.BackgroundColor3 = Color3.fromRGB(r, g, b)
     particle.BackgroundTransparency = math.random(40, 80) / 100
     particle.BorderSizePixel = 0
-    particle.ZIndex = -99
+    particle.ZIndex = 2
     particle.Parent = self.Container
     
     local corner = Instance.new("UICorner")
