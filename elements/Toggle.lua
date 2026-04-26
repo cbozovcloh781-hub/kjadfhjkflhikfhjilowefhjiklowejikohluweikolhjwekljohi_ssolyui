@@ -34,7 +34,7 @@ function Toggle:CreateElement(parent)
     self.Container.Name = "Toggle"
     self.Container.Size = UDim2.new(1, -30, 0, self.Description and 60 or 45)
     self.Container.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-    self.Container.BackgroundTransparency = 0.3
+    self.Container.BackgroundTransparency = 0.5
     self.Container.BorderSizePixel = 0
     self.Container.Parent = parent or self.Window.ContentContainer
     
@@ -124,7 +124,7 @@ function Toggle:CreateElement(parent)
     -- Hover effects
     self.Button.MouseEnter:Connect(function()
         TweenService:Create(self.Container, TweenInfo.new(0.2), {
-            BackgroundTransparency = 0.3
+            BackgroundTransparency = 0.4
         }):Play()
     end)
     

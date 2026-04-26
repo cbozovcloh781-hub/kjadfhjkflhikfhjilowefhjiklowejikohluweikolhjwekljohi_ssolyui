@@ -58,7 +58,7 @@ function Dropdown:CreateElement()
     self.Container = Instance.new("Frame")
     self.Container.Name = "Dropdown"
     self.Container.Size = UDim2.new(1, -30, 0, 85)
-    self.Container.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    self.Container.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
     self.Container.BackgroundTransparency = 0.5
     self.Container.BorderSizePixel = 0
     self.Container.ClipsDescendants = false
@@ -66,8 +66,16 @@ function Dropdown:CreateElement()
     self.Container.Parent = self.ParentContainer
     
     local Corner = Instance.new("UICorner")
-    Corner.CornerRadius = UDim.new(0, 8)
+    Corner.CornerRadius = UDim.new(0, 10)
     Corner.Parent = self.Container
+    
+    -- Subtle border
+    local Stroke = Instance.new("UIStroke")
+    Stroke.Color = Color3.fromRGB(40, 40, 40)
+    Stroke.Thickness = 1
+    Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    Stroke.Transparency = 0.5
+    Stroke.Parent = self.Container
     
     -- Title
     self.TitleLabel = Instance.new("TextLabel")

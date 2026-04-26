@@ -170,8 +170,9 @@ function Tab:Select()
     if not glow then
         glow = Instance.new("ImageLabel")
         glow.Name = "Glow"
-        glow.Size = UDim2.new(1, 40, 1, 40)
-        glow.Position = UDim2.fromOffset(-20, -20)
+        glow.Size = UDim2.new(1, 20, 1, 20)
+        glow.Position = UDim2.new(0.5, 0, 0.5, 0)
+        glow.AnchorPoint = Vector2.new(0.5, 0.5)
         glow.BackgroundTransparency = 1
         glow.Image = "rbxassetid://5028857084"
         glow.ImageColor3 = accentColor
@@ -180,10 +181,14 @@ function Tab:Select()
         glow.SliceCenter = Rect.new(24, 24, 276, 276)
         glow.ZIndex = 0
         glow.Parent = self.Button
+        
+        if self.Window.AccentElements then
+            table.insert(self.Window.AccentElements, glow)
+        end
     end
     
     TweenService:Create(glow, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-        ImageTransparency = 0.7,
+        ImageTransparency = 0.5,
         ImageColor3 = accentColor
     }):Play()
     
@@ -212,79 +217,80 @@ function Tab:Select()
         end
     end
     
-    -- Show elements with staggered fade-in (no position change)
+    -- Show elements with staggered fade-in
     for i, element in pairs(self.Elements) do
-        element.Visible = true
-        element.BackgroundTransparency = 1
+        -- Store original values before making visible
+        local originalBgTransparency = element.BackgroundTransparency
         
-        -- Store original transparencies
-        local originalTransparencies = {}
+        local originalValues = {}
         for _, child in pairs(element:GetDescendants()) do
             if child:IsA("GuiObject") then
-                originalTransparencies[child] = {
-                    Background = child.BackgroundTransparency,
-                    Text = (child:IsA("TextLabel") or child:IsA("TextButton")) and 0 or nil,
-                    Image = (child:IsA("ImageLabel") or child:IsA("ImageButton")) and child.ImageTransparency or nil,
-                    Stroke = child:FindFirstChildOfClass("UIStroke") and child:FindFirstChildOfClass("UIStroke").Transparency or nil
+                originalValues[child] = {
+                    BgTransparency = child.BackgroundTransparency,
+                    TextTransparency = (child:IsA("TextLabel") or child:IsA("TextButton")) and child.TextTransparency or nil,
+                    ImageTransparency = (child:IsA("ImageLabel") or child:IsA("ImageButton")) and child.ImageTransparency or nil
                 }
+                local stroke = child:FindFirstChildOfClass("UIStroke")
+                if stroke then
+                    originalValues[child].StrokeTransparency = stroke.Transparency
+                end
             end
         end
         
-        -- Staggered animation for each element
-        task.delay(i * 0.03, function()
+        -- Set everything to transparent
+        element.BackgroundTransparency = 1
+        for _, child in pairs(element:GetDescendants()) do
+            if child:IsA("GuiObject") then
+                child.BackgroundTransparency = 1
+                if child:IsA("TextLabel") or child:IsA("TextButton") then
+                    child.TextTransparency = 1
+                end
+                if child:IsA("ImageLabel") or child:IsA("ImageButton") then
+                    child.ImageTransparency = 1
+                end
+                local stroke = child:FindFirstChildOfClass("UIStroke")
+                if stroke then
+                    stroke.Transparency = 1
+                end
+            end
+        end
+        
+        element.Visible = true
+        
+        -- Staggered fade-in animation
+        task.delay(i * 0.04, function()
             if element and element.Parent then
-                -- Fade in container background
-                TweenService:Create(element, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-                    BackgroundTransparency = 0.5
+                -- Fade in container
+                TweenService:Create(element, TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                    BackgroundTransparency = originalBgTransparency
                 }):Play()
                 
-                -- Fade in all descendants
-                for child, transparencies in pairs(originalTransparencies) do
+                -- Fade in all children
+                for child, values in pairs(originalValues) do
                     if child and child.Parent then
-                        -- Skip accent-colored elements (buttons, sliders)
-                        local isAccentElement = false
-                        if child:IsA("Frame") and (child.Name == "Fill" or child.Name == "SwitchBg") then
-                            isAccentElement = true
-                        elseif child:IsA("TextButton") and child.Parent and child.Parent.Name == "Button" then
-                            isAccentElement = true
-                        end
+                        TweenService:Create(child, TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                            BackgroundTransparency = values.BgTransparency
+                        }):Play()
                         
-                        -- Fade in backgrounds
-                        if transparencies.Background < 1 and not isAccentElement then
-                            TweenService:Create(child, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-                                BackgroundTransparency = transparencies.Background
-                            }):Play()
-                        elseif isAccentElement then
-                            -- For accent elements, restore their color
-                            TweenService:Create(child, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-                                BackgroundTransparency = transparencies.Background
+                        if values.TextTransparency then
+                            TweenService:Create(child, TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                                TextTransparency = values.TextTransparency
                             }):Play()
                         end
                         
-                        -- Fade in text
-                        if transparencies.Text and (child:IsA("TextLabel") or child:IsA("TextButton")) then
-                            child.TextTransparency = 1
-                            local targetTransparency = child.Name == "Title" and 0 or (child.Name == "Description" and 0.3 or 0.2)
-                            TweenService:Create(child, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-                                TextTransparency = targetTransparency
+                        if values.ImageTransparency then
+                            TweenService:Create(child, TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                                ImageTransparency = values.ImageTransparency
                             }):Play()
                         end
                         
-                        -- Fade in images
-                        if transparencies.Image and (child:IsA("ImageLabel") or child:IsA("ImageButton")) then
-                            child.ImageTransparency = 1
-                            TweenService:Create(child, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-                                ImageTransparency = transparencies.Image
-                            }):Play()
-                        end
-                        
-                        -- Fade in strokes
-                        local stroke = child:FindFirstChildOfClass("UIStroke")
-                        if stroke and transparencies.Stroke then
-                            stroke.Transparency = 1
-                            TweenService:Create(stroke, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-                                Transparency = transparencies.Stroke
-                            }):Play()
+                        if values.StrokeTransparency then
+                            local stroke = child:FindFirstChildOfClass("UIStroke")
+                            if stroke then
+                                TweenService:Create(stroke, TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                                    Transparency = values.StrokeTransparency
+                                }):Play()
+                            end
                         end
                     end
                 end
@@ -302,10 +308,10 @@ function Tab:Deselect()
         BackgroundTransparency = 0.2
     }):Play()
     
-    -- Remove glow
+    -- Fade out glow
     local glow = self.Button:FindFirstChild("Glow")
     if glow then
-        TweenService:Create(glow, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+        TweenService:Create(glow, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.In), {
             ImageTransparency = 1
         }):Play()
     end
