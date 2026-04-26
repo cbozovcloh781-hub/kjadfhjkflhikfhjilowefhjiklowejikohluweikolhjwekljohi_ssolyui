@@ -321,6 +321,8 @@ function Tab:Deselect()
 end
 
 -- Section creation
+local baseUrl = "https://raw.githubusercontent.com/cbozovcloh781-hub/kjadfhjkflhikfhjilowefhjiklowejikohluweikolhjwekljohi_ssolyui/main/"
+
 function Tab:AddSection(side)
     side = side or "Left"
     
@@ -447,8 +449,6 @@ function Tab:AddSection(side)
     table.insert(self.Sections, section)
     return section
 end
-
-local baseUrl = "https://raw.githubusercontent.com/cbozovcloh781-hub/kjadfhjkflhikfhjilowefhjiklowejikohluweikolhjwekljohi_ssolyui/main/"
 
 function Tab:AddToggle(config)
     local s, r = pcall(function()
