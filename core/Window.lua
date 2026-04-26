@@ -881,42 +881,28 @@ function Window:Show()
     if not self._delayShow then return end
     
     -- Close loading screen first
-    if self.Config._loadingGui and self.Config._loadingGui.Parent then
-        local TweenService = game:GetService("TweenService")
+    if self.Config._loadingGui then
+        local loadingGui = self.Config._loadingGui
+        local loadingBlur = self.Config._loadingBlur
         
-        -- Stop animation
-        self.Config._loadingGui:SetAttribute("StopAnimation", true)
-        
-        -- Fade out blur immediately
-        if self.Config._loadingBlur and self.Config._loadingBlur.Parent then
-            TweenService:Create(self.Config._loadingBlur, TweenInfo.new(0.2), {Size = 0}):Play()
-            task.delay(0.25, function()
-                if self.Config._loadingBlur and self.Config._loadingBlur.Parent then
-                    self.Config._loadingBlur:Destroy()
-                end
-            end)
+        -- Stop animation immediately
+        if loadingGui.Parent then
+            loadingGui:SetAttribute("StopAnimation", true)
         end
         
-        -- Fade out loading GUI
-        for _, child in pairs(self.Config._loadingGui:GetDescendants()) do
-            if child:IsA("GuiObject") then
-                if child:IsA("TextLabel") or child:IsA("TextButton") then
-                    TweenService:Create(child, TweenInfo.new(0.2), {
-                        TextTransparency = 1
-                    }):Play()
-                end
-                TweenService:Create(child, TweenInfo.new(0.2), {
-                    BackgroundTransparency = 1
-                }):Play()
-            end
+        -- Destroy blur immediately
+        if loadingBlur and loadingBlur.Parent then
+            loadingBlur:Destroy()
         end
         
-        -- Destroy after fade
-        task.delay(0.25, function()
-            if self.Config._loadingGui and self.Config._loadingGui.Parent then
-                self.Config._loadingGui:Destroy()
-            end
-        end)
+        -- Destroy loading GUI immediately
+        if loadingGui.Parent then
+            loadingGui:Destroy()
+        end
+        
+        -- Clear references
+        self.Config._loadingGui = nil
+        self.Config._loadingBlur = nil
     end
     
     -- Show window
