@@ -846,11 +846,50 @@ function Window:SelectTab(tab)
     
     self._switchingTab = true
     
-    -- Deselect current tab with fade out
+    -- Fade out current tab content
     if self.CurrentTab then
+        -- Fade out all elements first
+        for _, element in pairs(self.CurrentTab.Elements) do
+            if element and element.Parent and element.Visible then
+                -- Fade out container and all children
+                TweenService:Create(element, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                    BackgroundTransparency = 1
+                }):Play()
+                
+                for _, child in pairs(element:GetDescendants()) do
+                    if child:IsA("GuiObject") then
+                        TweenService:Create(child, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                            BackgroundTransparency = 1
+                        }):Play()
+                        
+                        if child:IsA("TextLabel") or child:IsA("TextButton") then
+                            TweenService:Create(child, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                                TextTransparency = 1
+                            }):Play()
+                        end
+                        
+                        if child:IsA("ImageLabel") or child:IsA("ImageButton") then
+                            TweenService:Create(child, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                                ImageTransparency = 1
+                            }):Play()
+                        end
+                        
+                        local stroke = child:FindFirstChildOfClass("UIStroke")
+                        if stroke then
+                            TweenService:Create(stroke, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                                Transparency = 1
+                            }):Play()
+                        end
+                    end
+                end
+            end
+        end
+        
+        -- Wait for fade out to complete
+        task.wait(0.3)
+        
+        -- Now deselect tab
         self.CurrentTab:Deselect()
-        -- Wait for deselect animation to complete
-        task.wait(0.25)
     end
     
     -- Select new tab with fade in
@@ -983,6 +1022,9 @@ function Window:SetTheme(themeName)
     
     local color = themes[themeName] or themes.Blue
     self:SetAccentColor(color)
+    
+    -- Return the color so it can be used for other purposes
+    return color
 end
 
 function Window:SetHubStatus(status, expiryDate)

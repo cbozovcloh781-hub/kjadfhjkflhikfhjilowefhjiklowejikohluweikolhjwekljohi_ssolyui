@@ -17,7 +17,7 @@ function Particles.new(parent, accentColor)
     self.Container.Name = "ParticlesContainer"
     self.Container.Size = UDim2.fromScale(1, 1)
     self.Container.BackgroundTransparency = 1
-    self.Container.ZIndex = 1
+    self.Container.ZIndex = 0
     self.Container.ClipsDescendants = true
     self.Container.Parent = parent
     
@@ -37,7 +37,7 @@ function Particles:CreateParticle()
     if #self.Particles >= self.MaxParticles then return end
     
     local particle = Instance.new("Frame")
-    particle.Size = UDim2.fromOffset(math.random(1, 3), math.random(1, 3))
+    particle.Size = UDim2.fromOffset(math.random(2, 4), math.random(2, 4))
     particle.Position = UDim2.new(
         math.random(0, 100) / 100,
         0,
@@ -53,7 +53,7 @@ function Particles:CreateParticle()
     particle.BackgroundColor3 = Color3.fromRGB(r, g, b)
     particle.BackgroundTransparency = math.random(40, 80) / 100
     particle.BorderSizePixel = 0
-    particle.ZIndex = 2
+    particle.ZIndex = 1
     particle.Parent = self.Container
     
     local corner = Instance.new("UICorner")
