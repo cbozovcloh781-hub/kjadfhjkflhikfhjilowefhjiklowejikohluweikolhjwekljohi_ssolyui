@@ -869,60 +869,55 @@ end
 function Window:SetAccentColor(color)
     self.AccentColor = color
     
-    -- Update all accent elements
-    for _, element in pairs(self.AccentElements) do
-        if element and element.Parent then
-            if element:IsA("UIStroke") then
-                TweenService:Create(element, TweenInfo.new(0.3), {
-                    Color = color
-                }):Play()
-            elseif element:IsA("ImageLabel") or element:IsA("ImageButton") then
-                TweenService:Create(element, TweenInfo.new(0.3), {
-                    ImageColor3 = color
-                }):Play()
-            elseif element:IsA("ScrollingFrame") then
-                TweenService:Create(element, TweenInfo.new(0.3), {
-                    ScrollBarImageColor3 = color
-                }):Play()
-            elseif element:IsA("Frame") or element:IsA("TextButton") then
-                TweenService:Create(element, TweenInfo.new(0.3), {
-                    BackgroundColor3 = color
-                }):Play()
-            end
+    -- Update all accent elements safely
+    for i = #self.AccentElements, 1, -1 do
+        local element = self.AccentElements[i]
+        if not element or not element.Parent then
+            table.remove(self.AccentElements, i)
+        else
+            pcall(function()
+                if element:IsA("UIStroke") then
+                    element.Color = color
+                elseif element:IsA("ImageLabel") or element:IsA("ImageButton") then
+                    element.ImageColor3 = color
+                elseif element:IsA("ScrollingFrame") then
+                    element.ScrollBarImageColor3 = color
+                elseif element:IsA("Frame") or element:IsA("TextButton") then
+                    element.BackgroundColor3 = color
+                end
+            end)
         end
     end
     
     -- Update active tab background
     if self.CurrentTab and self.CurrentTab.Button then
-        TweenService:Create(self.CurrentTab.Button, TweenInfo.new(0.3), {
-            BackgroundColor3 = color
-        }):Play()
+        pcall(function()
+            self.CurrentTab.Button.BackgroundColor3 = color
+        end)
     end
     
-    -- Update all active toggles
+    -- Update all active toggles and dropdowns
     for _, tab in pairs(self.Tabs) do
         for _, element in pairs(tab.Elements) do
-            -- Check if it's a toggle and if it's enabled
-            local switchBg = element:FindFirstChild("SwitchBg", true)
-            if switchBg and switchBg.BackgroundColor3 ~= Color3.fromRGB(50, 50, 50) then
-                TweenService:Create(switchBg, TweenInfo.new(0.3), {
-                    BackgroundColor3 = color
-                }):Play()
-            end
-            
-            -- Check for dropdown checkmarks
-            for _, child in pairs(element:GetDescendants()) do
-                if child.Name == "Check" and child:IsA("TextLabel") then
-                    local stroke = child:FindFirstChildOfClass("UIStroke")
-                    if stroke and child.BackgroundColor3 ~= Color3.fromRGB(35, 35, 35) then
-                        TweenService:Create(child, TweenInfo.new(0.3), {
-                            BackgroundColor3 = color
-                        }):Play()
-                        TweenService:Create(stroke, TweenInfo.new(0.3), {
-                            Color = color
-                        }):Play()
+            if element and element.Parent then
+                pcall(function()
+                    -- Toggle switches
+                    local switchBg = element:FindFirstChild("SwitchBg", true)
+                    if switchBg and switchBg.BackgroundColor3 ~= Color3.fromRGB(50, 50, 50) then
+                        switchBg.BackgroundColor3 = color
                     end
-                end
+                    
+                    -- Dropdown checkmarks
+                    for _, child in pairs(element:GetDescendants()) do
+                        if child.Name == "Check" and child:IsA("TextLabel") then
+                            local stroke = child:FindFirstChildOfClass("UIStroke")
+                            if stroke and child.BackgroundColor3 ~= Color3.fromRGB(35, 35, 35) then
+                                child.BackgroundColor3 = color
+                                stroke.Color = color
+                            end
+                        end
+                    end
+                end)
             end
         end
     end

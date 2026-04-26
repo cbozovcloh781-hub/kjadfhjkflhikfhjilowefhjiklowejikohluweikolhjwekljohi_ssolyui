@@ -29,7 +29,7 @@ function Colorpicker:CreateElement()
     -- Main container
     self.Container = Instance.new("Frame")
     self.Container.Name = "Colorpicker"
-    self.Container.Size = UDim2.new(1, -20, 0, self.Description and 55 or 45)
+    self.Container.Size = UDim2.new(1, -30, 0, self.Description and 55 or 45)
     self.Container.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     self.Container.BackgroundTransparency = 0.5
     self.Container.BorderSizePixel = 0
@@ -403,7 +403,7 @@ function Colorpicker:Open()
     -- Expand container first
     local newHeight = (self.Description and 55 or 45) + 220
     TweenService:Create(self.Container, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-        Size = UDim2.new(1, -20, 0, newHeight)
+        Size = UDim2.new(1, -30, 0, newHeight)
     }):Play()
     
     -- Then expand picker
@@ -423,7 +423,7 @@ function Colorpicker:Close()
     
     local newHeight = self.Description and 55 or 45
     local closeTween2 = TweenService:Create(self.Container, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-        Size = UDim2.new(1, -20, 0, newHeight)
+        Size = UDim2.new(1, -30, 0, newHeight)
     })
     closeTween2:Play()
     
