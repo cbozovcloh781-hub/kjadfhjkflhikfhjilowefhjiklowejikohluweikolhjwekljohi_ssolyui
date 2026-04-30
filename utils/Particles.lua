@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global
 -- Particles system for Ssoly UI
 -- Beautiful animated particles with settings toggle
 
@@ -46,9 +47,10 @@ function Particles:CreateParticle()
     )
     
     -- Use accent color with slight variation
-    local r = math.clamp(self.AccentColor.R * 255 + math.random(-15, 15), 0, 255)
-    local g = math.clamp(self.AccentColor.G * 255 + math.random(-15, 15), 0, 255)
-    local b = math.clamp(self.AccentColor.B * 255 + math.random(-15, 15), 0, 255)
+    local function clamp(val, min, max) return math.max(min, math.min(max, val)) end
+    local r = clamp(self.AccentColor.R * 255 + math.random(-15, 15), 0, 255)
+    local g = clamp(self.AccentColor.G * 255 + math.random(-15, 15), 0, 255)
+    local b = clamp(self.AccentColor.B * 255 + math.random(-15, 15), 0, 255)
     
     particle.BackgroundColor3 = Color3.fromRGB(r, g, b)
     particle.BackgroundTransparency = math.random(40, 80) / 100

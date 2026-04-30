@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global
 -- Icon system with animations for Ssoly UI
 -- Inspired by maclib's beautiful icon animations
 

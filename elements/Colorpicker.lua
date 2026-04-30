@@ -295,6 +295,76 @@ function Colorpicker:CreateElement()
         end)
     end
     
+    -- HEX input
+    local hexFrame = Instance.new("Frame")
+    hexFrame.Size = UDim2.new(1, -20, 0, 30)
+    hexFrame.Position = UDim2.fromOffset(10, 210)
+    hexFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+    hexFrame.BorderSizePixel = 0
+    hexFrame.Parent = self.PickerContainer
+    
+    local hexCorner = Instance.new("UICorner")
+    hexCorner.CornerRadius = UDim.new(0, 5)
+    hexCorner.Parent = hexFrame
+    
+    local hexLabel = Instance.new("TextLabel")
+    hexLabel.Size = UDim2.fromOffset(35, 30)
+    hexLabel.BackgroundTransparency = 1
+    hexLabel.Text = "HEX"
+    hexLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
+    hexLabel.TextSize = 12
+    hexLabel.Font = Enum.Font.SourceSansBold
+    hexLabel.Parent = hexFrame
+    
+    self.HexInput = Instance.new("TextBox")
+    self.HexInput.Size = UDim2.new(1, -40, 1, 0)
+    self.HexInput.Position = UDim2.fromOffset(37, 0)
+    self.HexInput.BackgroundTransparency = 1
+    self.HexInput.Text = "#FFFFFF"
+    self.HexInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+    self.HexInput.TextSize = 12
+    self.HexInput.Font = Enum.Font.SourceSans
+    self.HexInput.ClearTextOnFocus = false
+    self.HexInput.Parent = hexFrame
+    
+    -- HEX validation
+    self.HexInput:GetPropertyChangedSignal("Text"):Connect(function()
+        local text = self.HexInput.Text:upper()
+        if not text:match("^#") then
+            text = "#" .. text
+        end
+        text = text:gsub("[^#0-9A-F]", "")
+        if #text > 7 then
+            text = text:sub(1, 7)
+        end
+        if text ~= self.HexInput.Text then
+            self.HexInput.Text = text
+        end
+    end)
+    
+    self.HexInput.FocusLost:Connect(function()
+        local hex = self.HexInput.Text:gsub("#", "")
+        if #hex == 6 then
+            local r = tonumber(hex:sub(1, 2), 16) or 0
+            local g = tonumber(hex:sub(3, 4), 16) or 0
+            local b = tonumber(hex:sub(5, 6), 16) or 0
+            
+            local color = Color3.fromRGB(r, g, b)
+            local h, s, v = color:ToHSV()
+            
+            -- Update palette cursor position
+            self.PaletteCursor.Position = UDim2.new(s, 0, 1 - v, 0)
+            
+            -- Update hue cursor
+            self.HueCursor.Position = UDim2.new(0, -2, h, 0)
+            
+            -- Update palette background color
+            self.Palette.BackgroundColor3 = Color3.fromHSV(h, 1, 1)
+            
+            self:SetValue(color)
+        end
+    end)
+    
     -- Palette dragging
     local paletteDragging = false
     
@@ -426,7 +496,7 @@ function Colorpicker:Open()
     
     -- Then expand picker
     TweenService:Create(self.PickerContainer, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-        Size = UDim2.new(1, -24, 0, 215)
+        Size = UDim2.new(1, -24, 0, 255)
     }):Play()
 end
 
@@ -465,6 +535,12 @@ function Colorpicker:SetValue(color, silent)
     self.RGBInputs.G.Text = tostring(g)
     self.RGBInputs.B.Text = tostring(b)
     
+    -- Update HEX input
+    local hex = string.format("#%02X%02X%02X", r, g, b)
+    if self.HexInput then
+        self.HexInput.Text = hex
+    end
+    
     if not silent then
         task.spawn(function()
             self.Callback(color)
@@ -473,3 +549,6 @@ function Colorpicker:SetValue(color, silent)
 end
 
 return Colorpicker
+
+
+
