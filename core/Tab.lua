@@ -190,85 +190,9 @@ function Tab:Select()
         end
     end
     
-    -- Show elements with staggered fade-in
+    -- Show elements instantly without animation
     for i, element in pairs(self.Elements) do
         element.Visible = true
-        
-        -- Store original values
-        local originalBgTransparency = element.BackgroundTransparency
-        local originalValues = {}
-        
-        for _, child in pairs(element:GetDescendants()) do
-            if child:IsA("GuiObject") then
-                originalValues[child] = {
-                    BgTransparency = child.BackgroundTransparency,
-                    TextTransparency = (child:IsA("TextLabel") or child:IsA("TextButton")) and child.TextTransparency or nil,
-                    ImageTransparency = (child:IsA("ImageLabel") or child:IsA("ImageButton")) and child.ImageTransparency or nil
-                }
-                local stroke = child:FindFirstChildOfClass("UIStroke")
-                if stroke then
-                    originalValues[child].StrokeTransparency = stroke.Transparency
-                end
-            end
-        end
-        
-        -- Set everything to transparent
-        element.BackgroundTransparency = 1
-        for _, child in pairs(element:GetDescendants()) do
-            if child:IsA("GuiObject") then
-                child.BackgroundTransparency = 1
-                if child:IsA("TextLabel") or child:IsA("TextButton") then
-                    child.TextTransparency = 1
-                end
-                if child:IsA("ImageLabel") or child:IsA("ImageButton") then
-                    child.ImageTransparency = 1
-                end
-                local stroke = child:FindFirstChildOfClass("UIStroke")
-                if stroke then
-                    stroke.Transparency = 1
-                end
-            end
-        end
-        
-        -- Staggered fade-in animation
-        task.delay(i * 0.03, function()
-            if element and element.Parent and element.Visible then
-                -- Fade in container
-                TweenService:Create(element, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-                    BackgroundTransparency = originalBgTransparency
-                }):Play()
-                
-                -- Fade in all children
-                for child, values in pairs(originalValues) do
-                    if child and child.Parent then
-                        TweenService:Create(child, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-                            BackgroundTransparency = values.BgTransparency
-                        }):Play()
-                        
-                        if values.TextTransparency then
-                            TweenService:Create(child, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-                                TextTransparency = values.TextTransparency
-                            }):Play()
-                        end
-                        
-                        if values.ImageTransparency then
-                            TweenService:Create(child, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-                                ImageTransparency = values.ImageTransparency
-                            }):Play()
-                        end
-                        
-                        if values.StrokeTransparency then
-                            local stroke = child:FindFirstChildOfClass("UIStroke")
-                            if stroke then
-                                TweenService:Create(stroke, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-                                    Transparency = values.StrokeTransparency
-                                }):Play()
-                            end
-                        end
-                    end
-                end
-            end
-        end)
     end
 end
 
@@ -356,8 +280,8 @@ function Tab:AddSection(side)
         Padding.PaddingBottom = UDim.new(0, 10)
         Padding.Parent = sectionContainer
         
-        -- Add divider line between sections
-        if side == "Right" then
+        -- Add divider line between sections (only once)
+        if side == "Right" and not self.ContentContainer:FindFirstChild("Divider") then
             local divider = Instance.new("Frame")
             divider.Name = "Divider"
             divider.Size = UDim2.new(0, 1, 1, 0)
