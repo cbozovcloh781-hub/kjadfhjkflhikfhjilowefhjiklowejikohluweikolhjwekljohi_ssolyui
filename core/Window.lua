@@ -926,27 +926,22 @@ function Window:SelectTab(tab)
     
     self._switchingTab = true
     
-    -- Fade out current tab content quickly
+    -- Hide current tab content instantly
     if self.CurrentTab then
-        -- Immediately hide elements without animation to prevent bugs
         for _, element in pairs(self.CurrentTab.Elements) do
             if element and element.Parent then
                 element.Visible = false
             end
         end
-        
-        -- Deselect tab
         self.CurrentTab:Deselect()
     end
     
-    -- Select new tab with fade in
+    -- Select new tab instantly
     self.CurrentTab = tab
     tab:Select()
     
-    -- Allow next tab switch quickly
-    task.delay(0.3, function()
-        self._switchingTab = false
-    end)
+    -- Allow next tab switch immediately
+    self._switchingTab = false
 end
 
 function Window:Notify(config)

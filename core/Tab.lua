@@ -159,24 +159,12 @@ function Tab:Select()
     
     local accentColor = self.Window.AccentColor or Color3.fromRGB(74, 158, 255)
     
-    -- Animate selection
-    TweenService:Create(self.Button, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-        BackgroundColor3 = accentColor,
-        BackgroundTransparency = 0.85
-    }):Play()
-    
-    TweenService:Create(self.TitleLabel, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-        TextColor3 = Color3.fromRGB(255, 255, 255)
-    }):Play()
-    
-    TweenService:Create(self.IconLabel, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-        ImageColor3 = Color3.fromRGB(255, 255, 255)
-    }):Play()
-    
-    -- Indicator grows with bounce
-    TweenService:Create(self.Indicator, TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-        Size = UDim2.new(0, 3, 0, 30)
-    }):Play()
+    -- Instant selection without animation
+    self.Button.BackgroundColor3 = accentColor
+    self.Button.BackgroundTransparency = 0.85
+    self.TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    self.IconLabel.ImageColor3 = Color3.fromRGB(255, 255, 255)
+    self.Indicator.Size = UDim2.new(0, 3, 0, 30)
     
     -- Show content container for sections
     if #self.Sections > 0 then
@@ -190,14 +178,10 @@ function Tab:Select()
         end
     end
     
-    -- Show elements instantly without animation
+    -- Show elements instantly
     for i, element in pairs(self.Elements) do
         if element and element.Parent then
             element.Visible = true
-            -- Reset position to prevent jumping
-            if element:IsA("Frame") or element:IsA("GuiObject") then
-                element.Position = UDim2.new(element.Position.X.Scale, element.Position.X.Offset, element.Position.Y.Scale, element.Position.Y.Offset)
-            end
         end
     end
 end
@@ -205,50 +189,28 @@ end
 function Tab:Deselect()
     self.Selected = false
     
-    -- Animate deselection smoothly
-    TweenService:Create(self.Button, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-        BackgroundColor3 = Color3.fromRGB(20, 20, 20),
-        BackgroundTransparency = 0.2
-    }):Play()
-    
-    -- Fade out glow
-    local glow = self.Button:FindFirstChild("Glow")
-    if glow then
-        glow:Destroy()
-    end
-    
-    TweenService:Create(self.TitleLabel, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-        TextColor3 = Color3.fromRGB(150, 150, 150)
-    }):Play()
-    
-    TweenService:Create(self.IconLabel, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-        ImageColor3 = Color3.fromRGB(150, 150, 150)
-    }):Play()
-    
-    TweenService:Create(self.Indicator, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.In), {
-        Size = UDim2.new(0, 3, 0, 0)
-    }):Play()
+    -- Instant deselection without animation
+    self.Button.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    self.Button.BackgroundTransparency = 0.2
+    self.TitleLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
+    self.IconLabel.ImageColor3 = Color3.fromRGB(150, 150, 150)
+    self.Indicator.Size = UDim2.new(0, 3, 0, 0)
     
     -- Hide content container for sections
     if #self.Sections > 0 then
-        task.delay(0.35, function()
-            self.ContentContainer.Visible = false
-        end)
+        self.ContentContainer.Visible = false
         
         -- Hide sections
         for _, section in pairs(self.Sections) do
             if section.Container then
-                task.delay(0.35, function()
-                    section.Container.Visible = false
-                end)
+                section.Container.Visible = false
             end
         end
     end
     
-    -- Fade out elements smoothly without position change
+    -- Hide elements instantly
     for i, element in pairs(self.Elements) do
         if element and element.Parent then
-            -- Immediately hide to prevent ghosting
             element.Visible = false
         end
     end
