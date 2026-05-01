@@ -192,7 +192,13 @@ function Tab:Select()
     
     -- Show elements instantly without animation
     for i, element in pairs(self.Elements) do
-        element.Visible = true
+        if element and element.Parent then
+            element.Visible = true
+            -- Reset position to prevent jumping
+            if element:IsA("Frame") or element:IsA("GuiObject") then
+                element.Position = UDim2.new(element.Position.X.Scale, element.Position.X.Offset, element.Position.Y.Scale, element.Position.Y.Offset)
+            end
+        end
     end
 end
 
@@ -257,33 +263,36 @@ function Tab:AddSection(side)
     -- Create section container if not exists
     local sectionContainer = self.ContentContainer:FindFirstChild(side .. "Section")
     if not sectionContainer then
-        sectionContainer = Instance.new("ScrollingFrame")
-        sectionContainer.Name = side .. "Section"
-        sectionContainer.Size = UDim2.new(0.5, -7.5, 1, 0)
-        sectionContainer.Position = side == "Left" and UDim2.new(0, 0, 0, 0) or UDim2.new(0.5, 7.5, 0, 0)
-        sectionContainer.BackgroundTransparency = 1
-        sectionContainer.BorderSizePixel = 0
-        sectionContainer.ScrollBarThickness = 4
-        sectionContainer.ScrollBarImageColor3 = Color3.fromRGB(80, 80, 80)
-        sectionContainer.CanvasSize = UDim2.new(0, 0, 1, 0)
-        sectionContainer.AutomaticCanvasSize = Enum.AutomaticSize.None
-        sectionContainer.Visible = false
-        sectionContainer.Parent = self.ContentContainer
+        -- Use regular Frame instead of ScrollingFrame to avoid empty space
+        local scrollFrame = Instance.new("ScrollingFrame")
+        scrollFrame.Name = side .. "Section"
+        scrollFrame.Size = UDim2.new(0.5, -7.5, 1, 0)
+        scrollFrame.Position = side == "Left" and UDim2.new(0, 0, 0, 0) or UDim2.new(0.5, 7.5, 0, 0)
+        scrollFrame.BackgroundTransparency = 1
+        scrollFrame.BorderSizePixel = 0
+        scrollFrame.ScrollBarThickness = 4
+        scrollFrame.ScrollBarImageColor3 = Color3.fromRGB(80, 80, 80)
+        scrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+        scrollFrame.Visible = false
+        scrollFrame.Parent = self.ContentContainer
         
         local Layout = Instance.new("UIListLayout")
         Layout.SortOrder = Enum.SortOrder.LayoutOrder
         Layout.Padding = UDim.new(0, 10)
-        Layout.Parent = sectionContainer
-        
-        -- Update canvas size when layout changes
-        Layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-            sectionContainer.CanvasSize = UDim2.new(0, 0, 0, Layout.AbsoluteContentSize.Y + 20)
-        end)
+        Layout.Parent = scrollFrame
         
         local Padding = Instance.new("UIPadding")
         Padding.PaddingTop = UDim.new(0, 10)
         Padding.PaddingBottom = UDim.new(0, 10)
-        Padding.Parent = sectionContainer
+        Padding.Parent = scrollFrame
+        
+        -- Update canvas size smoothly
+        Layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+            local contentHeight = Layout.AbsoluteContentSize.Y + 20
+            scrollFrame.CanvasSize = UDim2.new(0, 0, 0, contentHeight)
+        end)
+        
+        sectionContainer = scrollFrame
         
         -- Add divider line between sections (only once)
         if side == "Right" and not self.ContentContainer:FindFirstChild("Divider") then
