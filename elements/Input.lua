@@ -28,7 +28,7 @@ function Input:CreateElement()
     -- Main container
     self.Container = Instance.new("Frame")
     self.Container.Name = "Input"
-    self.Container.Size = UDim2.new(1, -30, 0, self.Description and 90 or 70)
+    self.Container.Size = UDim2.new(1, -30, 0, self.Description and 75 or 60)
     self.Container.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     self.Container.BackgroundTransparency = 0.5
     self.Container.BorderSizePixel = 0
@@ -41,40 +41,40 @@ function Input:CreateElement()
     -- Title
     self.TitleLabel = Instance.new("TextLabel")
     self.TitleLabel.Name = "Title"
-    self.TitleLabel.Size = UDim2.new(1, -20, 0, 20)
-    self.TitleLabel.Position = UDim2.fromOffset(12, 10)
+    self.TitleLabel.Size = UDim2.new(1, -20, 0, 18)
+    self.TitleLabel.Position = UDim2.fromOffset(10, 8)
     self.TitleLabel.BackgroundTransparency = 1
     self.TitleLabel.Text = self.Title
     self.TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    self.TitleLabel.TextSize = 14
+    self.TitleLabel.TextSize = 13
     self.TitleLabel.Font = Enum.Font.SourceSans
     self.TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
     self.TitleLabel.TextStrokeTransparency = 0.8
     self.TitleLabel.Parent = self.Container
     
     -- Description (optional)
-    local inputY = 32
+    local inputY = 28
     if self.Description then
         self.DescLabel = Instance.new("TextLabel")
         self.DescLabel.Name = "Description"
-        self.DescLabel.Size = UDim2.new(1, -20, 0, 15)
-        self.DescLabel.Position = UDim2.fromOffset(12, 32)
+        self.DescLabel.Size = UDim2.new(1, -20, 0, 14)
+        self.DescLabel.Position = UDim2.fromOffset(10, 26)
         self.DescLabel.BackgroundTransparency = 1
         self.DescLabel.Text = self.Description
         self.DescLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
-        self.DescLabel.TextSize = 11
+        self.DescLabel.TextSize = 10
         self.DescLabel.Font = Enum.Font.SourceSans
         self.DescLabel.TextXAlignment = Enum.TextXAlignment.Left
         self.DescLabel.TextWrapped = true
         self.DescLabel.Parent = self.Container
-        inputY = 50
+        inputY = 42
     end
     
     -- Input box
     self.InputBox = Instance.new("TextBox")
     self.InputBox.Name = "InputBox"
-    self.InputBox.Size = UDim2.new(1, -24, 0, 35)
-    self.InputBox.Position = UDim2.fromOffset(12, inputY)
+    self.InputBox.Size = UDim2.new(1, -20, 0, 30)
+    self.InputBox.Position = UDim2.fromOffset(10, inputY)
     self.InputBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
     self.InputBox.BackgroundTransparency = 0.3
     self.InputBox.BorderSizePixel = 0
@@ -82,7 +82,7 @@ function Input:CreateElement()
     self.InputBox.PlaceholderText = self.Placeholder
     self.InputBox.TextColor3 = Color3.fromRGB(255, 255, 255)
     self.InputBox.PlaceholderColor3 = Color3.fromRGB(120, 120, 120)
-    self.InputBox.TextSize = 13
+    self.InputBox.TextSize = 12
     self.InputBox.Font = Enum.Font.SourceSans
     self.InputBox.TextXAlignment = Enum.TextXAlignment.Left
     self.InputBox.ClearTextOnFocus = false

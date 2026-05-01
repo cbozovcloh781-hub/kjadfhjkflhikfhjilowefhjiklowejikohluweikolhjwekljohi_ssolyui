@@ -32,7 +32,7 @@ function Toggle:CreateElement(parent)
     -- Main container - card style with shadow
     self.Container = Instance.new("Frame")
     self.Container.Name = "Toggle"
-    self.Container.Size = UDim2.new(1, -30, 0, self.Description and 60 or 45)
+    self.Container.Size = UDim2.new(1, -30, 0, self.Description and 50 or 38)
     self.Container.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
     self.Container.BackgroundTransparency = 0.5
     self.Container.BorderSizePixel = 0
@@ -53,12 +53,12 @@ function Toggle:CreateElement(parent)
     -- Title
     self.TitleLabel = Instance.new("TextLabel")
     self.TitleLabel.Name = "Title"
-    self.TitleLabel.Size = UDim2.new(1, -70, 0, 20)
-    self.TitleLabel.Position = UDim2.fromOffset(12, 10)
+    self.TitleLabel.Size = UDim2.new(1, -70, 0, 18)
+    self.TitleLabel.Position = UDim2.fromOffset(10, 8)
     self.TitleLabel.BackgroundTransparency = 1
     self.TitleLabel.Text = self.Title
     self.TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    self.TitleLabel.TextSize = 14
+    self.TitleLabel.TextSize = 13
     self.TitleLabel.Font = Enum.Font.SourceSans
     self.TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
     self.TitleLabel.TextStrokeTransparency = 0.8
@@ -68,12 +68,12 @@ function Toggle:CreateElement(parent)
     if self.Description then
         self.DescLabel = Instance.new("TextLabel")
         self.DescLabel.Name = "Description"
-        self.DescLabel.Size = UDim2.new(1, -70, 0, 15)
-        self.DescLabel.Position = UDim2.fromOffset(12, 32)
+        self.DescLabel.Size = UDim2.new(1, -70, 0, 14)
+        self.DescLabel.Position = UDim2.fromOffset(10, 26)
         self.DescLabel.BackgroundTransparency = 1
         self.DescLabel.Text = self.Description
         self.DescLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
-        self.DescLabel.TextSize = 11
+        self.DescLabel.TextSize = 10
         self.DescLabel.Font = Enum.Font.SourceSans
         self.DescLabel.TextXAlignment = Enum.TextXAlignment.Left
         self.DescLabel.TextWrapped = true
@@ -83,8 +83,8 @@ function Toggle:CreateElement(parent)
     -- Toggle switch background
     self.SwitchBg = Instance.new("Frame")
     self.SwitchBg.Name = "SwitchBg"
-    self.SwitchBg.Size = UDim2.fromOffset(45, 22)
-    self.SwitchBg.Position = UDim2.new(1, -55, 0.5, -11)
+    self.SwitchBg.Size = UDim2.fromOffset(40, 20)
+    self.SwitchBg.Position = UDim2.new(1, -48, 0.5, -10)
     self.SwitchBg.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     self.SwitchBg.BorderSizePixel = 0
     self.SwitchBg.Parent = self.Container
@@ -96,7 +96,7 @@ function Toggle:CreateElement(parent)
     -- Toggle switch circle
     self.SwitchCircle = Instance.new("Frame")
     self.SwitchCircle.Name = "Circle"
-    self.SwitchCircle.Size = UDim2.fromOffset(18, 18)
+    self.SwitchCircle.Size = UDim2.fromOffset(16, 16)
     self.SwitchCircle.Position = UDim2.fromOffset(2, 2)
     self.SwitchCircle.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
     self.SwitchCircle.BorderSizePixel = 0
@@ -151,7 +151,7 @@ function Toggle:SetValue(value, silent)
         }):Play()
         
         TweenService:Create(self.SwitchCircle, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-            Position = UDim2.fromOffset(25, 2),
+            Position = UDim2.fromOffset(22, 2),
             BackgroundColor3 = Color3.fromRGB(255, 255, 255)
         }):Play()
     else

@@ -57,7 +57,7 @@ function Dropdown:CreateElement()
     -- Main container
     self.Container = Instance.new("Frame")
     self.Container.Name = "Dropdown"
-    self.Container.Size = UDim2.new(1, -30, 0, 85)
+    self.Container.Size = UDim2.new(1, -30, 0, 72)
     self.Container.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
     self.Container.BackgroundTransparency = 0.5
     self.Container.BorderSizePixel = 0
@@ -80,27 +80,27 @@ function Dropdown:CreateElement()
     -- Title
     self.TitleLabel = Instance.new("TextLabel")
     self.TitleLabel.Name = "Title"
-    self.TitleLabel.Size = UDim2.new(1, -20, 0, 20)
-    self.TitleLabel.Position = UDim2.fromOffset(12, 10)
+    self.TitleLabel.Size = UDim2.new(1, -20, 0, 18)
+    self.TitleLabel.Position = UDim2.fromOffset(10, 8)
     self.TitleLabel.BackgroundTransparency = 1
     self.TitleLabel.Text = self.Title
     self.TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    self.TitleLabel.TextSize = 14
+    self.TitleLabel.TextSize = 13
     self.TitleLabel.Font = Enum.Font.GothamBold
     self.TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
     self.TitleLabel.Parent = self.Container
     
     -- Description (optional)
-    local dropdownY = 50
+    local dropdownY = 42
     if self.Description then
         self.DescLabel = Instance.new("TextLabel")
         self.DescLabel.Name = "Description"
-        self.DescLabel.Size = UDim2.new(1, -24, 0, 14)
-        self.DescLabel.Position = UDim2.fromOffset(12, 28)
+        self.DescLabel.Size = UDim2.new(1, -20, 0, 13)
+        self.DescLabel.Position = UDim2.fromOffset(10, 24)
         self.DescLabel.BackgroundTransparency = 1
         self.DescLabel.Text = self.Description
         self.DescLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
-        self.DescLabel.TextSize = 11
+        self.DescLabel.TextSize = 10
         self.DescLabel.Font = Enum.Font.Gotham
         self.DescLabel.TextXAlignment = Enum.TextXAlignment.Left
         self.DescLabel.TextWrapped = true
@@ -110,8 +110,8 @@ function Dropdown:CreateElement()
     -- Dropdown button
     self.DropdownButton = Instance.new("TextButton")
     self.DropdownButton.Name = "Button"
-    self.DropdownButton.Size = UDim2.new(1, -24, 0, 30)
-    self.DropdownButton.Position = UDim2.fromOffset(12, dropdownY)
+    self.DropdownButton.Size = UDim2.new(1, -20, 0, 26)
+    self.DropdownButton.Position = UDim2.fromOffset(10, dropdownY)
     self.DropdownButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
     self.DropdownButton.BackgroundTransparency = 0.3
     self.DropdownButton.BorderSizePixel = 0
@@ -127,12 +127,12 @@ function Dropdown:CreateElement()
     -- Display text
     self.DisplayLabel = Instance.new("TextLabel")
     self.DisplayLabel.Name = "Display"
-    self.DisplayLabel.Size = UDim2.new(1, -30, 1, 0)
-    self.DisplayLabel.Position = UDim2.fromOffset(10, 0)
+    self.DisplayLabel.Size = UDim2.new(1, -26, 1, 0)
+    self.DisplayLabel.Position = UDim2.fromOffset(8, 0)
     self.DisplayLabel.BackgroundTransparency = 1
     self.DisplayLabel.Text = "--"
     self.DisplayLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
-    self.DisplayLabel.TextSize = 11
+    self.DisplayLabel.TextSize = 10
     self.DisplayLabel.Font = Enum.Font.Gotham
     self.DisplayLabel.TextXAlignment = Enum.TextXAlignment.Left
     self.DisplayLabel.TextTruncate = Enum.TextTruncate.AtEnd
@@ -141,8 +141,8 @@ function Dropdown:CreateElement()
     -- Arrow icon with animation
     self.ArrowIcon = Instance.new("TextLabel")
     self.ArrowIcon.Name = "Arrow"
-    self.ArrowIcon.Size = UDim2.fromOffset(16, 16)
-    self.ArrowIcon.Position = UDim2.new(1, -20, 0.5, -8)
+    self.ArrowIcon.Size = UDim2.fromOffset(14, 14)
+    self.ArrowIcon.Position = UDim2.new(1, -18, 0.5, -7)
     self.ArrowIcon.BackgroundTransparency = 1
     self.ArrowIcon.Text = "▼"
     self.ArrowIcon.TextColor3 = Color3.fromRGB(150, 150, 150)
@@ -166,8 +166,8 @@ function Dropdown:CreateElement()
     -- Options container (hidden by default) - positioned below button with ZIndex
     self.OptionsContainer = Instance.new("Frame")
     self.OptionsContainer.Name = "Options"
-    self.OptionsContainer.Size = UDim2.new(1, -24, 0, 0)
-    self.OptionsContainer.Position = UDim2.fromOffset(12, dropdownY + 35)
+    self.OptionsContainer.Size = UDim2.new(1, -20, 0, 0)
+    self.OptionsContainer.Position = UDim2.fromOffset(10, dropdownY + 30)
     self.OptionsContainer.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
     self.OptionsContainer.BorderSizePixel = 0
     self.OptionsContainer.ClipsDescendants = true
@@ -268,7 +268,7 @@ function Dropdown:CreateOptions()
     for _, value in ipairs(self.Values) do
         local optionButton = Instance.new("TextButton")
         optionButton.Name = value
-        optionButton.Size = UDim2.new(1, -10, 0, 28)
+        optionButton.Size = UDim2.new(1, -10, 0, 25)
         optionButton.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
         optionButton.BackgroundTransparency = 0.5
         optionButton.BorderSizePixel = 0
@@ -284,8 +284,8 @@ function Dropdown:CreateOptions()
         -- Checkmark (for multi-select)
         local checkmark = Instance.new("Frame")
         checkmark.Name = "Check"
-        checkmark.Size = UDim2.fromOffset(18, 18)
-        checkmark.Position = UDim2.fromOffset(7, 5)
+        checkmark.Size = UDim2.fromOffset(16, 16)
+        checkmark.Position = UDim2.fromOffset(6, 4)
         checkmark.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
         checkmark.BackgroundTransparency = 0
         checkmark.BorderSizePixel = 0
@@ -307,7 +307,7 @@ function Dropdown:CreateOptions()
         checkIcon.BackgroundTransparency = 1
         checkIcon.Text = ""
         checkIcon.TextColor3 = Color3.fromRGB(255, 255, 255)
-        checkIcon.TextSize = 14
+        checkIcon.TextSize = 12
         checkIcon.Font = Enum.Font.GothamBold
         checkIcon.Parent = checkmark
         
@@ -318,12 +318,12 @@ function Dropdown:CreateOptions()
         -- Option text
         local optionLabel = Instance.new("TextLabel")
         optionLabel.Name = "Label"
-        optionLabel.Size = UDim2.new(1, self.Multi and -36 or -16, 1, 0)
-        optionLabel.Position = UDim2.fromOffset(self.Multi and 32 or 8, 0)
+        optionLabel.Size = UDim2.new(1, self.Multi and -32 or -14, 1, 0)
+        optionLabel.Position = UDim2.fromOffset(self.Multi and 28 or 7, 0)
         optionLabel.BackgroundTransparency = 1
         optionLabel.Text = value
         optionLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
-        optionLabel.TextSize = 11
+        optionLabel.TextSize = 10
         optionLabel.Font = Enum.Font.Gotham
         optionLabel.TextXAlignment = Enum.TextXAlignment.Left
         optionLabel.TextTruncate = Enum.TextTruncate.AtEnd
@@ -368,7 +368,7 @@ function Dropdown:Open()
     self.Opened = true
     
     local optionCount = math.min(#self.Values, 6)
-    local targetHeight = (optionCount * 30) + 10
+    local targetHeight = (optionCount * 27) + 10
     
     -- Update position on every frame while open
     if self.UpdateConnection then

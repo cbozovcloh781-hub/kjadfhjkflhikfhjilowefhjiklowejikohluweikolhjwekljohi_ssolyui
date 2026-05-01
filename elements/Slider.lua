@@ -42,7 +42,7 @@ function Slider:CreateElement()
     -- Main container
     self.Container = Instance.new("Frame")
     self.Container.Name = "Slider"
-    self.Container.Size = UDim2.new(1, -30, 0, self.Description and 90 or 75)
+    self.Container.Size = UDim2.new(1, -30, 0, self.Description and 75 or 62)
     self.Container.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     self.Container.BackgroundTransparency = 0.5
     self.Container.BorderSizePixel = 0
@@ -55,12 +55,12 @@ function Slider:CreateElement()
     -- Title
     self.TitleLabel = Instance.new("TextLabel")
     self.TitleLabel.Name = "Title"
-    self.TitleLabel.Size = UDim2.new(1, -120, 0, 20)
-    self.TitleLabel.Position = UDim2.fromOffset(12, 10)
+    self.TitleLabel.Size = UDim2.new(1, -120, 0, 18)
+    self.TitleLabel.Position = UDim2.fromOffset(10, 8)
     self.TitleLabel.BackgroundTransparency = 1
     self.TitleLabel.Text = self.Title
     self.TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    self.TitleLabel.TextSize = 14
+    self.TitleLabel.TextSize = 13
     self.TitleLabel.Font = Enum.Font.SourceSans
     self.TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
     self.TitleLabel.TextStrokeTransparency = 0.8
@@ -69,8 +69,8 @@ function Slider:CreateElement()
     -- Value display / input
     self.ValueBox = Instance.new("TextBox")
     self.ValueBox.Name = "ValueBox"
-    self.ValueBox.Size = UDim2.fromOffset(70, 25)
-    self.ValueBox.Position = UDim2.new(1, -78, 0, 8)
+    self.ValueBox.Size = UDim2.fromOffset(65, 22)
+    self.ValueBox.Position = UDim2.new(1, -72, 0, 7)
     self.ValueBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
     self.ValueBox.BackgroundTransparency = 0.3
     self.ValueBox.BorderSizePixel = 0
@@ -90,12 +90,12 @@ function Slider:CreateElement()
     if self.Description then
         self.DescLabel = Instance.new("TextLabel")
         self.DescLabel.Name = "Description"
-        self.DescLabel.Size = UDim2.new(1, -20, 0, 15)
-        self.DescLabel.Position = UDim2.fromOffset(12, 32)
+        self.DescLabel.Size = UDim2.new(1, -20, 0, 14)
+        self.DescLabel.Position = UDim2.fromOffset(10, 26)
         self.DescLabel.BackgroundTransparency = 1
         self.DescLabel.Text = self.Description
         self.DescLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
-        self.DescLabel.TextSize = 11
+        self.DescLabel.TextSize = 10
         self.DescLabel.Font = Enum.Font.SourceSans
         self.DescLabel.TextXAlignment = Enum.TextXAlignment.Left
         self.DescLabel.TextWrapped = true
@@ -103,11 +103,11 @@ function Slider:CreateElement()
     end
     
     -- Slider track background (thicker)
-    local sliderY = self.Description and 52 or 38
+    local sliderY = self.Description and 43 or 32
     self.SliderTrack = Instance.new("Frame")
     self.SliderTrack.Name = "Track"
-    self.SliderTrack.Size = UDim2.new(1, -24, 0, 10)
-    self.SliderTrack.Position = UDim2.fromOffset(12, sliderY)
+    self.SliderTrack.Size = UDim2.new(1, -20, 0, 8)
+    self.SliderTrack.Position = UDim2.fromOffset(10, sliderY)
     self.SliderTrack.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     self.SliderTrack.BorderSizePixel = 0
     self.SliderTrack.Active = true
@@ -139,7 +139,7 @@ function Slider:CreateElement()
     -- Slider handle (circle) - properly centered on track with larger hitbox
     self.SliderHandle = Instance.new("TextButton")
     self.SliderHandle.Name = "Handle"
-    self.SliderHandle.Size = UDim2.fromOffset(30, 30)
+    self.SliderHandle.Size = UDim2.fromOffset(26, 26)
     self.SliderHandle.Position = UDim2.new(0, 0, 0.5, 0)
     self.SliderHandle.AnchorPoint = Vector2.new(0.5, 0.5)
     self.SliderHandle.BackgroundTransparency = 1
@@ -152,7 +152,7 @@ function Slider:CreateElement()
     -- Visual circle inside button
     local handleCircle = Instance.new("Frame")
     handleCircle.Name = "Circle"
-    handleCircle.Size = UDim2.fromOffset(18, 18)
+    handleCircle.Size = UDim2.fromOffset(16, 16)
     handleCircle.Position = UDim2.new(0.5, 0, 0.5, 0)
     handleCircle.AnchorPoint = Vector2.new(0.5, 0.5)
     handleCircle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -167,8 +167,8 @@ function Slider:CreateElement()
     
     -- Min/Max labels
     self.MinLabel = Instance.new("TextLabel")
-    self.MinLabel.Size = UDim2.fromOffset(50, 15)
-    self.MinLabel.Position = UDim2.fromOffset(12, sliderY + 15)
+    self.MinLabel.Size = UDim2.fromOffset(50, 14)
+    self.MinLabel.Position = UDim2.fromOffset(10, sliderY + 12)
     self.MinLabel.BackgroundTransparency = 1
     self.MinLabel.Text = tostring(self.Min)
     self.MinLabel.TextColor3 = Color3.fromRGB(120, 120, 120)
@@ -178,8 +178,8 @@ function Slider:CreateElement()
     self.MinLabel.Parent = self.Container
     
     self.MaxLabel = Instance.new("TextLabel")
-    self.MaxLabel.Size = UDim2.fromOffset(50, 15)
-    self.MaxLabel.Position = UDim2.new(1, -62, 0, sliderY + 15)
+    self.MaxLabel.Size = UDim2.fromOffset(50, 14)
+    self.MaxLabel.Position = UDim2.new(1, -60, 0, sliderY + 12)
     self.MaxLabel.BackgroundTransparency = 1
     self.MaxLabel.Text = tostring(self.Max)
     self.MaxLabel.TextColor3 = Color3.fromRGB(120, 120, 120)
@@ -239,14 +239,14 @@ function Slider:CreateElement()
     -- Hover effects
     self.SliderTrack.MouseEnter:Connect(function()
         TweenService:Create(self.HandleCircle, TweenInfo.new(0.2), {
-            Size = UDim2.fromOffset(22, 22)
+            Size = UDim2.fromOffset(20, 20)
         }):Play()
     end)
     
     self.SliderTrack.MouseLeave:Connect(function()
         if not dragging then
             TweenService:Create(self.HandleCircle, TweenInfo.new(0.2), {
-                Size = UDim2.fromOffset(18, 18)
+                Size = UDim2.fromOffset(16, 16)
             }):Play()
         end
     end)

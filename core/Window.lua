@@ -12,10 +12,10 @@ Window.__index = Window
 -- Default configuration
 local DEFAULT_CONFIG = {
     Title = "Sosalkin Hub",
-    Size = UDim2.fromOffset(700, 500),
-    MinSize = Vector2.new(500, 400),
+    Size = UDim2.fromOffset(900, 650),
+    MinSize = Vector2.new(700, 550),
     MaxSize = Vector2.new(1200, 800),
-    Position = UDim2.new(0.5, -350, 0.5, -250),
+    Position = UDim2.new(0.5, -450, 0.5, -325),
     Transparency = 0.1,
     BlurEnabled = true,
     Draggable = true,

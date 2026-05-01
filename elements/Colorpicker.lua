@@ -39,7 +39,7 @@ function Colorpicker:CreateElement()
     -- Main container
     self.Container = Instance.new("Frame")
     self.Container.Name = "Colorpicker"
-    self.Container.Size = UDim2.new(1, -30, 0, self.Description and 55 or 45)
+    self.Container.Size = UDim2.new(1, -30, 0, self.Description and 46 or 38)
     self.Container.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
     self.Container.BackgroundTransparency = 0.5
     self.Container.BorderSizePixel = 0
@@ -62,12 +62,12 @@ function Colorpicker:CreateElement()
     -- Title
     self.TitleLabel = Instance.new("TextLabel")
     self.TitleLabel.Name = "Title"
-    self.TitleLabel.Size = UDim2.new(1, -70, 0, 20)
-    self.TitleLabel.Position = UDim2.fromOffset(12, 10)
+    self.TitleLabel.Size = UDim2.new(1, -70, 0, 18)
+    self.TitleLabel.Position = UDim2.fromOffset(10, 8)
     self.TitleLabel.BackgroundTransparency = 1
     self.TitleLabel.Text = self.Title
     self.TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    self.TitleLabel.TextSize = 14
+    self.TitleLabel.TextSize = 13
     self.TitleLabel.Font = Enum.Font.SourceSans
     self.TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
     self.TitleLabel.TextStrokeTransparency = 0.8
@@ -76,8 +76,8 @@ function Colorpicker:CreateElement()
     -- Color preview button
     self.ColorButton = Instance.new("TextButton")
     self.ColorButton.Name = "ColorButton"
-    self.ColorButton.Size = UDim2.fromOffset(40, 25)
-    self.ColorButton.Position = UDim2.new(1, -50, 0, 8)
+    self.ColorButton.Size = UDim2.fromOffset(36, 22)
+    self.ColorButton.Position = UDim2.new(1, -44, 0, 7)
     self.ColorButton.BackgroundColor3 = self.Default
     self.ColorButton.BorderSizePixel = 0
     self.ColorButton.Text = ""
@@ -99,12 +99,12 @@ function Colorpicker:CreateElement()
     if self.Description then
         self.DescLabel = Instance.new("TextLabel")
         self.DescLabel.Name = "Description"
-        self.DescLabel.Size = UDim2.new(1, -70, 0, 15)
-        self.DescLabel.Position = UDim2.fromOffset(12, 32)
+        self.DescLabel.Size = UDim2.new(1, -70, 0, 14)
+        self.DescLabel.Position = UDim2.fromOffset(10, 26)
         self.DescLabel.BackgroundTransparency = 1
         self.DescLabel.Text = self.Description
         self.DescLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
-        self.DescLabel.TextSize = 11
+        self.DescLabel.TextSize = 10
         self.DescLabel.Font = Enum.Font.SourceSans
         self.DescLabel.TextXAlignment = Enum.TextXAlignment.Left
         self.DescLabel.TextWrapped = true
@@ -114,8 +114,8 @@ function Colorpicker:CreateElement()
     -- Picker container (hidden by default)
     self.PickerContainer = Instance.new("Frame")
     self.PickerContainer.Name = "Picker"
-    self.PickerContainer.Size = UDim2.new(1, -24, 0, 0)
-    self.PickerContainer.Position = UDim2.fromOffset(12, self.Description and 55 or 45)
+    self.PickerContainer.Size = UDim2.new(1, -20, 0, 0)
+    self.PickerContainer.Position = UDim2.fromOffset(10, self.Description and 46 or 38)
     self.PickerContainer.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
     self.PickerContainer.BorderSizePixel = 0
     self.PickerContainer.ClipsDescendants = true
@@ -489,14 +489,14 @@ function Colorpicker:Open()
     self.PickerContainer.Size = UDim2.new(1, -24, 0, 0)
     
     -- Expand container first
-    local newHeight = (self.Description and 55 or 45) + 220
+    local newHeight = (self.Description and 46 or 38) + 220
     TweenService:Create(self.Container, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
         Size = UDim2.new(1, -30, 0, newHeight)
     }):Play()
     
     -- Then expand picker
     TweenService:Create(self.PickerContainer, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-        Size = UDim2.new(1, -24, 0, 255)
+        Size = UDim2.new(1, -20, 0, 255)
     }):Play()
 end
 
@@ -505,11 +505,11 @@ function Colorpicker:Close()
     
     -- Close picker and container simultaneously
     local closeTween1 = TweenService:Create(self.PickerContainer, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-        Size = UDim2.new(1, -24, 0, 0)
+        Size = UDim2.new(1, -20, 0, 0)
     })
     closeTween1:Play()
     
-    local newHeight = self.Description and 55 or 45
+    local newHeight = self.Description and 46 or 38
     local closeTween2 = TweenService:Create(self.Container, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
         Size = UDim2.new(1, -30, 0, newHeight)
     })
