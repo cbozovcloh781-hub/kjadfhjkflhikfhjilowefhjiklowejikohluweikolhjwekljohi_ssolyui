@@ -40,7 +40,7 @@ function Tab:CreateButton()
     self.Button.Name = self.Title
     self.Button.Size = UDim2.new(1, 0, 0, 40)
     self.Button.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-    self.Button.BackgroundTransparency = 0.2
+    self.Button.BackgroundTransparency = 0
     self.Button.BorderSizePixel = 0
     self.Button.Text = ""
     self.Button.AutoButtonColor = false
@@ -127,13 +127,13 @@ function Tab:CreateButton()
     -- Hover effects
     self.Button.MouseEnter:Connect(function()
         if not self.Selected then
-            TweenService:Create(self.Button, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-                BackgroundTransparency = 0.1
+            TweenService:Create(self.Button, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                BackgroundColor3 = Color3.fromRGB(30, 30, 30)
             }):Play()
-            TweenService:Create(self.TitleLabel, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+            TweenService:Create(self.TitleLabel, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
                 TextColor3 = Color3.fromRGB(200, 200, 200)
             }):Play()
-            TweenService:Create(self.IconLabel, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+            TweenService:Create(self.IconLabel, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
                 ImageColor3 = Color3.fromRGB(200, 200, 200)
             }):Play()
         end
@@ -141,13 +141,13 @@ function Tab:CreateButton()
     
     self.Button.MouseLeave:Connect(function()
         if not self.Selected then
-            TweenService:Create(self.Button, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-                BackgroundTransparency = 0.3
+            TweenService:Create(self.Button, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                BackgroundColor3 = Color3.fromRGB(20, 20, 20)
             }):Play()
-            TweenService:Create(self.TitleLabel, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+            TweenService:Create(self.TitleLabel, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
                 TextColor3 = Color3.fromRGB(150, 150, 150)
             }):Play()
-            TweenService:Create(self.IconLabel, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+            TweenService:Create(self.IconLabel, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
                 ImageColor3 = Color3.fromRGB(150, 150, 150)
             }):Play()
         end
@@ -160,49 +160,39 @@ function Tab:Select()
     local accentColor = self.Window.AccentColor or Color3.fromRGB(74, 158, 255)
     
     -- Smooth button animation
-    TweenService:Create(self.Button, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+    TweenService:Create(self.Button, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
         BackgroundColor3 = accentColor,
         BackgroundTransparency = 0.85
     }):Play()
     
-    TweenService:Create(self.TitleLabel, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+    TweenService:Create(self.TitleLabel, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
         TextColor3 = Color3.fromRGB(255, 255, 255)
     }):Play()
     
-    TweenService:Create(self.IconLabel, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+    TweenService:Create(self.IconLabel, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
         ImageColor3 = Color3.fromRGB(255, 255, 255)
     }):Play()
     
-    TweenService:Create(self.Indicator, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+    TweenService:Create(self.Indicator, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
         Size = UDim2.new(0, 3, 0, 30)
     }):Play()
     
-    -- Show content container for sections
+    -- Show content container for sections instantly
     if #self.Sections > 0 then
         self.ContentContainer.Visible = true
         
-        -- Show sections with fade
+        -- Show sections instantly
         for _, section in pairs(self.Sections) do
             if section.Container then
                 section.Container.Visible = true
-                section.Container.GroupTransparency = 1
-                TweenService:Create(section.Container, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-                    GroupTransparency = 0
-                }):Play()
             end
         end
     end
     
-    -- Show elements with fade
+    -- Show elements instantly
     for i, element in pairs(self.Elements) do
         if element and element.Parent then
             element.Visible = true
-            if element:IsA("GuiObject") then
-                element.GroupTransparency = 1
-                TweenService:Create(element, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-                    GroupTransparency = 0
-                }):Play()
-            end
         end
     end
 end
@@ -211,64 +201,39 @@ function Tab:Deselect()
     self.Selected = false
     
     -- Smooth button animation
-    TweenService:Create(self.Button, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+    TweenService:Create(self.Button, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
         BackgroundColor3 = Color3.fromRGB(20, 20, 20),
-        BackgroundTransparency = 0.2
+        BackgroundTransparency = 0
     }):Play()
     
-    TweenService:Create(self.TitleLabel, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+    TweenService:Create(self.TitleLabel, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
         TextColor3 = Color3.fromRGB(150, 150, 150)
     }):Play()
     
-    TweenService:Create(self.IconLabel, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+    TweenService:Create(self.IconLabel, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
         ImageColor3 = Color3.fromRGB(150, 150, 150)
     }):Play()
     
-    TweenService:Create(self.Indicator, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+    TweenService:Create(self.Indicator, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
         Size = UDim2.new(0, 3, 0, 0)
     }):Play()
     
-    -- Fade out elements first
-    for i, element in pairs(self.Elements) do
-        if element and element.Parent and element:IsA("GuiObject") then
-            TweenService:Create(element, TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-                GroupTransparency = 1
-            }):Play()
-        end
-    end
-    
-    -- Fade out sections
+    -- Hide content instantly
     if #self.Sections > 0 then
+        self.ContentContainer.Visible = false
+        
         for _, section in pairs(self.Sections) do
             if section.Container then
-                TweenService:Create(section.Container, TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-                    GroupTransparency = 1
-                }):Play()
+                section.Container.Visible = false
             end
         end
     end
     
-    -- Hide after fade completes
-    task.delay(0.15, function()
-        -- Hide content container for sections
-        if #self.Sections > 0 then
-            self.ContentContainer.Visible = false
-            
-            -- Hide sections
-            for _, section in pairs(self.Sections) do
-                if section.Container then
-                    section.Container.Visible = false
-                end
-            end
+    for i, element in pairs(self.Elements) do
+        if element and element.Parent then
+            element.Visible = false
         end
-        
-        -- Hide elements
-        for i, element in pairs(self.Elements) do
-            if element and element.Parent then
-                element.Visible = false
-            end
-        end
-    end)
+    end
 end
 
 -- Section creation

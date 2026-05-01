@@ -920,27 +920,16 @@ function Window:AddTab(config)
 end
 
 function Window:SelectTab(tab)
-    -- Prevent rapid tab switching
-    if self._switchingTab then return end
     if self.CurrentTab == tab then return end
     
-    self._switchingTab = true
-    
-    -- Fade out current tab content
+    -- Deselect current tab
     if self.CurrentTab then
         self.CurrentTab:Deselect()
     end
     
-    -- Wait for fade out, then show new tab
-    task.delay(0.15, function()
-        self.CurrentTab = tab
-        tab:Select()
-        
-        -- Allow next tab switch after animation
-        task.delay(0.2, function()
-            self._switchingTab = false
-        end)
-    end)
+    -- Select new tab
+    self.CurrentTab = tab
+    tab:Select()
 end
 
 function Window:Notify(config)
