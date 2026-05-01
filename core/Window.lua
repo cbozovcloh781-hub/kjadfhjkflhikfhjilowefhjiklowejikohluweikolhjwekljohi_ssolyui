@@ -921,15 +921,29 @@ end
 
 function Window:SelectTab(tab)
     if self.CurrentTab == tab then return end
+    if self._switchingTab then return end
     
-    -- Deselect current tab
+    self._switchingTab = true
+    
+    -- Deselect current tab with fade out
     if self.CurrentTab then
         self.CurrentTab:Deselect()
+        
+        -- Wait for fade out to complete, then show new tab
+        task.delay(0.25, function()
+            self.CurrentTab = tab
+            tab:Select()
+            
+            task.delay(0.4, function()
+                self._switchingTab = false
+            end)
+        end)
+    else
+        -- No current tab, show immediately
+        self.CurrentTab = tab
+        tab:Select()
+        self._switchingTab = false
     end
-    
-    -- Select new tab
-    self.CurrentTab = tab
-    tab:Select()
 end
 
 function Window:Notify(config)
