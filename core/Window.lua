@@ -24,6 +24,8 @@ local DEFAULT_CONFIG = {
     HubStatus = "shub", -- "shub", "shub+", or "dev"
     StatusColor = Color3.fromRGB(150, 150, 150),
     PremiumExpiry = nil, -- Unix timestamp for shub+ expiry
+    AccentTheme = "Blue", -- Accent color theme
+    ColorScheme = "Dark", -- Background color scheme
 }
 
 function Window.new(config)
@@ -48,6 +50,18 @@ function Window.new(config)
     self:SetupDragging()
     self:SetupResizing()
     self:SetupMinimize()
+    
+    -- Apply theme if specified
+    if self.Config.AccentTheme or self.Config.ColorScheme then
+        task.defer(function()
+            if self.Config.AccentTheme and self.Config.AccentTheme ~= "Blue" then
+                self:SetTheme(self.Config.AccentTheme)
+            end
+            if self.Config.ColorScheme and self.Config.ColorScheme ~= "Dark" then
+                self:SetColorScheme(self.Config.ColorScheme)
+            end
+        end)
+    end
     
     -- Initialize particles system
     self:InitParticles()
@@ -1069,6 +1083,137 @@ function Window:SetTheme(themeName)
     
     -- Return the color so it can be used for other purposes
     return color
+end
+
+-- New: Set custom color scheme for background
+function Window:SetColorScheme(scheme)
+    local schemes = {
+        Dark = {
+            Container = Color3.fromRGB(15, 15, 15),
+            TitleBar = Color3.fromRGB(12, 12, 12),
+            Content = Color3.fromRGB(12, 12, 12),
+            TabButton = Color3.fromRGB(20, 20, 20),
+            Profile = Color3.fromRGB(18, 18, 18),
+            Border = Color3.fromRGB(40, 40, 40),
+        },
+        Coffee = {
+            Container = Color3.fromRGB(40, 30, 25),
+            TitleBar = Color3.fromRGB(35, 25, 20),
+            Content = Color3.fromRGB(35, 25, 20),
+            TabButton = Color3.fromRGB(50, 38, 30),
+            Profile = Color3.fromRGB(45, 33, 25),
+            Border = Color3.fromRGB(70, 55, 45),
+        },
+        Navy = {
+            Container = Color3.fromRGB(15, 20, 30),
+            TitleBar = Color3.fromRGB(12, 17, 27),
+            Content = Color3.fromRGB(12, 17, 27),
+            TabButton = Color3.fromRGB(20, 28, 40),
+            Profile = Color3.fromRGB(18, 25, 35),
+            Border = Color3.fromRGB(40, 50, 65),
+        },
+        Forest = {
+            Container = Color3.fromRGB(20, 25, 20),
+            TitleBar = Color3.fromRGB(17, 22, 17),
+            Content = Color3.fromRGB(17, 22, 17),
+            TabButton = Color3.fromRGB(28, 35, 28),
+            Profile = Color3.fromRGB(23, 30, 23),
+            Border = Color3.fromRGB(45, 55, 45),
+        },
+        Purple = {
+            Container = Color3.fromRGB(25, 15, 30),
+            TitleBar = Color3.fromRGB(22, 12, 27),
+            Content = Color3.fromRGB(22, 12, 27),
+            TabButton = Color3.fromRGB(35, 20, 40),
+            Profile = Color3.fromRGB(30, 18, 35),
+            Border = Color3.fromRGB(55, 40, 65),
+        },
+        Midnight = {
+            Container = Color3.fromRGB(10, 10, 15),
+            TitleBar = Color3.fromRGB(8, 8, 12),
+            Content = Color3.fromRGB(8, 8, 12),
+            TabButton = Color3.fromRGB(15, 15, 22),
+            Profile = Color3.fromRGB(13, 13, 18),
+            Border = Color3.fromRGB(30, 30, 40),
+        },
+    }
+    
+    local colors = schemes[scheme] or schemes.Dark
+    
+    -- Animate color transitions
+    local duration = 0.6
+    local easing = Enum.EasingStyle.Quint
+    
+    -- Update container
+    TweenService:Create(self.Container, TweenInfo.new(duration, easing), {
+        BackgroundColor3 = colors.Container
+    }):Play()
+    
+    -- Update title bar
+    TweenService:Create(self.TitleBar, TweenInfo.new(duration, easing), {
+        BackgroundColor3 = colors.TitleBar
+    }):Play()
+    
+    -- Update content container
+    TweenService:Create(self.ContentContainer, TweenInfo.new(duration, easing), {
+        BackgroundColor3 = colors.Content
+    }):Play()
+    
+    -- Update profile
+    TweenService:Create(self.ProfileContainer, TweenInfo.new(duration, easing), {
+        BackgroundColor3 = colors.Profile
+    }):Play()
+    
+    -- Update all tab buttons
+    for _, tab in pairs(self.Tabs) do
+        if tab.Button and not tab.Selected then
+            TweenService:Create(tab.Button, TweenInfo.new(duration, easing), {
+                BackgroundColor3 = colors.TabButton
+            }):Play()
+        end
+        
+        -- Update section containers
+        for _, section in pairs(tab.Sections) do
+            if section.Container then
+                -- Update toggle backgrounds
+                for _, child in pairs(section.Container:GetDescendants()) do
+                    if child:IsA("Frame") and child.Name ~= "SwitchBg" and child.Name ~= "Check" then
+                        local isToggle = child:FindFirstChild("SwitchBg") ~= nil
+                        if isToggle then
+                            TweenService:Create(child, TweenInfo.new(duration, easing), {
+                                BackgroundColor3 = colors.TabButton
+                            }):Play()
+                        end
+                    end
+                end
+            end
+        end
+    end
+    
+    -- Update borders
+    local containerStroke = self.Container:FindFirstChildOfClass("UIStroke")
+    if containerStroke then
+        TweenService:Create(containerStroke, TweenInfo.new(duration, easing), {
+            Color = colors.Border
+        }):Play()
+    end
+    
+    local profileStroke = self.ProfileContainer:FindFirstChildOfClass("UIStroke")
+    if profileStroke then
+        TweenService:Create(profileStroke, TweenInfo.new(duration, easing), {
+            Color = colors.Border
+        }):Play()
+    end
+    
+    -- Store current scheme
+    self.CurrentColorScheme = scheme
+    self.ColorSchemeColors = colors
+end
+
+-- New: Apply full theme (accent + color scheme)
+function Window:ApplyTheme(accentTheme, colorScheme)
+    self:SetTheme(accentTheme)
+    self:SetColorScheme(colorScheme or "Dark")
 end
 
 function Window:SetHubStatus(status, expiryDate)

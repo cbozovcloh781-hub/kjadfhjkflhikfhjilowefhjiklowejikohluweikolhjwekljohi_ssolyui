@@ -275,7 +275,15 @@ function Ssoly:CreateWindow(config)
 end
 
 -- Version info
-Ssoly.Version = "1.0.0"
+Ssoly.Version = "1.1.0"
 Ssoly.Author = "Sosalkin hub"
+Ssoly.Features = {
+    "Theme System (8 accents + 6 schemes)",
+    "Smooth tab animations",
+    "Particle effects",
+    "Notification system",
+    "Resizable windows",
+    "Draggable interface"
+}
 
 return Ssoly
