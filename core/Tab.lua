@@ -245,7 +245,7 @@ function Tab:AddSection(side)
     -- Create section container if not exists
     local sectionContainer = self.ContentContainer:FindFirstChild(side .. "Section")
     if not sectionContainer then
-        -- Use regular Frame instead of ScrollingFrame to avoid empty space
+        -- Use ScrollingFrame for sections
         local scrollFrame = Instance.new("ScrollingFrame")
         scrollFrame.Name = side .. "Section"
         scrollFrame.Size = UDim2.new(0.5, -7.5, 1, 0)
@@ -256,6 +256,7 @@ function Tab:AddSection(side)
         scrollFrame.ScrollBarImageColor3 = Color3.fromRGB(80, 80, 80)
         scrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
         scrollFrame.Visible = false
+        scrollFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y  -- Автоматический размер
         scrollFrame.Parent = self.ContentContainer
         
         local Layout = Instance.new("UIListLayout")
@@ -267,12 +268,6 @@ function Tab:AddSection(side)
         Padding.PaddingTop = UDim.new(0, 10)
         Padding.PaddingBottom = UDim.new(0, 10)
         Padding.Parent = scrollFrame
-        
-        -- Update canvas size smoothly
-        Layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-            local contentHeight = Layout.AbsoluteContentSize.Y + 20
-            scrollFrame.CanvasSize = UDim2.new(0, 0, 0, contentHeight)
-        end)
         
         sectionContainer = scrollFrame
         
