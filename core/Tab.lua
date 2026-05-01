@@ -265,8 +265,8 @@ function Tab:AddSection(side)
         sectionContainer.BorderSizePixel = 0
         sectionContainer.ScrollBarThickness = 4
         sectionContainer.ScrollBarImageColor3 = Color3.fromRGB(80, 80, 80)
-        sectionContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
-        sectionContainer.AutomaticCanvasSize = Enum.AutomaticSize.Y
+        sectionContainer.CanvasSize = UDim2.new(0, 0, 1, 0)
+        sectionContainer.AutomaticCanvasSize = Enum.AutomaticSize.None
         sectionContainer.Visible = false
         sectionContainer.Parent = self.ContentContainer
         
@@ -274,6 +274,11 @@ function Tab:AddSection(side)
         Layout.SortOrder = Enum.SortOrder.LayoutOrder
         Layout.Padding = UDim.new(0, 10)
         Layout.Parent = sectionContainer
+        
+        -- Update canvas size when layout changes
+        Layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+            sectionContainer.CanvasSize = UDim2.new(0, 0, 0, Layout.AbsoluteContentSize.Y + 20)
+        end)
         
         local Padding = Instance.new("UIPadding")
         Padding.PaddingTop = UDim.new(0, 10)
