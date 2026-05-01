@@ -181,101 +181,18 @@ function Tab:Select()
     if #self.Sections > 0 then
         self.ContentContainer.Visible = true
         
-        -- Fade in sections with position animation
+        -- Show sections instantly without fade animation
         for _, section in pairs(self.Sections) do
             if section.Container then
                 section.Container.Visible = true
-                
-                -- Start from slightly offset position
-                local originalPos = section.Container.Position
-                section.Container.Position = UDim2.new(
-                    originalPos.X.Scale,
-                    originalPos.X.Offset,
-                    originalPos.Y.Scale,
-                    originalPos.Y.Offset + 20
-                )
-                section.Container.BackgroundTransparency = 1
-                
-                -- Animate to original position with fade
-                TweenService:Create(section.Container, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
-                    Position = originalPos,
-                    BackgroundTransparency = 1
-                }):Play()
-                
-                -- Fade in all children
-                for _, child in pairs(section.Container:GetDescendants()) do
-                    if child:IsA("GuiObject") and child.Name ~= "UIListLayout" and child.Name ~= "UIPadding" and child.Name ~= "UICorner" then
-                        local originalTrans = child.BackgroundTransparency
-                        local originalTextTrans = child:IsA("TextLabel") and child.TextTransparency or nil
-                        
-                        child.BackgroundTransparency = 1
-                        if child:IsA("TextLabel") or child:IsA("TextButton") then
-                            child.TextTransparency = 1
-                        end
-                        if child:IsA("ImageLabel") or child:IsA("ImageButton") then
-                            child.ImageTransparency = 1
-                        end
-                        
-                        task.delay(0.1, function()
-                            TweenService:Create(child, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-                                BackgroundTransparency = originalTrans
-                            }):Play()
-                            
-                            if child:IsA("TextLabel") or child:IsA("TextButton") then
-                                TweenService:Create(child, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-                                    TextTransparency = originalTextTrans or 0
-                                }):Play()
-                            end
-                            
-                            if child:IsA("ImageLabel") or child:IsA("ImageButton") then
-                                TweenService:Create(child, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-                                    ImageTransparency = 0
-                                }):Play()
-                            end
-                        end)
-                    end
-                end
             end
         end
     end
     
-    -- Show elements with fade
+    -- Show elements instantly
     for i, element in pairs(self.Elements) do
         if element and element.Parent then
             element.Visible = true
-            
-            -- Fade in element
-            for _, child in pairs(element:GetDescendants()) do
-                if child:IsA("GuiObject") then
-                    local originalTrans = child.BackgroundTransparency
-                    child.BackgroundTransparency = 1
-                    
-                    if child:IsA("TextLabel") or child:IsA("TextButton") then
-                        child.TextTransparency = 1
-                    end
-                    if child:IsA("ImageLabel") or child:IsA("ImageButton") then
-                        child.ImageTransparency = 1
-                    end
-                    
-                    task.delay(0.1, function()
-                        TweenService:Create(child, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-                            BackgroundTransparency = originalTrans
-                        }):Play()
-                        
-                        if child:IsA("TextLabel") or child:IsA("TextButton") then
-                            TweenService:Create(child, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-                                TextTransparency = 0
-                            }):Play()
-                        end
-                        
-                        if child:IsA("ImageLabel") or child:IsA("ImageButton") then
-                            TweenService:Create(child, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-                                ImageTransparency = 0
-                            }):Play()
-                        end
-                    end)
-                end
-            end
         end
     end
 end
@@ -301,97 +218,22 @@ function Tab:Deselect()
         Size = UDim2.new(0, 3, 0, 0)
     }):Play()
     
-    -- Fade out sections with position animation
+    -- Hide content instantly
     if #self.Sections > 0 then
+        self.ContentContainer.Visible = false
+        
         for _, section in pairs(self.Sections) do
             if section.Container then
-                local originalPos = section.Container.Position
-                
-                -- Animate position down and fade out
-                TweenService:Create(section.Container, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-                    Position = UDim2.new(
-                        originalPos.X.Scale,
-                        originalPos.X.Offset,
-                        originalPos.Y.Scale,
-                        originalPos.Y.Offset - 20
-                    )
-                }):Play()
-                
-                -- Fade out all children
-                for _, child in pairs(section.Container:GetDescendants()) do
-                    if child:IsA("GuiObject") then
-                        TweenService:Create(child, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-                            BackgroundTransparency = 1
-                        }):Play()
-                        
-                        if child:IsA("TextLabel") or child:IsA("TextButton") then
-                            TweenService:Create(child, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-                                TextTransparency = 1
-                            }):Play()
-                        end
-                        
-                        if child:IsA("ImageLabel") or child:IsA("ImageButton") then
-                            TweenService:Create(child, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-                                ImageTransparency = 1
-                            }):Play()
-                        end
-                    end
-                end
+                section.Container.Visible = false
             end
         end
     end
     
-    -- Fade out elements
     for i, element in pairs(self.Elements) do
         if element and element.Parent then
-            for _, child in pairs(element:GetDescendants()) do
-                if child:IsA("GuiObject") then
-                    TweenService:Create(child, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-                        BackgroundTransparency = 1
-                    }):Play()
-                    
-                    if child:IsA("TextLabel") or child:IsA("TextButton") then
-                        TweenService:Create(child, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-                            TextTransparency = 1
-                        }):Play()
-                    end
-                    
-                    if child:IsA("ImageLabel") or child:IsA("ImageButton") then
-                        TweenService:Create(child, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-                            ImageTransparency = 1
-                        }):Play()
-                    end
-                end
-            end
+            element.Visible = false
         end
     end
-    
-    -- Hide after fade completes
-    task.delay(0.25, function()
-        if #self.Sections > 0 then
-            self.ContentContainer.Visible = false
-            
-            for _, section in pairs(self.Sections) do
-                if section.Container then
-                    section.Container.Visible = false
-                    -- Reset position
-                    local originalPos = section.Container.Position
-                    section.Container.Position = UDim2.new(
-                        originalPos.X.Scale,
-                        originalPos.X.Offset,
-                        originalPos.Y.Scale,
-                        section.Side == "Left" and 0 or 0
-                    )
-                end
-            end
-        end
-        
-        for i, element in pairs(self.Elements) do
-            if element and element.Parent then
-                element.Visible = false
-            end
-        end
-    end)
 end
 
 -- Section creation

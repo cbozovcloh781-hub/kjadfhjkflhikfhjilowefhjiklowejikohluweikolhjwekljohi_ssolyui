@@ -1095,6 +1095,7 @@ function Window:SetColorScheme(scheme)
             TabButton = Color3.fromRGB(20, 20, 20),
             Profile = Color3.fromRGB(18, 18, 18),
             Border = Color3.fromRGB(40, 40, 40),
+            Element = Color3.fromRGB(20, 20, 20),
         },
         Coffee = {
             Container = Color3.fromRGB(40, 30, 25),
@@ -1103,6 +1104,7 @@ function Window:SetColorScheme(scheme)
             TabButton = Color3.fromRGB(50, 38, 30),
             Profile = Color3.fromRGB(45, 33, 25),
             Border = Color3.fromRGB(70, 55, 45),
+            Element = Color3.fromRGB(50, 38, 30),
         },
         Navy = {
             Container = Color3.fromRGB(15, 20, 30),
@@ -1111,6 +1113,7 @@ function Window:SetColorScheme(scheme)
             TabButton = Color3.fromRGB(20, 28, 40),
             Profile = Color3.fromRGB(18, 25, 35),
             Border = Color3.fromRGB(40, 50, 65),
+            Element = Color3.fromRGB(20, 28, 40),
         },
         Forest = {
             Container = Color3.fromRGB(20, 25, 20),
@@ -1119,6 +1122,7 @@ function Window:SetColorScheme(scheme)
             TabButton = Color3.fromRGB(28, 35, 28),
             Profile = Color3.fromRGB(23, 30, 23),
             Border = Color3.fromRGB(45, 55, 45),
+            Element = Color3.fromRGB(28, 35, 28),
         },
         Purple = {
             Container = Color3.fromRGB(25, 15, 30),
@@ -1127,6 +1131,7 @@ function Window:SetColorScheme(scheme)
             TabButton = Color3.fromRGB(35, 20, 40),
             Profile = Color3.fromRGB(30, 18, 35),
             Border = Color3.fromRGB(55, 40, 65),
+            Element = Color3.fromRGB(35, 20, 40),
         },
         Midnight = {
             Container = Color3.fromRGB(10, 10, 15),
@@ -1135,6 +1140,7 @@ function Window:SetColorScheme(scheme)
             TabButton = Color3.fromRGB(15, 15, 22),
             Profile = Color3.fromRGB(13, 13, 18),
             Border = Color3.fromRGB(30, 30, 40),
+            Element = Color3.fromRGB(15, 15, 22),
         },
     }
     
@@ -1172,16 +1178,19 @@ function Window:SetColorScheme(scheme)
             }):Play()
         end
         
-        -- Update section containers
+        -- Update all elements in sections
         for _, section in pairs(tab.Sections) do
             if section.Container then
-                -- Update toggle backgrounds
+                -- Update all child elements
                 for _, child in pairs(section.Container:GetDescendants()) do
-                    if child:IsA("Frame") and child.Name ~= "SwitchBg" and child.Name ~= "Check" then
-                        local isToggle = child:FindFirstChild("SwitchBg") ~= nil
-                        if isToggle then
+                    if child:IsA("Frame") and child.Parent and child.Parent:IsA("ScrollingFrame") then
+                        -- This is a toggle/element container
+                        local isSwitchBg = child.Name == "SwitchBg"
+                        local isCheck = child.Name == "Check"
+                        
+                        if not isSwitchBg and not isCheck then
                             TweenService:Create(child, TweenInfo.new(duration, easing), {
-                                BackgroundColor3 = colors.TabButton
+                                BackgroundColor3 = colors.Element
                             }):Play()
                         end
                     end
