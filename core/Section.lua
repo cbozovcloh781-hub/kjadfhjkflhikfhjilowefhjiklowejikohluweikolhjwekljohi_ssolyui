@@ -28,7 +28,6 @@ function Section:CreateContainer()
     self.Container.ScrollBarThickness = 4
     self.Container.ScrollBarImageColor3 = Color3.fromRGB(80, 80, 80)
     self.Container.CanvasSize = UDim2.new(0, 0, 0, 0)
-    self.Container.AutomaticCanvasSize = Enum.AutomaticSize.Y
     self.Container.Visible = false
     self.Container.Parent = tab.ContentContainer
     
@@ -37,6 +36,11 @@ function Section:CreateContainer()
     Layout.SortOrder = Enum.SortOrder.LayoutOrder
     Layout.Padding = UDim.new(0, 10)
     Layout.Parent = self.Container
+    
+    -- Auto-update canvas size based on content
+    Layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        self.Container.CanvasSize = UDim2.new(0, 0, 0, Layout.AbsoluteContentSize.Y + 20)
+    end)
     
     local Padding = Instance.new("UIPadding")
     Padding.PaddingTop = UDim.new(0, 10)

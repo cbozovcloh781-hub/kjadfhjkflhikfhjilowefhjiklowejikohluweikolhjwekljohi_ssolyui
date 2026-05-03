@@ -428,35 +428,71 @@ function Window:CreateGUI()
     ResizeHCorner.CornerRadius = UDim.new(1, 0)
     ResizeHCorner.Parent = self.ResizeHandleH
     
-    -- Minimized indicator (hidden by default) - small icon that follows window
+    -- Minimized indicator (hidden by default) - horizontal bar at top
     self.MinimizedIndicator = Instance.new("Frame")
     self.MinimizedIndicator.Name = "MinimizedIndicator"
-    self.MinimizedIndicator.Size = UDim2.fromOffset(50, 50)
-    self.MinimizedIndicator.Position = self.Config.Position
-    self.MinimizedIndicator.AnchorPoint = Vector2.new(0.5, 0.5)
-    self.MinimizedIndicator.BackgroundColor3 = Color3.fromRGB(26, 26, 26)
+    self.MinimizedIndicator.Size = UDim2.fromOffset(300, 35)
+    self.MinimizedIndicator.Position = UDim2.new(0.5, 0, 0, 20)
+    self.MinimizedIndicator.AnchorPoint = Vector2.new(0.5, 0)
+    self.MinimizedIndicator.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
     self.MinimizedIndicator.BackgroundTransparency = 0.1
     self.MinimizedIndicator.BorderSizePixel = 0
     self.MinimizedIndicator.Visible = false
     self.MinimizedIndicator.Parent = self.ScreenGui
     
     local MinIndCorner = Instance.new("UICorner")
-    MinIndCorner.CornerRadius = UDim.new(1, 0)
+    MinIndCorner.CornerRadius = UDim.new(0, 8)
     MinIndCorner.Parent = self.MinimizedIndicator
     
     local MinIndStroke = Instance.new("UIStroke")
-    MinIndStroke.Color = Color3.fromRGB(60, 60, 60)
-    MinIndStroke.Thickness = 1
+    MinIndStroke.Color = self.AccentColor
+    MinIndStroke.Thickness = 2
     MinIndStroke.Parent = self.MinimizedIndicator
     
+    table.insert(self.AccentElements, MinIndStroke)
+    
     local MinIndLabel = Instance.new("TextLabel")
-    MinIndLabel.Size = UDim2.new(1, 0, 1, 0)
+    MinIndLabel.Size = UDim2.new(1, -40, 1, 0)
+    MinIndLabel.Position = UDim2.fromOffset(10, 0)
     MinIndLabel.BackgroundTransparency = 1
-    MinIndLabel.Text = self.Config.Title:sub(1, 1):upper()
+    MinIndLabel.Text = self.Config.Title
     MinIndLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    MinIndLabel.TextSize = 26
+    MinIndLabel.TextSize = 13
     MinIndLabel.Font = Enum.Font.GothamBold
+    MinIndLabel.TextXAlignment = Enum.TextXAlignment.Left
     MinIndLabel.Parent = self.MinimizedIndicator
+    
+    -- Restore button
+    local RestoreButton = Instance.new("TextButton")
+    RestoreButton.Size = UDim2.fromOffset(25, 25)
+    RestoreButton.Position = UDim2.new(1, -30, 0.5, -12.5)
+    RestoreButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    RestoreButton.Text = "□"
+    RestoreButton.TextColor3 = Color3.fromRGB(200, 200, 200)
+    RestoreButton.TextSize = 14
+    RestoreButton.Font = Enum.Font.GothamBold
+    RestoreButton.AutoButtonColor = false
+    RestoreButton.Parent = self.MinimizedIndicator
+    
+    local RestoreCorner = Instance.new("UICorner")
+    RestoreCorner.CornerRadius = UDim.new(0, 4)
+    RestoreCorner.Parent = RestoreButton
+    
+    RestoreButton.MouseButton1Click:Connect(function()
+        self:ToggleMinimize()
+    end)
+    
+    RestoreButton.MouseEnter:Connect(function()
+        TweenService:Create(RestoreButton, TweenInfo.new(0.2), {
+            BackgroundColor3 = self.AccentColor
+        }):Play()
+    end)
+    
+    RestoreButton.MouseLeave:Connect(function()
+        TweenService:Create(RestoreButton, TweenInfo.new(0.2), {
+            BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+        }):Play()
+    end)
     
     -- Snow particles effect (deprecated, use new particles system)
     -- self:CreateSnowEffect()
@@ -787,30 +823,28 @@ function Window:SetupMinimize()
     -- Minimized indicator hover animation
     self.MinimizedIndicator.MouseEnter:Connect(function()
         TweenService:Create(self.MinimizedIndicator, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-            Size = UDim2.fromOffset(60, 60),
-            BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+            Size = UDim2.fromOffset(320, 38),
+            BackgroundColor3 = Color3.fromRGB(25, 25, 25)
         }):Play()
         
         local stroke = self.MinimizedIndicator:FindFirstChildOfClass("UIStroke")
         if stroke then
             TweenService:Create(stroke, TweenInfo.new(0.3), {
-                Color = self.AccentColor,
-                Thickness = 2
+                Thickness = 3
             }):Play()
         end
     end)
     
     self.MinimizedIndicator.MouseLeave:Connect(function()
         TweenService:Create(self.MinimizedIndicator, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-            Size = UDim2.fromOffset(50, 50),
-            BackgroundColor3 = Color3.fromRGB(26, 26, 26)
+            Size = UDim2.fromOffset(300, 35),
+            BackgroundColor3 = Color3.fromRGB(20, 20, 20)
         }):Play()
         
         local stroke = self.MinimizedIndicator:FindFirstChildOfClass("UIStroke")
         if stroke then
             TweenService:Create(stroke, TweenInfo.new(0.3), {
-                Color = Color3.fromRGB(60, 60, 60),
-                Thickness = 1
+                Thickness = 2
             }):Play()
         end
     end)
@@ -858,13 +892,13 @@ function Window:ToggleMinimize()
         tween.Completed:Connect(function()
             self.Container.Visible = false
             
-            -- Show indicator at same position
-            self.MinimizedIndicator.Position = UDim2.new(currentPos.X.Scale, currentPos.X.Offset + currentSize.X.Offset/2, currentPos.Y.Scale, currentPos.Y.Offset + currentSize.Y.Offset/2)
+            -- Show indicator at top
+            self.MinimizedIndicator.Position = UDim2.new(0.5, 0, 0, 20)
             self.MinimizedIndicator.Visible = true
-            self.MinimizedIndicator.Size = UDim2.fromOffset(0, 0)
+            self.MinimizedIndicator.Size = UDim2.fromOffset(0, 35)
             
             TweenService:Create(self.MinimizedIndicator, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-                Size = UDim2.fromOffset(50, 50)
+                Size = UDim2.fromOffset(300, 35)
             }):Play()
             
             -- Allow next toggle
@@ -886,25 +920,23 @@ function Window:ToggleMinimize()
         -- Show profile
         self.ProfileContainer.Visible = true
         
-        -- Get indicator position
-        local indPos = self.MinimizedIndicator.Position
-        
         -- Hide indicator
         TweenService:Create(self.MinimizedIndicator, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.In), {
-            Size = UDim2.fromOffset(0, 0)
+            Size = UDim2.fromOffset(0, 35)
         }):Play()
         
         task.wait(0.4)
         self.MinimizedIndicator.Visible = false
         
-        -- Restore window from indicator position with saved size
+        -- Restore window from center
         self.Container.Visible = true
         self.Container.Size = UDim2.fromOffset(0, 0)
-        self.Container.Position = indPos
+        self.Container.Position = UDim2.new(0.5, 0, 0.5, 0)
+        self.Container.AnchorPoint = Vector2.new(0.5, 0.5)
         
         TweenService:Create(self.Container, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
             Size = self.Config.Size,
-            Position = UDim2.new(indPos.X.Scale, indPos.X.Offset - self.Config.Size.X.Offset/2, indPos.Y.Scale, indPos.Y.Offset - self.Config.Size.Y.Offset/2)
+            Position = UDim2.new(0.5, 0, 0.5, 0)
         }):Play()
         
         -- Show resize handles AFTER animation completes
@@ -1068,21 +1100,95 @@ end
 
 function Window:SetTheme(themeName)
     local themes = {
-        Blue = Color3.fromRGB(74, 158, 255),
-        Purple = Color3.fromRGB(138, 43, 226),
-        Pink = Color3.fromRGB(255, 105, 180),
-        Red = Color3.fromRGB(255, 69, 58),
-        Orange = Color3.fromRGB(255, 149, 0),
-        Green = Color3.fromRGB(52, 199, 89),
-        Cyan = Color3.fromRGB(90, 200, 250),
-        Yellow = Color3.fromRGB(255, 214, 10),
+        -- Accent + Background combinations
+        Ocean = {accent = Color3.fromRGB(52, 152, 219), bg = Color3.fromRGB(15, 25, 35)},
+        Sunset = {accent = Color3.fromRGB(255, 107, 107), bg = Color3.fromRGB(35, 20, 20)},
+        Forest = {accent = Color3.fromRGB(46, 213, 115), bg = Color3.fromRGB(20, 30, 20)},
+        Purple = {accent = Color3.fromRGB(155, 89, 182), bg = Color3.fromRGB(30, 20, 35)},
+        Midnight = {accent = Color3.fromRGB(108, 122, 137), bg = Color3.fromRGB(10, 12, 15)},
+        Cherry = {accent = Color3.fromRGB(255, 71, 87), bg = Color3.fromRGB(30, 15, 18)},
+        Mint = {accent = Color3.fromRGB(85, 239, 196), bg = Color3.fromRGB(18, 28, 25)},
+        Gold = {accent = Color3.fromRGB(253, 203, 110), bg = Color3.fromRGB(30, 25, 15)},
+        Rose = {accent = Color3.fromRGB(253, 121, 168), bg = Color3.fromRGB(32, 18, 25)},
+        Sky = {accent = Color3.fromRGB(116, 185, 255), bg = Color3.fromRGB(18, 22, 30)},
+        Lavender = {accent = Color3.fromRGB(179, 136, 255), bg = Color3.fromRGB(25, 20, 32)},
+        Coral = {accent = Color3.fromRGB(255, 127, 80), bg = Color3.fromRGB(32, 22, 18)},
+        Teal = {accent = Color3.fromRGB(72, 219, 251), bg = Color3.fromRGB(15, 28, 30)},
+        Amber = {accent = Color3.fromRGB(255, 193, 7), bg = Color3.fromRGB(30, 27, 15)},
+        Crimson = {accent = Color3.fromRGB(220, 20, 60), bg = Color3.fromRGB(28, 12, 15)},
     }
     
-    local color = themes[themeName] or themes.Blue
-    self:SetAccentColor(color)
+    local theme = themes[themeName] or themes.Ocean
+    self:SetAccentColor(theme.accent)
     
-    -- Return the color so it can be used for other purposes
-    return color
+    -- Update background colors
+    local duration = 0.6
+    local easing = Enum.EasingStyle.Quint
+    
+    TweenService:Create(self.Container, TweenInfo.new(duration, easing), {
+        BackgroundColor3 = theme.bg
+    }):Play()
+    
+    local titleBg = Color3.fromRGB(
+        math.max(0, theme.bg.R * 255 - 3),
+        math.max(0, theme.bg.G * 255 - 3),
+        math.max(0, theme.bg.B * 255 - 3)
+    )
+    TweenService:Create(self.TitleBar, TweenInfo.new(duration, easing), {
+        BackgroundColor3 = titleBg
+    }):Play()
+    
+    TweenService:Create(self.ContentContainer, TweenInfo.new(duration, easing), {
+        BackgroundColor3 = titleBg
+    }):Play()
+    
+    local profileBg = Color3.fromRGB(
+        math.min(255, theme.bg.R * 255 + 3),
+        math.min(255, theme.bg.G * 255 + 3),
+        math.min(255, theme.bg.B * 255 + 3)
+    )
+    TweenService:Create(self.ProfileContainer, TweenInfo.new(duration, easing), {
+        BackgroundColor3 = profileBg
+    }):Play()
+    
+    -- Update tab buttons
+    for _, tab in pairs(self.Tabs) do
+        if tab.Button and not tab.Selected then
+            local tabBg = Color3.fromRGB(
+                math.min(255, theme.bg.R * 255 + 5),
+                math.min(255, theme.bg.G * 255 + 5),
+                math.min(255, theme.bg.B * 255 + 5)
+            )
+            TweenService:Create(tab.Button, TweenInfo.new(duration, easing), {
+                BackgroundColor3 = tabBg
+            }):Play()
+        end
+        
+        -- Update elements
+        for _, section in pairs(tab.Sections) do
+            if section.Container then
+                for _, child in pairs(section.Container:GetDescendants()) do
+                    if child:IsA("Frame") and child.Parent and child.Parent:IsA("ScrollingFrame") then
+                        local isSwitchBg = child.Name == "SwitchBg"
+                        local isCheck = child.Name == "Check"
+                        
+                        if not isSwitchBg and not isCheck then
+                            local elemBg = Color3.fromRGB(
+                                math.min(255, theme.bg.R * 255 + 5),
+                                math.min(255, theme.bg.G * 255 + 5),
+                                math.min(255, theme.bg.B * 255 + 5)
+                            )
+                            TweenService:Create(child, TweenInfo.new(duration, easing), {
+                                BackgroundColor3 = elemBg
+                            }):Play()
+                        end
+                    end
+                end
+            end
+        end
+    end
+    
+    return theme.accent
 end
 
 -- New: Set custom color scheme for background
