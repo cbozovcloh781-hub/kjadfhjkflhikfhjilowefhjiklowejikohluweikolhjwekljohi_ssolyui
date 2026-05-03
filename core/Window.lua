@@ -96,18 +96,7 @@ function Window:CreateGUI()
     self.ScreenGui.Enabled = not self._delayShow  -- Hide if delayed
     self.ScreenGui.Parent = coreGui
     
-    -- Click blocker - перехватывает все клики в меню
-    self.ClickBlocker = Instance.new("TextButton")
-    self.ClickBlocker.Name = "ClickBlocker"
-    self.ClickBlocker.Size = UDim2.fromScale(1, 1)
-    self.ClickBlocker.Position = UDim2.fromScale(0, 0)
-    self.ClickBlocker.BackgroundTransparency = 1
-    self.ClickBlocker.Text = ""
-    self.ClickBlocker.Modal = true  -- Блокирует клики под собой
-    self.ClickBlocker.ZIndex = -1  -- Под всеми элементами меню
-    self.ClickBlocker.Active = true
-    self.ClickBlocker.AutoButtonColor = false
-    self.ClickBlocker.Parent = self.ScreenGui
+
     
     -- Blur effect
     if self.Config.BlurEnabled then
@@ -706,9 +695,20 @@ function Window:SetupResizing()
 end
 
 function Window:SetupMinimize()
-    -- Close button click
+    -- Close button click - HIDE COMPLETELY
     self.CloseButton.MouseButton1Click:Connect(function()
-        self:ToggleMinimize()
+        -- Hide entire GUI
+        self.ScreenGui.Enabled = false
+        
+        -- Hide blur
+        if self.Blur then
+            TweenService:Create(self.Blur, TweenInfo.new(0.3, Enum.EasingStyle.Quint), {Size = 0}):Play()
+        end
+        
+        -- Stop particles
+        if self.ParticleSystem and self.ParticleSystem.Container then
+            self.ParticleSystem.Container.Visible = false
+        end
     end)
     
     -- Close button hover
@@ -729,10 +729,30 @@ function Window:SetupMinimize()
         self:ToggleMinimize()
     end)
     
-    -- Hotkey
+    -- Hotkey - TOGGLE VISIBILITY
     UserInputService.InputBegan:Connect(function(input, gameProcessed)
         if not gameProcessed and input.KeyCode == self.Config.MinimizeKey then
-            self:ToggleMinimize()
+            self.ScreenGui.Enabled = not self.ScreenGui.Enabled
+            
+            if self.ScreenGui.Enabled then
+                -- Show blur
+                if self.Blur then
+                    TweenService:Create(self.Blur, TweenInfo.new(0.3, Enum.EasingStyle.Quint), {Size = self.BlurSize}):Play()
+                end
+                -- Show particles
+                if self.ParticleSystem and self.ParticleSystem.Container then
+                    self.ParticleSystem.Container.Visible = true
+                end
+            else
+                -- Hide blur
+                if self.Blur then
+                    TweenService:Create(self.Blur, TweenInfo.new(0.3, Enum.EasingStyle.Quint), {Size = 0}):Play()
+                end
+                -- Stop particles
+                if self.ParticleSystem and self.ParticleSystem.Container then
+                    self.ParticleSystem.Container.Visible = false
+                end
+            end
         end
     end)
     
@@ -757,9 +777,12 @@ function Window:ToggleMinimize()
     self.Minimized = not self.Minimized
     
     if self.Minimized then
+        -- Save current position
+        self._savedPosition = self.Container.Position
+        
         -- Hide blur
         if self.Blur then
-            TweenService:Create(self.Blur, TweenInfo.new(0.3, Enum.EasingStyle.Quint), {Size = 0}):Play()
+            TweenService:Create(self.Blur, TweenInfo.new(0.5, Enum.EasingStyle.Quint), {Size = 0}):Play()
         end
         
         -- Hide particles
@@ -778,14 +801,18 @@ function Window:ToggleMinimize()
         self.ProfileContainer.Visible = false
         self.BottomGlow.Visible = false
         
-        -- Shrink to title bar only
-        TweenService:Create(self.Container, TweenInfo.new(0.3, Enum.EasingStyle.Quint), {
+        -- Calculate minimized position (keep X, adjust Y to keep title bar at same position)
+        local currentAbsPos = self.Container.AbsolutePosition
+        local minimizedPos = UDim2.fromOffset(currentAbsPos.X, currentAbsPos.Y)
+        
+        -- Shrink to title bar only (slower animation)
+        TweenService:Create(self.Container, TweenInfo.new(0.5, Enum.EasingStyle.Quint), {
             Size = UDim2.fromOffset(300, 35),
-            Position = UDim2.new(0.5, -150, 0, 20)
+            Position = minimizedPos
         }):Play()
         
         -- Update title
-        task.delay(0.3, function()
+        task.delay(0.5, function()
             self.TitleLabel.Text = "Sosalkin Hub | " .. os.date("%a %H:%M") .. " | Online: --"
             self._minimizing = false
         end)
@@ -793,14 +820,14 @@ function Window:ToggleMinimize()
         -- Restore title
         self.TitleLabel.Text = self.Config.Title
         
-        -- Expand container
-        TweenService:Create(self.Container, TweenInfo.new(0.3, Enum.EasingStyle.Quint), {
+        -- Expand container (slower animation) - restore to saved position
+        TweenService:Create(self.Container, TweenInfo.new(0.5, Enum.EasingStyle.Quint), {
             Size = self.Config.Size,
-            Position = self.Config.Position
+            Position = self._savedPosition or self.Config.Position
         }):Play()
         
         -- Show content after delay
-        task.delay(0.15, function()
+        task.delay(0.25, function()
             self.ContentContainer.Visible = true
             self.TabContainer.Visible = true
             self.ProfileContainer.Visible = true
@@ -809,7 +836,7 @@ function Window:ToggleMinimize()
         
         -- Show blur and particles
         if self.Blur then
-            TweenService:Create(self.Blur, TweenInfo.new(0.3, Enum.EasingStyle.Quint), {Size = self.BlurSize}):Play()
+            TweenService:Create(self.Blur, TweenInfo.new(0.5, Enum.EasingStyle.Quint), {Size = self.BlurSize}):Play()
         end
         
         if self.ParticleSystem and self.ParticleSystem.Container then
@@ -817,7 +844,7 @@ function Window:ToggleMinimize()
         end
         
         -- Show resize handles
-        task.delay(0.3, function()
+        task.delay(0.5, function()
             self.ResizeHandle.Visible = true
             self.ResizeHandleV.Visible = true
             self.ResizeHandleH.Visible = true
@@ -1030,15 +1057,25 @@ function Window:SetTheme(themeName)
     
     -- Update tab buttons
     for _, tab in pairs(self.Tabs) do
-        if tab.Button and not tab.Selected then
-            local tabBg = Color3.fromRGB(
-                math.min(255, theme.bg.R * 255 + 5),
-                math.min(255, theme.bg.G * 255 + 5),
-                math.min(255, theme.bg.B * 255 + 5)
-            )
-            TweenService:Create(tab.Button, TweenInfo.new(duration, easing), {
-                BackgroundColor3 = tabBg
-            }):Play()
+        if tab.Button then
+            if tab.Selected then
+                -- Active tab - use accent color
+                TweenService:Create(tab.Button, TweenInfo.new(duration, easing), {
+                    BackgroundColor3 = theme.accent,
+                    BackgroundTransparency = 0.85
+                }):Play()
+            else
+                -- Inactive tab - use theme background
+                local tabBg = Color3.fromRGB(
+                    math.min(255, theme.bg.R * 255 + 5),
+                    math.min(255, theme.bg.G * 255 + 5),
+                    math.min(255, theme.bg.B * 255 + 5)
+                )
+                TweenService:Create(tab.Button, TweenInfo.new(duration, easing), {
+                    BackgroundColor3 = tabBg,
+                    BackgroundTransparency = 0
+                }):Play()
+            end
         end
         
         -- Update elements

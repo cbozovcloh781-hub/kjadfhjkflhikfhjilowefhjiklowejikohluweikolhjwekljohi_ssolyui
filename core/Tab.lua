@@ -188,17 +188,50 @@ function Tab:Select()
         end
     end
     
-    -- Fade in elements
+    -- Fade in elements with staggered timing
     for i, element in pairs(self.Elements) do
         if element and element.Parent then
+            -- Start invisible
             element.Visible = true
-            element.BackgroundTransparency = 1
             
-            task.delay(i * 0.015, function()
-                if element and element.Parent then
-                    TweenService:Create(element, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-                        BackgroundTransparency = 0.5
-                    }):Play()
+            -- Fade in all text elements
+            for _, child in pairs(element:GetDescendants()) do
+                if child:IsA("TextLabel") or child:IsA("TextButton") or child:IsA("TextBox") then
+                    child.TextTransparency = 1
+                elseif child:IsA("ImageLabel") or child:IsA("ImageButton") then
+                    child.ImageTransparency = 1
+                elseif child:IsA("Frame") then
+                    child.BackgroundTransparency = 1
+                end
+            end
+            
+            -- Staggered fade in
+            task.delay(i * 0.02, function()
+                if element and element.Parent and self.Selected then
+                    -- Fade in all elements
+                    for _, child in pairs(element:GetDescendants()) do
+                        if child:IsA("TextLabel") or child:IsA("TextButton") or child:IsA("TextBox") then
+                            local targetTransparency = 0
+                            if child.Name == "Title" or child.Name == "Value" then
+                                targetTransparency = 0.3
+                            end
+                            TweenService:Create(child, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                                TextTransparency = targetTransparency
+                            }):Play()
+                        elseif child:IsA("ImageLabel") or child:IsA("ImageButton") then
+                            TweenService:Create(child, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                                ImageTransparency = 0
+                            }):Play()
+                        elseif child:IsA("Frame") then
+                            local targetTransparency = 0
+                            if child.Name == "Container" or child.Parent.Name == "Container" then
+                                targetTransparency = 0
+                            end
+                            TweenService:Create(child, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                                BackgroundTransparency = targetTransparency
+                            }):Play()
+                        end
+                    end
                 end
             end)
         end
@@ -226,12 +259,25 @@ function Tab:Deselect()
         Size = UDim2.new(0, 3, 0, 0)
     }):Play()
     
-    -- Fade out elements
+    -- Fade out all elements
     for i, element in pairs(self.Elements) do
         if element and element.Parent then
-            TweenService:Create(element, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-                BackgroundTransparency = 1
-            }):Play()
+            -- Fade out all text and image elements
+            for _, child in pairs(element:GetDescendants()) do
+                if child:IsA("TextLabel") or child:IsA("TextButton") or child:IsA("TextBox") then
+                    TweenService:Create(child, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                        TextTransparency = 1
+                    }):Play()
+                elseif child:IsA("ImageLabel") or child:IsA("ImageButton") then
+                    TweenService:Create(child, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                        ImageTransparency = 1
+                    }):Play()
+                elseif child:IsA("Frame") then
+                    TweenService:Create(child, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                        BackgroundTransparency = 1
+                    }):Play()
+                end
+            end
         end
     end
     

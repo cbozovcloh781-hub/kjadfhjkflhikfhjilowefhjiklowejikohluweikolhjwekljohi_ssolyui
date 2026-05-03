@@ -39,13 +39,26 @@ function Particles:CreateParticle()
     
     local particle = Instance.new("Frame")
     particle.Size = UDim2.fromOffset(math.random(2, 5), math.random(2, 5))
-    -- Спавним сверху (Y = -10 пикселей)
-    particle.Position = UDim2.new(
-        math.random(0, 100) / 100,
-        0,
-        0,
-        -10
-    )
+    
+    -- Случайное направление: сверху (70%), слева (15%), справа (15%)
+    local direction = math.random(1, 100)
+    local startPos, endPos
+    
+    if direction <= 70 then
+        -- Сверху вниз
+        startPos = UDim2.new(math.random(0, 100) / 100, 0, 0, -10)
+        endPos = UDim2.new(startPos.X.Scale + math.random(-10, 10) / 100, 0, 1, 10)
+    elseif direction <= 85 then
+        -- Слева направо
+        startPos = UDim2.new(0, -10, math.random(0, 100) / 100, 0)
+        endPos = UDim2.new(1, 10, startPos.Y.Scale + math.random(-10, 10) / 100, 0)
+    else
+        -- Справа налево
+        startPos = UDim2.new(1, 10, math.random(0, 100) / 100, 0)
+        endPos = UDim2.new(0, -10, startPos.Y.Scale + math.random(-10, 10) / 100, 0)
+    end
+    
+    particle.Position = startPos
     
     -- Use accent color with slight variation
     local function clamp(val, min, max) return math.max(min, math.min(max, val)) end
@@ -65,15 +78,8 @@ function Particles:CreateParticle()
     
     table.insert(self.Particles, particle)
     
-    -- Animate particle - падение вниз
-    local duration = math.random(4, 8)
-    local containerHeight = self.Container.AbsoluteSize.Y
-    local endPos = UDim2.new(
-        particle.Position.X.Scale + math.random(-10, 10) / 100,
-        0,
-        1,
-        10
-    )
+    -- Медленная анимация с долгим исчезновением
+    local duration = math.random(6, 12)
     
     local tween = TweenService:Create(
         particle,
@@ -126,17 +132,17 @@ function Particles:Stop()
         self.Connection = nil
     end
     
-    -- Плавно исчезаем все частицы
+    -- Медленно и плавно исчезаем все частицы
     for i = #self.Particles, 1, -1 do
         local particle = self.Particles[i]
         if particle and particle.Parent then
-            -- Анимация исчезновения
-            TweenService:Create(particle, TweenInfo.new(0.8, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+            -- Долгая анимация исчезновения (2 секунды)
+            TweenService:Create(particle, TweenInfo.new(2, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
                 BackgroundTransparency = 1
             }):Play()
             
             -- Удаляем после анимации
-            task.delay(0.8, function()
+            task.delay(2, function()
                 if particle and particle.Parent then
                     particle:Destroy()
                 end
@@ -164,20 +170,20 @@ function Particles.SetEnabled(enabled)
     
     for _, particleSystem in ipairs(Particles.Active) do
         if not enabled then
-            -- Останавливаем систему и плавно удаляем все частицы
+            -- Останавливаем систему и медленно удаляем все частицы
             particleSystem.Running = false
             if particleSystem.Container then
                 particleSystem.Container.Visible = false
             end
-            -- Плавно исчезаем все частицы
+            -- Долгое исчезновение всех частиц (2 секунды)
             for i = #particleSystem.Particles, 1, -1 do
                 local particle = particleSystem.Particles[i]
                 if particle and particle.Parent then
-                    TweenService:Create(particle, TweenInfo.new(0.8, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                    TweenService:Create(particle, TweenInfo.new(2, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
                         BackgroundTransparency = 1
                     }):Play()
                     
-                    task.delay(0.8, function()
+                    task.delay(2, function()
                         if particle and particle.Parent then
                             particle:Destroy()
                         end
