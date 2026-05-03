@@ -181,7 +181,6 @@ function Tab:Select()
     if #self.Sections > 0 then
         self.ContentContainer.Visible = true
         
-        -- Show sections instantly without fade animation
         for _, section in pairs(self.Sections) do
             if section.Container then
                 section.Container.Visible = true
@@ -189,10 +188,19 @@ function Tab:Select()
         end
     end
     
-    -- Show elements instantly
+    -- Fade in elements
     for i, element in pairs(self.Elements) do
         if element and element.Parent then
             element.Visible = true
+            element.BackgroundTransparency = 1
+            
+            task.delay(i * 0.015, function()
+                if element and element.Parent then
+                    TweenService:Create(element, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                        BackgroundTransparency = 0.5
+                    }):Play()
+                end
+            end)
         end
     end
 end
@@ -218,22 +226,33 @@ function Tab:Deselect()
         Size = UDim2.new(0, 3, 0, 0)
     }):Play()
     
-    -- Hide content instantly
-    if #self.Sections > 0 then
-        self.ContentContainer.Visible = false
-        
-        for _, section in pairs(self.Sections) do
-            if section.Container then
-                section.Container.Visible = false
-            end
+    -- Fade out elements
+    for i, element in pairs(self.Elements) do
+        if element and element.Parent then
+            TweenService:Create(element, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                BackgroundTransparency = 1
+            }):Play()
         end
     end
     
-    for i, element in pairs(self.Elements) do
-        if element and element.Parent then
-            element.Visible = false
+    -- Hide content after fade
+    task.delay(0.25, function()
+        if not self.Selected then
+            self.ContentContainer.Visible = false
+            
+            for _, section in pairs(self.Sections) do
+                if section.Container then
+                    section.Container.Visible = false
+                end
+            end
+            
+            for _, element in pairs(self.Elements) do
+                if element and element.Parent then
+                    element.Visible = false
+                end
+            end
         end
-    end
+    end)
 end
 
 -- Section creation
@@ -256,13 +275,17 @@ function Tab:AddSection(side)
         scrollFrame.ScrollBarImageColor3 = Color3.fromRGB(80, 80, 80)
         scrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
         scrollFrame.Visible = false
-        scrollFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y  -- Автоматический размер
         scrollFrame.Parent = self.ContentContainer
         
         local Layout = Instance.new("UIListLayout")
         Layout.SortOrder = Enum.SortOrder.LayoutOrder
         Layout.Padding = UDim.new(0, 10)
         Layout.Parent = scrollFrame
+        
+        -- Auto-update canvas size
+        Layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+            scrollFrame.CanvasSize = UDim2.new(0, 0, 0, Layout.AbsoluteContentSize.Y + 20)
+        end)
         
         local Padding = Instance.new("UIPadding")
         Padding.PaddingTop = UDim.new(0, 10)

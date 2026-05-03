@@ -23,8 +23,8 @@ function Particles.new(parent, accentColor)
     self.Container.Parent = parent
     
     self.Particles = {}
-    self.MaxParticles = 50
-    self.SpawnRate = 0.2
+    self.MaxParticles = 100
+    self.SpawnRate = 0.08
     self.LastSpawn = 0
     self.Running = false
     
@@ -38,12 +38,13 @@ function Particles:CreateParticle()
     if #self.Particles >= self.MaxParticles then return end
     
     local particle = Instance.new("Frame")
-    particle.Size = UDim2.fromOffset(math.random(2, 4), math.random(2, 4))
+    particle.Size = UDim2.fromOffset(math.random(2, 5), math.random(2, 5))
+    -- Спавним сверху (Y = -10 пикселей)
     particle.Position = UDim2.new(
         math.random(0, 100) / 100,
         0,
-        math.random(0, 100) / 100,
-        0
+        0,
+        -10
     )
     
     -- Use accent color with slight variation
@@ -64,13 +65,14 @@ function Particles:CreateParticle()
     
     table.insert(self.Particles, particle)
     
-    -- Animate particle
-    local duration = math.random(3, 6)
+    -- Animate particle - падение вниз
+    local duration = math.random(4, 8)
+    local containerHeight = self.Container.AbsoluteSize.Y
     local endPos = UDim2.new(
-        math.random(0, 100) / 100,
+        particle.Position.X.Scale + math.random(-10, 10) / 100,
         0,
-        math.random(0, 100) / 100,
-        0
+        1,
+        10
     )
     
     local tween = TweenService:Create(

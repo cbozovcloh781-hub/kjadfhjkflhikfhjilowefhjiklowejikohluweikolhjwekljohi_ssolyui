@@ -96,6 +96,19 @@ function Window:CreateGUI()
     self.ScreenGui.Enabled = not self._delayShow  -- Hide if delayed
     self.ScreenGui.Parent = coreGui
     
+    -- Click blocker - перехватывает все клики в меню
+    self.ClickBlocker = Instance.new("TextButton")
+    self.ClickBlocker.Name = "ClickBlocker"
+    self.ClickBlocker.Size = UDim2.fromScale(1, 1)
+    self.ClickBlocker.Position = UDim2.fromScale(0, 0)
+    self.ClickBlocker.BackgroundTransparency = 1
+    self.ClickBlocker.Text = ""
+    self.ClickBlocker.Modal = true  -- Блокирует клики под собой
+    self.ClickBlocker.ZIndex = -1  -- Под всеми элементами меню
+    self.ClickBlocker.Active = true
+    self.ClickBlocker.AutoButtonColor = false
+    self.ClickBlocker.Parent = self.ScreenGui
+    
     -- Blur effect
     if self.Config.BlurEnabled then
         self.Blur = Instance.new("BlurEffect")
@@ -250,6 +263,29 @@ function Window:CreateGUI()
     ContentPadding.PaddingLeft = UDim.new(0, 15)
     ContentPadding.PaddingRight = UDim.new(0, 15)
     ContentPadding.Parent = self.ContentContainer
+    
+    -- Bottom glow effect (subtle accent glow)
+    self.BottomGlow = Instance.new("Frame")
+    self.BottomGlow.Name = "BottomGlow"
+    self.BottomGlow.Size = UDim2.new(1, 0, 0, 3)
+    self.BottomGlow.Position = UDim2.new(0, 0, 1, -3)
+    self.BottomGlow.BackgroundColor3 = self.AccentColor
+    self.BottomGlow.BackgroundTransparency = 0.7
+    self.BottomGlow.BorderSizePixel = 0
+    self.BottomGlow.ZIndex = 10
+    self.BottomGlow.Parent = self.Container
+    
+    -- Glow gradient for softer effect
+    local glowGradient = Instance.new("UIGradient")
+    glowGradient.Transparency = NumberSequence.new({
+        NumberSequenceKeypoint.new(0, 1),
+        NumberSequenceKeypoint.new(0.5, 0.3),
+        NumberSequenceKeypoint.new(1, 1)
+    })
+    glowGradient.Rotation = 0
+    glowGradient.Parent = self.BottomGlow
+    
+    table.insert(self.AccentElements, self.BottomGlow)
     
     -- Player profile (bottom-left corner) - card style
     self.ProfileContainer = Instance.new("Frame")
@@ -428,72 +464,6 @@ function Window:CreateGUI()
     ResizeHCorner.CornerRadius = UDim.new(1, 0)
     ResizeHCorner.Parent = self.ResizeHandleH
     
-    -- Minimized indicator (hidden by default) - horizontal bar at top
-    self.MinimizedIndicator = Instance.new("Frame")
-    self.MinimizedIndicator.Name = "MinimizedIndicator"
-    self.MinimizedIndicator.Size = UDim2.fromOffset(300, 35)
-    self.MinimizedIndicator.Position = UDim2.new(0.5, 0, 0, 20)
-    self.MinimizedIndicator.AnchorPoint = Vector2.new(0.5, 0)
-    self.MinimizedIndicator.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-    self.MinimizedIndicator.BackgroundTransparency = 0.1
-    self.MinimizedIndicator.BorderSizePixel = 0
-    self.MinimizedIndicator.Visible = false
-    self.MinimizedIndicator.Parent = self.ScreenGui
-    
-    local MinIndCorner = Instance.new("UICorner")
-    MinIndCorner.CornerRadius = UDim.new(0, 8)
-    MinIndCorner.Parent = self.MinimizedIndicator
-    
-    local MinIndStroke = Instance.new("UIStroke")
-    MinIndStroke.Color = self.AccentColor
-    MinIndStroke.Thickness = 2
-    MinIndStroke.Parent = self.MinimizedIndicator
-    
-    table.insert(self.AccentElements, MinIndStroke)
-    
-    local MinIndLabel = Instance.new("TextLabel")
-    MinIndLabel.Size = UDim2.new(1, -40, 1, 0)
-    MinIndLabel.Position = UDim2.fromOffset(10, 0)
-    MinIndLabel.BackgroundTransparency = 1
-    MinIndLabel.Text = self.Config.Title
-    MinIndLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    MinIndLabel.TextSize = 13
-    MinIndLabel.Font = Enum.Font.GothamBold
-    MinIndLabel.TextXAlignment = Enum.TextXAlignment.Left
-    MinIndLabel.Parent = self.MinimizedIndicator
-    
-    -- Restore button
-    local RestoreButton = Instance.new("TextButton")
-    RestoreButton.Size = UDim2.fromOffset(25, 25)
-    RestoreButton.Position = UDim2.new(1, -30, 0.5, -12.5)
-    RestoreButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    RestoreButton.Text = "□"
-    RestoreButton.TextColor3 = Color3.fromRGB(200, 200, 200)
-    RestoreButton.TextSize = 14
-    RestoreButton.Font = Enum.Font.GothamBold
-    RestoreButton.AutoButtonColor = false
-    RestoreButton.Parent = self.MinimizedIndicator
-    
-    local RestoreCorner = Instance.new("UICorner")
-    RestoreCorner.CornerRadius = UDim.new(0, 4)
-    RestoreCorner.Parent = RestoreButton
-    
-    RestoreButton.MouseButton1Click:Connect(function()
-        self:ToggleMinimize()
-    end)
-    
-    RestoreButton.MouseEnter:Connect(function()
-        TweenService:Create(RestoreButton, TweenInfo.new(0.2), {
-            BackgroundColor3 = self.AccentColor
-        }):Play()
-    end)
-    
-    RestoreButton.MouseLeave:Connect(function()
-        TweenService:Create(RestoreButton, TweenInfo.new(0.2), {
-            BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-        }):Play()
-    end)
-    
     -- Snow particles effect (deprecated, use new particles system)
     -- self:CreateSnowEffect()
 end
@@ -591,47 +561,6 @@ function Window:SetupDragging()
     local minStartPos = nil
     local lastClickTime = 0
     
-    -- Minimized indicator dragging
-    local minDragging = false
-    local minDragStart = nil
-    local minStartPos = nil
-    local hasMoved = false
-    
-    self.MinimizedIndicator.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            minDragging = true
-            hasMoved = false
-            minDragStart = input.Position
-            minStartPos = self.MinimizedIndicator.Position
-        end
-    end)
-    
-    UserInputService.InputChanged:Connect(function(input)
-        if minDragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-            local delta = input.Position - minDragStart
-            if math.abs(delta.X) > 5 or math.abs(delta.Y) > 5 then
-                hasMoved = true
-                self.MinimizedIndicator.Position = UDim2.new(
-                    minStartPos.X.Scale,
-                    minStartPos.X.Offset + delta.X,
-                    minStartPos.Y.Scale,
-                    minStartPos.Y.Offset + delta.Y
-                )
-                -- Update config position for restore
-                self.Config.Position = self.MinimizedIndicator.Position
-            end
-        end
-    end)
-    
-    UserInputService.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 and minDragging then
-            minDragging = false
-            if not hasMoved then
-                -- Click without drag = restore
-                self:ToggleMinimize()
-            end
-        end
-    end)
 end
 
 function Window:SetupResizing()
@@ -819,39 +748,9 @@ function Window:SetupMinimize()
             BackgroundColor3 = Color3.fromRGB(40, 40, 40)
         }):Play()
     end)
-    
-    -- Minimized indicator hover animation
-    self.MinimizedIndicator.MouseEnter:Connect(function()
-        TweenService:Create(self.MinimizedIndicator, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-            Size = UDim2.fromOffset(320, 38),
-            BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-        }):Play()
-        
-        local stroke = self.MinimizedIndicator:FindFirstChildOfClass("UIStroke")
-        if stroke then
-            TweenService:Create(stroke, TweenInfo.new(0.3), {
-                Thickness = 3
-            }):Play()
-        end
-    end)
-    
-    self.MinimizedIndicator.MouseLeave:Connect(function()
-        TweenService:Create(self.MinimizedIndicator, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-            Size = UDim2.fromOffset(300, 35),
-            BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-        }):Play()
-        
-        local stroke = self.MinimizedIndicator:FindFirstChildOfClass("UIStroke")
-        if stroke then
-            TweenService:Create(stroke, TweenInfo.new(0.3), {
-                Thickness = 2
-            }):Play()
-        end
-    end)
 end
 
 function Window:ToggleMinimize()
-    -- Prevent rapid toggling
     if self._minimizing then return end
     self._minimizing = true
     
@@ -860,7 +759,7 @@ function Window:ToggleMinimize()
     if self.Minimized then
         -- Hide blur
         if self.Blur then
-            TweenService:Create(self.Blur, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Size = 0}):Play()
+            TweenService:Create(self.Blur, TweenInfo.new(0.3, Enum.EasingStyle.Quint), {Size = 0}):Play()
         end
         
         -- Hide particles
@@ -873,79 +772,55 @@ function Window:ToggleMinimize()
         self.ResizeHandleV.Visible = false
         self.ResizeHandleH.Visible = false
         
-        -- Hide profile
+        -- Hide all content immediately
+        self.ContentContainer.Visible = false
+        self.TabContainer.Visible = false
         self.ProfileContainer.Visible = false
+        self.BottomGlow.Visible = false
         
-        -- Store current position and size
-        local currentPos = self.Container.Position
-        local currentSize = self.Container.Size
-        self.Config.Size = currentSize
-        self.Config.Position = UDim2.new(currentPos.X.Scale, currentPos.X.Offset, currentPos.Y.Scale, currentPos.Y.Offset)
+        -- Shrink to title bar only
+        TweenService:Create(self.Container, TweenInfo.new(0.3, Enum.EasingStyle.Quint), {
+            Size = UDim2.fromOffset(300, 35),
+            Position = UDim2.new(0.5, -150, 0, 20)
+        }):Play()
         
-        -- Minimize animation to center
-        local tween = TweenService:Create(self.Container, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.In), {
-            Size = UDim2.fromOffset(0, 0),
-            Position = UDim2.new(currentPos.X.Scale, currentPos.X.Offset + currentSize.X.Offset/2, currentPos.Y.Scale, currentPos.Y.Offset + currentSize.Y.Offset/2)
-        })
-        tween:Play()
-        
-        tween.Completed:Connect(function()
-            self.Container.Visible = false
-            
-            -- Show indicator at top
-            self.MinimizedIndicator.Position = UDim2.new(0.5, 0, 0, 20)
-            self.MinimizedIndicator.Visible = true
-            self.MinimizedIndicator.Size = UDim2.fromOffset(0, 35)
-            
-            TweenService:Create(self.MinimizedIndicator, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-                Size = UDim2.fromOffset(300, 35)
-            }):Play()
-            
-            -- Allow next toggle
-            task.delay(0.5, function()
-                self._minimizing = false
-            end)
+        -- Update title
+        task.delay(0.3, function()
+            self.TitleLabel.Text = "Sosalkin Hub | " .. os.date("%a %H:%M") .. " | Online: --"
+            self._minimizing = false
         end)
     else
-        -- Show blur
+        -- Restore title
+        self.TitleLabel.Text = self.Config.Title
+        
+        -- Expand container
+        TweenService:Create(self.Container, TweenInfo.new(0.3, Enum.EasingStyle.Quint), {
+            Size = self.Config.Size,
+            Position = self.Config.Position
+        }):Play()
+        
+        -- Show content after delay
+        task.delay(0.15, function()
+            self.ContentContainer.Visible = true
+            self.TabContainer.Visible = true
+            self.ProfileContainer.Visible = true
+            self.BottomGlow.Visible = true
+        end)
+        
+        -- Show blur and particles
         if self.Blur then
-            TweenService:Create(self.Blur, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Size = self.BlurSize}):Play()
+            TweenService:Create(self.Blur, TweenInfo.new(0.3, Enum.EasingStyle.Quint), {Size = self.BlurSize}):Play()
         end
         
-        -- Show particles
         if self.ParticleSystem and self.ParticleSystem.Container then
             self.ParticleSystem.Container.Visible = true
         end
         
-        -- Show profile
-        self.ProfileContainer.Visible = true
-        
-        -- Hide indicator
-        TweenService:Create(self.MinimizedIndicator, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.In), {
-            Size = UDim2.fromOffset(0, 35)
-        }):Play()
-        
-        task.wait(0.4)
-        self.MinimizedIndicator.Visible = false
-        
-        -- Restore window from center
-        self.Container.Visible = true
-        self.Container.Size = UDim2.fromOffset(0, 0)
-        self.Container.Position = UDim2.new(0.5, 0, 0.5, 0)
-        self.Container.AnchorPoint = Vector2.new(0.5, 0.5)
-        
-        TweenService:Create(self.Container, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-            Size = self.Config.Size,
-            Position = UDim2.new(0.5, 0, 0.5, 0)
-        }):Play()
-        
-        -- Show resize handles AFTER animation completes
-        task.delay(0.5, function()
+        -- Show resize handles
+        task.delay(0.3, function()
             self.ResizeHandle.Visible = true
             self.ResizeHandleV.Visible = true
             self.ResizeHandleH.Visible = true
-            
-            -- Allow next toggle
             self._minimizing = false
         end)
     end
@@ -1055,16 +930,6 @@ function Window:SetAccentColor(color)
         end)
     end
     
-    -- Update minimized indicator border
-    if self.MinimizedIndicator then
-        local stroke = self.MinimizedIndicator:FindFirstChildOfClass("UIStroke")
-        if stroke then
-            TweenService:Create(stroke, TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-                Color = color
-            }):Play()
-        end
-    end
-    
     -- Update all active toggles and dropdowns with smooth transition
     for _, tab in pairs(self.Tabs) do
         for _, element in pairs(tab.Elements) do
@@ -1100,7 +965,7 @@ end
 
 function Window:SetTheme(themeName)
     local themes = {
-        -- Accent + Background combinations
+        -- Существующие темы
         Ocean = {accent = Color3.fromRGB(52, 152, 219), bg = Color3.fromRGB(15, 25, 35)},
         Sunset = {accent = Color3.fromRGB(255, 107, 107), bg = Color3.fromRGB(35, 20, 20)},
         Forest = {accent = Color3.fromRGB(46, 213, 115), bg = Color3.fromRGB(20, 30, 20)},
@@ -1116,6 +981,18 @@ function Window:SetTheme(themeName)
         Teal = {accent = Color3.fromRGB(72, 219, 251), bg = Color3.fromRGB(15, 28, 30)},
         Amber = {accent = Color3.fromRGB(255, 193, 7), bg = Color3.fromRGB(30, 27, 15)},
         Crimson = {accent = Color3.fromRGB(220, 20, 60), bg = Color3.fromRGB(28, 12, 15)},
+        
+        -- Новые экзотические темы
+        Neon = {accent = Color3.fromRGB(0, 255, 255), bg = Color3.fromRGB(10, 10, 20)},
+        Toxic = {accent = Color3.fromRGB(185, 255, 0), bg = Color3.fromRGB(18, 25, 12)},
+        Magma = {accent = Color3.fromRGB(255, 69, 0), bg = Color3.fromRGB(35, 15, 10)},
+        Galaxy = {accent = Color3.fromRGB(138, 43, 226), bg = Color3.fromRGB(15, 10, 25)},
+        Arctic = {accent = Color3.fromRGB(175, 238, 238), bg = Color3.fromRGB(18, 25, 28)},
+        Sakura = {accent = Color3.fromRGB(255, 182, 193), bg = Color3.fromRGB(30, 22, 24)},
+        Venom = {accent = Color3.fromRGB(148, 0, 211), bg = Color3.fromRGB(20, 10, 25)},
+        Ember = {accent = Color3.fromRGB(255, 140, 0), bg = Color3.fromRGB(32, 20, 12)},
+        Aqua = {accent = Color3.fromRGB(0, 206, 209), bg = Color3.fromRGB(12, 22, 25)},
+        Void = {accent = Color3.fromRGB(75, 0, 130), bg = Color3.fromRGB(8, 5, 12)},
     }
     
     local theme = themes[themeName] or themes.Ocean
