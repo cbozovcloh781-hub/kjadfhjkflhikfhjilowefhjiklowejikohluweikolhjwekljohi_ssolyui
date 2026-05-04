@@ -255,9 +255,10 @@ function Window:CreateGUI()
     ContentLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
         local contentHeight = ContentLayout.AbsoluteContentSize.Y
         local containerHeight = self.ContentContainer.AbsoluteSize.Y
-        -- Only update if content is actually larger than container
+        -- Cap maximum canvas size to prevent infinite growth
+        local maxCanvasSize = containerHeight * 3 -- Max 3x container height
         if contentHeight > containerHeight then
-            self.ContentContainer.CanvasSize = UDim2.new(0, 0, 0, contentHeight + 20)
+            self.ContentContainer.CanvasSize = UDim2.new(0, 0, 0, math.min(contentHeight + 20, maxCanvasSize))
         else
             self.ContentContainer.CanvasSize = UDim2.new(0, 0, 0, containerHeight)
         end
@@ -712,66 +713,25 @@ function Window:SetupResizing()
 end
 
 function Window:SetupMinimize()
-    -- Close button click - SMOOTH FADE OUT (but keep GUI for restore)
+    -- Close button click - INSTANT HIDE (no animation)
     self.CloseButton.MouseButton1Click:Connect(function()
         if self._closing then return end
         self._closing = true
         
-        local duration = 0.6
-        
-        -- Fade all elements simultaneously
-        local tweens = {}
-        
-        -- Fade container
-        table.insert(tweens, TweenService:Create(self.Container, TweenInfo.new(duration, Enum.EasingStyle.Quint), {
-            BackgroundTransparency = 1
-        }))
-        
-        -- Fade all descendants
-        for _, descendant in pairs(self.Container:GetDescendants()) do
-            if descendant:IsA("TextLabel") or descendant:IsA("TextButton") then
-                table.insert(tweens, TweenService:Create(descendant, TweenInfo.new(duration, Enum.EasingStyle.Quint), {
-                    TextTransparency = 1
-                }))
-            end
-            if descendant:IsA("ImageLabel") or descendant:IsA("ImageButton") then
-                table.insert(tweens, TweenService:Create(descendant, TweenInfo.new(duration, Enum.EasingStyle.Quint), {
-                    ImageTransparency = 1
-                }))
-            end
-            if descendant:IsA("Frame") or descendant:IsA("ScrollingFrame") then
-                table.insert(tweens, TweenService:Create(descendant, TweenInfo.new(duration, Enum.EasingStyle.Quint), {
-                    BackgroundTransparency = 1
-                }))
-            end
-            if descendant:IsA("UIStroke") then
-                table.insert(tweens, TweenService:Create(descendant, TweenInfo.new(duration, Enum.EasingStyle.Quint), {
-                    Transparency = 1
-                }))
-            end
-        end
-        
-        -- Fade blur
-        if self.Blur then
-            table.insert(tweens, TweenService:Create(self.Blur, TweenInfo.new(duration, Enum.EasingStyle.Quint), {Size = 0}))
-        end
-        
-        -- Play all tweens simultaneously
-        for _, tween in ipairs(tweens) do
-            tween:Play()
-        end
+        -- Instantly hide everything
+        self.ScreenGui.Enabled = false
+        self._wasClosedWithX = true
+        self._closing = false
         
         -- Stop particles
         if self.ParticleSystem and self.ParticleSystem.Container then
             self.ParticleSystem.Container.Visible = false
         end
         
-        -- Hide after fade (don't destroy)
-        task.delay(duration, function()
-            self.ScreenGui.Enabled = false
-            self._closing = false
-            self._wasClosedWithX = true
-        end)
+        -- Fade blur
+        if self.Blur then
+            TweenService:Create(self.Blur, TweenInfo.new(0.3, Enum.EasingStyle.Quint), {Size = 0}):Play()
+        end
     end)
     
     -- Close button hover
