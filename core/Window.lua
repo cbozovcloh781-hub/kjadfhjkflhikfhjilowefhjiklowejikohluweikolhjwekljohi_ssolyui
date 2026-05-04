@@ -715,37 +715,39 @@ function Window:SetupResizing()
 end
 
 function Window:SetupMinimize()
-    -- Close button click - SMOOTH FADE OUT
+    -- Close button click - SMOOTH FADE OUT (all elements at same speed)
     self.CloseButton.MouseButton1Click:Connect(function()
         if self._closing then return end
         self._closing = true
         
-        -- Smooth fade out animation
-        local fadeDuration = 0.4
+        -- Smooth fade out animation - ALL elements same duration
+        local fadeDuration = 0.5
+        local fadeInfo = TweenInfo.new(fadeDuration, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
         
-        -- Fade out all elements
-        TweenService:Create(self.Container, TweenInfo.new(fadeDuration, Enum.EasingStyle.Quint), {
+        -- Fade container
+        TweenService:Create(self.Container, fadeInfo, {
             BackgroundTransparency = 1
         }):Play()
         
+        -- Fade ALL descendants at once
         for _, descendant in pairs(self.Container:GetDescendants()) do
             if descendant:IsA("TextLabel") or descendant:IsA("TextButton") then
-                TweenService:Create(descendant, TweenInfo.new(fadeDuration, Enum.EasingStyle.Quint), {
+                TweenService:Create(descendant, fadeInfo, {
                     TextTransparency = 1
                 }):Play()
             end
             if descendant:IsA("ImageLabel") or descendant:IsA("ImageButton") then
-                TweenService:Create(descendant, TweenInfo.new(fadeDuration, Enum.EasingStyle.Quint), {
+                TweenService:Create(descendant, fadeInfo, {
                     ImageTransparency = 1
                 }):Play()
             end
             if descendant:IsA("Frame") or descendant:IsA("ScrollingFrame") then
-                TweenService:Create(descendant, TweenInfo.new(fadeDuration, Enum.EasingStyle.Quint), {
+                TweenService:Create(descendant, fadeInfo, {
                     BackgroundTransparency = 1
                 }):Play()
             end
             if descendant:IsA("UIStroke") then
-                TweenService:Create(descendant, TweenInfo.new(fadeDuration, Enum.EasingStyle.Quint), {
+                TweenService:Create(descendant, fadeInfo, {
                     Transparency = 1
                 }):Play()
             end
@@ -765,7 +767,7 @@ function Window:SetupMinimize()
         
         -- Fade blur
         if self.Blur then
-            TweenService:Create(self.Blur, TweenInfo.new(fadeDuration, Enum.EasingStyle.Quint), {Size = 0}):Play()
+            TweenService:Create(self.Blur, fadeInfo, {Size = 0}):Play()
         end
     end)
     
@@ -817,26 +819,31 @@ function Window:SetupMinimize()
                 -- Enable GUI
                 self.ScreenGui.Enabled = true
                 
-                -- Smooth fade in animation
-                local fadeDuration = 0.4
+                -- Smooth fade in animation - ALL elements same duration
+                local fadeDuration = 0.5
+                local fadeInfo = TweenInfo.new(fadeDuration, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
                 
-                TweenService:Create(self.Container, TweenInfo.new(fadeDuration, Enum.EasingStyle.Quint), {
+                -- Fade in container
+                TweenService:Create(self.Container, fadeInfo, {
                     BackgroundTransparency = self.Config.Transparency
                 }):Play()
                 
+                -- Fade in ALL descendants with correct target transparency
                 for _, descendant in pairs(self.Container:GetDescendants()) do
                     if descendant:IsA("TextLabel") or descendant:IsA("TextButton") then
-                        TweenService:Create(descendant, TweenInfo.new(fadeDuration, Enum.EasingStyle.Quint), {
+                        TweenService:Create(descendant, fadeInfo, {
                             TextTransparency = 0
                         }):Play()
                     end
                     if descendant:IsA("ImageLabel") or descendant:IsA("ImageButton") then
-                        TweenService:Create(descendant, TweenInfo.new(fadeDuration, Enum.EasingStyle.Quint), {
+                        TweenService:Create(descendant, fadeInfo, {
                             ImageTransparency = 0
                         }):Play()
                     end
                     if descendant:IsA("Frame") or descendant:IsA("ScrollingFrame") then
+                        -- Determine correct transparency for each element type
                         local targetTransparency = 0
+                        
                         if descendant == self.ContentContainer then
                             targetTransparency = 0.3
                         elseif descendant == self.TabContainer then
@@ -844,24 +851,35 @@ function Window:SetupMinimize()
                         elseif descendant.Name == "BottomGlow" then
                             targetTransparency = 0.7
                         elseif descendant.Name == "SwitchBg" then
-                            -- Don't reset switch backgrounds
-                            targetTransparency = descendant.BackgroundTransparency
+                            -- Check if switch is active
+                            if descendant.BackgroundColor3 == self.AccentColor or descendant.BackgroundColor3 == Color3.fromRGB(74, 158, 255) then
+                                targetTransparency = 0
+                            else
+                                targetTransparency = 0
+                            end
+                        elseif descendant.Parent and descendant.Parent.Name == "Dropdown" then
+                            targetTransparency = 0
+                        else
+                            targetTransparency = 0
                         end
-                        TweenService:Create(descendant, TweenInfo.new(fadeDuration, Enum.EasingStyle.Quint), {
+                        
+                        TweenService:Create(descendant, fadeInfo, {
                             BackgroundTransparency = targetTransparency
                         }):Play()
                     end
                     if descendant:IsA("UIStroke") then
-                        TweenService:Create(descendant, TweenInfo.new(fadeDuration, Enum.EasingStyle.Quint), {
+                        TweenService:Create(descendant, fadeInfo, {
                             Transparency = 0
                         }):Play()
                     end
                 end
                 
+                -- Fade in blur
                 if self.Blur then
-                    TweenService:Create(self.Blur, TweenInfo.new(fadeDuration, Enum.EasingStyle.Quint), {Size = self.BlurSize}):Play()
+                    TweenService:Create(self.Blur, fadeInfo, {Size = self.BlurSize}):Play()
                 end
                 
+                -- Show particles
                 if self.ParticleSystem and self.ParticleSystem.Container then
                     self.ParticleSystem.Container.Visible = true
                 end
