@@ -713,7 +713,7 @@ function Window:SetupResizing()
 end
 
 function Window:SetupMinimize()
-    -- Close button click - SMOOTH FADE OUT AND DESTROY
+    -- Close button click - SMOOTH FADE OUT (but keep GUI for restore)
     self.CloseButton.MouseButton1Click:Connect(function()
         if self._closing then return end
         self._closing = true
@@ -767,11 +767,11 @@ function Window:SetupMinimize()
             self.ParticleSystem.Container.Visible = false
         end
         
-        -- Destroy after fade
+        -- Hide after fade (don't destroy)
         task.delay(duration, function()
-            if self.ScreenGui then
-                self.ScreenGui:Destroy()
-            end
+            self.ScreenGui.Enabled = false
+            self._closing = false
+            self._wasClosedWithX = true
         end)
     end)
     
@@ -797,7 +797,59 @@ function Window:SetupMinimize()
     UserInputService.InputBegan:Connect(function(input, gameProcessed)
         if not gameProcessed and input.KeyCode == self.Config.MinimizeKey then
             if self._closing then return end
-            self:ToggleMinimize()
+            
+            -- If was closed with X, restore with fade in
+            if self._wasClosedWithX and not self.ScreenGui.Enabled then
+                self._wasClosedWithX = false
+                self.ScreenGui.Enabled = true
+                
+                -- Fade in all elements
+                local duration = 0.6
+                
+                TweenService:Create(self.Container, TweenInfo.new(duration, Enum.EasingStyle.Quint), {
+                    BackgroundTransparency = self.Config.Transparency
+                }):Play()
+                
+                for _, descendant in pairs(self.Container:GetDescendants()) do
+                    if descendant:IsA("TextLabel") or descendant:IsA("TextButton") then
+                        TweenService:Create(descendant, TweenInfo.new(duration, Enum.EasingStyle.Quint), {
+                            TextTransparency = 0
+                        }):Play()
+                    end
+                    if descendant:IsA("ImageLabel") or descendant:IsA("ImageButton") then
+                        TweenService:Create(descendant, TweenInfo.new(duration, Enum.EasingStyle.Quint), {
+                            ImageTransparency = 0
+                        }):Play()
+                    end
+                    if descendant:IsA("Frame") or descendant:IsA("ScrollingFrame") then
+                        local targetTransparency = 0
+                        if descendant == self.ContentContainer then
+                            targetTransparency = 0.3
+                        elseif descendant == self.TabContainer then
+                            targetTransparency = 1
+                        end
+                        TweenService:Create(descendant, TweenInfo.new(duration, Enum.EasingStyle.Quint), {
+                            BackgroundTransparency = targetTransparency
+                        }):Play()
+                    end
+                    if descendant:IsA("UIStroke") then
+                        TweenService:Create(descendant, TweenInfo.new(duration, Enum.EasingStyle.Quint), {
+                            Transparency = 0
+                        }):Play()
+                    end
+                end
+                
+                if self.Blur then
+                    TweenService:Create(self.Blur, TweenInfo.new(duration, Enum.EasingStyle.Quint), {Size = self.BlurSize}):Play()
+                end
+                
+                if self.ParticleSystem and self.ParticleSystem.Container then
+                    self.ParticleSystem.Container.Visible = true
+                end
+            else
+                -- Normal minimize toggle
+                self:ToggleMinimize()
+            end
         end
     end)
     
@@ -891,15 +943,15 @@ function Window:ToggleMinimize()
             self.ProfileContainer.Visible = false
             self.BottomGlow.Visible = false
             
-            -- Calculate minimized position (keep same X, adjust Y to keep title bar at same position)
+            -- Calculate minimized position - use OFFSET to prevent jitter
             local currentAbsPos = self.Container.AbsolutePosition
             local minimizedPos = UDim2.fromOffset(currentAbsPos.X, currentAbsPos.Y)
             
-            -- Shrink to title bar only (smooth animation)
-            TweenService:Create(self.Container, TweenInfo.new(0.4, Enum.EasingStyle.Quint), {
-                Size = UDim2.fromOffset(300, 35),
-                Position = minimizedPos
-            }):Play()
+            -- Shrink to title bar only - use SAME position to prevent movement
+            local tween = TweenService:Create(self.Container, TweenInfo.new(0.4, Enum.EasingStyle.Quint), {
+                Size = UDim2.fromOffset(300, 35)
+            })
+            tween:Play()
             
             task.delay(0.4, function()
                 self._minimizing = false
