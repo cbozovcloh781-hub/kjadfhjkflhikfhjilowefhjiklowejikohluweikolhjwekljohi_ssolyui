@@ -797,12 +797,11 @@ function Window:SetupMinimize()
         if not gameProcessed and input.KeyCode == self.Config.MinimizeKey then
             if self._closing then return end
             
-            -- If was closed with X, restore with fade in
+            -- If was closed with X, restore INSTANTLY (no fade animation)
             if self._wasClosedWithX and not self.ScreenGui.Enabled then
                 self._wasClosedWithX = false
-                self.ScreenGui.Enabled = true
                 
-                -- Reset all transparencies first
+                -- Reset all transparencies INSTANTLY (no tweens)
                 self.Container.BackgroundTransparency = self.Config.Transparency
                 
                 for _, descendant in pairs(self.Container:GetDescendants()) do
@@ -819,6 +818,8 @@ function Window:SetupMinimize()
                             descendant.BackgroundTransparency = 1
                         elseif descendant.Name == "BottomGlow" then
                             descendant.BackgroundTransparency = 0.7
+                        elseif descendant.Name == "SwitchBg" then
+                            -- Don't reset switch backgrounds
                         else
                             descendant.BackgroundTransparency = 0
                         end
@@ -835,6 +836,9 @@ function Window:SetupMinimize()
                 if self.ParticleSystem and self.ParticleSystem.Container then
                     self.ParticleSystem.Container.Visible = true
                 end
+                
+                -- Enable GUI AFTER resetting transparencies
+                self.ScreenGui.Enabled = true
             else
                 -- Normal minimize toggle
                 self:ToggleMinimize()
