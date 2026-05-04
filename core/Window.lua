@@ -251,7 +251,7 @@ function Window:CreateGUI()
     ContentLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
     ContentLayout.Parent = self.ContentContainer
     
-    -- Auto-update canvas size (FIX: prevent infinite growth)
+    -- Auto-update canvas size (FIX: prevent infinite growth + hide scrollbar when not needed)
     ContentLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
         local contentHeight = ContentLayout.AbsoluteContentSize.Y
         local containerHeight = self.ContentContainer.AbsoluteSize.Y
@@ -259,8 +259,10 @@ function Window:CreateGUI()
         local maxCanvasSize = containerHeight * 3 -- Max 3x container height
         if contentHeight > containerHeight then
             self.ContentContainer.CanvasSize = UDim2.new(0, 0, 0, math.min(contentHeight + 20, maxCanvasSize))
+            self.ContentContainer.ScrollBarThickness = 4 -- Show scrollbar
         else
             self.ContentContainer.CanvasSize = UDim2.new(0, 0, 0, containerHeight)
+            self.ContentContainer.ScrollBarThickness = 0 -- Hide scrollbar
         end
     end)
     
@@ -713,15 +715,48 @@ function Window:SetupResizing()
 end
 
 function Window:SetupMinimize()
-    -- Close button click - INSTANT HIDE (no animation)
+    -- Close button click - SMOOTH FADE OUT
     self.CloseButton.MouseButton1Click:Connect(function()
         if self._closing then return end
         self._closing = true
         
-        -- Instantly hide everything
-        self.ScreenGui.Enabled = false
-        self._wasClosedWithX = true
-        self._closing = false
+        -- Smooth fade out animation
+        local fadeDuration = 0.4
+        
+        -- Fade out all elements
+        TweenService:Create(self.Container, TweenInfo.new(fadeDuration, Enum.EasingStyle.Quint), {
+            BackgroundTransparency = 1
+        }):Play()
+        
+        for _, descendant in pairs(self.Container:GetDescendants()) do
+            if descendant:IsA("TextLabel") or descendant:IsA("TextButton") then
+                TweenService:Create(descendant, TweenInfo.new(fadeDuration, Enum.EasingStyle.Quint), {
+                    TextTransparency = 1
+                }):Play()
+            end
+            if descendant:IsA("ImageLabel") or descendant:IsA("ImageButton") then
+                TweenService:Create(descendant, TweenInfo.new(fadeDuration, Enum.EasingStyle.Quint), {
+                    ImageTransparency = 1
+                }):Play()
+            end
+            if descendant:IsA("Frame") or descendant:IsA("ScrollingFrame") then
+                TweenService:Create(descendant, TweenInfo.new(fadeDuration, Enum.EasingStyle.Quint), {
+                    BackgroundTransparency = 1
+                }):Play()
+            end
+            if descendant:IsA("UIStroke") then
+                TweenService:Create(descendant, TweenInfo.new(fadeDuration, Enum.EasingStyle.Quint), {
+                    Transparency = 1
+                }):Play()
+            end
+        end
+        
+        -- Hide after fade
+        task.delay(fadeDuration, function()
+            self.ScreenGui.Enabled = false
+            self._wasClosedWithX = true
+            self._closing = false
+        end)
         
         -- Stop particles
         if self.ParticleSystem and self.ParticleSystem.Container then
@@ -730,7 +765,7 @@ function Window:SetupMinimize()
         
         -- Fade blur
         if self.Blur then
-            TweenService:Create(self.Blur, TweenInfo.new(0.3, Enum.EasingStyle.Quint), {Size = 0}):Play()
+            TweenService:Create(self.Blur, TweenInfo.new(fadeDuration, Enum.EasingStyle.Quint), {Size = 0}):Play()
         end
     end)
     
@@ -752,53 +787,84 @@ function Window:SetupMinimize()
         self:ToggleMinimize()
     end)
     
-    -- Hotkey - TOGGLE MINIMIZE (not visibility)
+    -- Hotkey - TOGGLE MINIMIZE or RESTORE after X close
     UserInputService.InputBegan:Connect(function(input, gameProcessed)
         if not gameProcessed and input.KeyCode == self.Config.MinimizeKey then
             if self._closing then return end
             
-            -- If was closed with X, restore INSTANTLY (no fade animation)
+            -- If was closed with X, restore with SMOOTH FADE IN
             if self._wasClosedWithX and not self.ScreenGui.Enabled then
                 self._wasClosedWithX = false
                 
-                -- Reset all transparencies INSTANTLY (no tweens)
-                self.Container.BackgroundTransparency = self.Config.Transparency
+                -- Reset all transparencies to 1 (invisible) BEFORE enabling
+                self.Container.BackgroundTransparency = 1
                 
                 for _, descendant in pairs(self.Container:GetDescendants()) do
                     if descendant:IsA("TextLabel") or descendant:IsA("TextButton") then
-                        descendant.TextTransparency = 0
+                        descendant.TextTransparency = 1
                     end
                     if descendant:IsA("ImageLabel") or descendant:IsA("ImageButton") then
-                        descendant.ImageTransparency = 0
+                        descendant.ImageTransparency = 1
                     end
                     if descendant:IsA("Frame") or descendant:IsA("ScrollingFrame") then
-                        if descendant == self.ContentContainer then
-                            descendant.BackgroundTransparency = 0.3
-                        elseif descendant == self.TabContainer then
-                            descendant.BackgroundTransparency = 1
-                        elseif descendant.Name == "BottomGlow" then
-                            descendant.BackgroundTransparency = 0.7
-                        elseif descendant.Name == "SwitchBg" then
-                            -- Don't reset switch backgrounds
-                        else
-                            descendant.BackgroundTransparency = 0
-                        end
+                        descendant.BackgroundTransparency = 1
                     end
                     if descendant:IsA("UIStroke") then
-                        descendant.Transparency = 0
+                        descendant.Transparency = 1
+                    end
+                end
+                
+                -- Enable GUI
+                self.ScreenGui.Enabled = true
+                
+                -- Smooth fade in animation
+                local fadeDuration = 0.4
+                
+                TweenService:Create(self.Container, TweenInfo.new(fadeDuration, Enum.EasingStyle.Quint), {
+                    BackgroundTransparency = self.Config.Transparency
+                }):Play()
+                
+                for _, descendant in pairs(self.Container:GetDescendants()) do
+                    if descendant:IsA("TextLabel") or descendant:IsA("TextButton") then
+                        TweenService:Create(descendant, TweenInfo.new(fadeDuration, Enum.EasingStyle.Quint), {
+                            TextTransparency = 0
+                        }):Play()
+                    end
+                    if descendant:IsA("ImageLabel") or descendant:IsA("ImageButton") then
+                        TweenService:Create(descendant, TweenInfo.new(fadeDuration, Enum.EasingStyle.Quint), {
+                            ImageTransparency = 0
+                        }):Play()
+                    end
+                    if descendant:IsA("Frame") or descendant:IsA("ScrollingFrame") then
+                        local targetTransparency = 0
+                        if descendant == self.ContentContainer then
+                            targetTransparency = 0.3
+                        elseif descendant == self.TabContainer then
+                            targetTransparency = 1
+                        elseif descendant.Name == "BottomGlow" then
+                            targetTransparency = 0.7
+                        elseif descendant.Name == "SwitchBg" then
+                            -- Don't reset switch backgrounds
+                            targetTransparency = descendant.BackgroundTransparency
+                        end
+                        TweenService:Create(descendant, TweenInfo.new(fadeDuration, Enum.EasingStyle.Quint), {
+                            BackgroundTransparency = targetTransparency
+                        }):Play()
+                    end
+                    if descendant:IsA("UIStroke") then
+                        TweenService:Create(descendant, TweenInfo.new(fadeDuration, Enum.EasingStyle.Quint), {
+                            Transparency = 0
+                        }):Play()
                     end
                 end
                 
                 if self.Blur then
-                    self.Blur.Size = self.BlurSize
+                    TweenService:Create(self.Blur, TweenInfo.new(fadeDuration, Enum.EasingStyle.Quint), {Size = self.BlurSize}):Play()
                 end
                 
                 if self.ParticleSystem and self.ParticleSystem.Container then
                     self.ParticleSystem.Container.Visible = true
                 end
-                
-                -- Enable GUI AFTER resetting transparencies
-                self.ScreenGui.Enabled = true
             else
                 -- Normal minimize toggle
                 self:ToggleMinimize()
