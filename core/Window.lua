@@ -793,30 +793,11 @@ function Window:SetupMinimize()
         self:ToggleMinimize()
     end)
     
-    -- Hotkey - TOGGLE VISIBILITY
+    -- Hotkey - TOGGLE MINIMIZE (not visibility)
     UserInputService.InputBegan:Connect(function(input, gameProcessed)
         if not gameProcessed and input.KeyCode == self.Config.MinimizeKey then
-            self.ScreenGui.Enabled = not self.ScreenGui.Enabled
-            
-            if self.ScreenGui.Enabled then
-                -- Show blur
-                if self.Blur then
-                    TweenService:Create(self.Blur, TweenInfo.new(0.3, Enum.EasingStyle.Quint), {Size = self.BlurSize}):Play()
-                end
-                -- Show particles
-                if self.ParticleSystem and self.ParticleSystem.Container then
-                    self.ParticleSystem.Container.Visible = true
-                end
-            else
-                -- Hide blur
-                if self.Blur then
-                    TweenService:Create(self.Blur, TweenInfo.new(0.3, Enum.EasingStyle.Quint), {Size = 0}):Play()
-                end
-                -- Stop particles
-                if self.ParticleSystem and self.ParticleSystem.Container then
-                    self.ParticleSystem.Container.Visible = false
-                end
-            end
+            if self._closing then return end
+            self:ToggleMinimize()
         end
     end)
     
@@ -835,7 +816,7 @@ function Window:SetupMinimize()
 end
 
 function Window:ToggleMinimize()
-    if self._minimizing then return end
+    if self._minimizing or self._closing then return end
     self._minimizing = true
     
     self.Minimized = not self.Minimized
@@ -859,42 +840,128 @@ function Window:ToggleMinimize()
         self.ResizeHandleV.Visible = false
         self.ResizeHandleH.Visible = false
         
-        -- Hide all content immediately
-        self.ContentContainer.Visible = false
-        self.TabContainer.Visible = false
-        self.ProfileContainer.Visible = false
-        self.BottomGlow.Visible = false
-        
-        -- Calculate minimized position (keep X, adjust Y to keep title bar at same position)
-        local currentAbsPos = self.Container.AbsolutePosition
-        local minimizedPos = UDim2.fromOffset(currentAbsPos.X, currentAbsPos.Y)
-        
-        -- Shrink to title bar only (slower animation)
-        TweenService:Create(self.Container, TweenInfo.new(0.5, Enum.EasingStyle.Quint), {
-            Size = UDim2.fromOffset(300, 35),
-            Position = minimizedPos
+        -- Fade out content smoothly BEFORE shrinking
+        local contentFadeDuration = 0.3
+        TweenService:Create(self.ContentContainer, TweenInfo.new(contentFadeDuration, Enum.EasingStyle.Quint), {
+            BackgroundTransparency = 1
+        }):Play()
+        TweenService:Create(self.TabContainer, TweenInfo.new(contentFadeDuration, Enum.EasingStyle.Quint), {
+            BackgroundTransparency = 1
+        }):Play()
+        TweenService:Create(self.ProfileContainer, TweenInfo.new(contentFadeDuration, Enum.EasingStyle.Quint), {
+            BackgroundTransparency = 1
+        }):Play()
+        TweenService:Create(self.BottomGlow, TweenInfo.new(contentFadeDuration, Enum.EasingStyle.Quint), {
+            BackgroundTransparency = 1
         }):Play()
         
-        -- Update title (DON'T change time/online when minimizing)
-        task.delay(0.5, function()
-            self._minimizing = false
+        -- Fade out all text in content
+        for _, desc in pairs(self.ContentContainer:GetDescendants()) do
+            if desc:IsA("TextLabel") or desc:IsA("TextButton") then
+                TweenService:Create(desc, TweenInfo.new(contentFadeDuration, Enum.EasingStyle.Quint), {
+                    TextTransparency = 1
+                }):Play()
+            end
+        end
+        for _, desc in pairs(self.TabContainer:GetDescendants()) do
+            if desc:IsA("TextLabel") or desc:IsA("TextButton") then
+                TweenService:Create(desc, TweenInfo.new(contentFadeDuration, Enum.EasingStyle.Quint), {
+                    TextTransparency = 1
+                }):Play()
+            end
+        end
+        for _, desc in pairs(self.ProfileContainer:GetDescendants()) do
+            if desc:IsA("TextLabel") or desc:IsA("ImageLabel") then
+                if desc:IsA("TextLabel") then
+                    TweenService:Create(desc, TweenInfo.new(contentFadeDuration, Enum.EasingStyle.Quint), {
+                        TextTransparency = 1
+                    }):Play()
+                else
+                    TweenService:Create(desc, TweenInfo.new(contentFadeDuration, Enum.EasingStyle.Quint), {
+                        ImageTransparency = 1
+                    }):Play()
+                end
+            end
+        end
+        
+        -- Wait for fade, then hide and shrink
+        task.delay(contentFadeDuration, function()
+            self.ContentContainer.Visible = false
+            self.TabContainer.Visible = false
+            self.ProfileContainer.Visible = false
+            self.BottomGlow.Visible = false
+            
+            -- Calculate minimized position (keep same X, adjust Y to keep title bar at same position)
+            local currentAbsPos = self.Container.AbsolutePosition
+            local minimizedPos = UDim2.fromOffset(currentAbsPos.X, currentAbsPos.Y)
+            
+            -- Shrink to title bar only (smooth animation)
+            TweenService:Create(self.Container, TweenInfo.new(0.4, Enum.EasingStyle.Quint), {
+                Size = UDim2.fromOffset(300, 35),
+                Position = minimizedPos
+            }):Play()
+            
+            task.delay(0.4, function()
+                self._minimizing = false
+            end)
         end)
     else
-        -- Restore title (will be updated by the loop)
-        -- Don't manually set it here, let the update loop handle it
-        
-        -- Expand container (slower animation) - restore to saved position
-        TweenService:Create(self.Container, TweenInfo.new(0.5, Enum.EasingStyle.Quint), {
+        -- Expand container (smooth animation) - restore to saved position
+        TweenService:Create(self.Container, TweenInfo.new(0.4, Enum.EasingStyle.Quint), {
             Size = self.Config.Size,
             Position = self._savedPosition or self.Config.Position
         }):Play()
         
-        -- Show content after delay
-        task.delay(0.25, function()
+        -- Show content after delay and fade in
+        task.delay(0.2, function()
             self.ContentContainer.Visible = true
             self.TabContainer.Visible = true
             self.ProfileContainer.Visible = true
             self.BottomGlow.Visible = true
+            
+            -- Fade in content
+            local contentFadeDuration = 0.3
+            TweenService:Create(self.ContentContainer, TweenInfo.new(contentFadeDuration, Enum.EasingStyle.Quint), {
+                BackgroundTransparency = 0.3
+            }):Play()
+            TweenService:Create(self.TabContainer, TweenInfo.new(contentFadeDuration, Enum.EasingStyle.Quint), {
+                BackgroundTransparency = 1
+            }):Play()
+            TweenService:Create(self.ProfileContainer, TweenInfo.new(contentFadeDuration, Enum.EasingStyle.Quint), {
+                BackgroundTransparency = 0
+            }):Play()
+            TweenService:Create(self.BottomGlow, TweenInfo.new(contentFadeDuration, Enum.EasingStyle.Quint), {
+                BackgroundTransparency = 0.7
+            }):Play()
+            
+            -- Fade in all text
+            for _, desc in pairs(self.ContentContainer:GetDescendants()) do
+                if desc:IsA("TextLabel") or desc:IsA("TextButton") then
+                    TweenService:Create(desc, TweenInfo.new(contentFadeDuration, Enum.EasingStyle.Quint), {
+                        TextTransparency = 0
+                    }):Play()
+                end
+            end
+            for _, desc in pairs(self.TabContainer:GetDescendants()) do
+                if desc:IsA("TextLabel") or desc:IsA("TextButton") then
+                    TweenService:Create(desc, TweenInfo.new(contentFadeDuration, Enum.EasingStyle.Quint), {
+                        TextTransparency = 0
+                    }):Play()
+                end
+            end
+            for _, desc in pairs(self.ProfileContainer:GetDescendants()) do
+                if desc:IsA("TextLabel") or desc:IsA("ImageLabel") then
+                    if desc:IsA("TextLabel") then
+                        TweenService:Create(desc, TweenInfo.new(contentFadeDuration, Enum.EasingStyle.Quint), {
+                            TextTransparency = 0
+                        }):Play()
+                    else
+                        TweenService:Create(desc, TweenInfo.new(contentFadeDuration, Enum.EasingStyle.Quint), {
+                            ImageTransparency = 0
+                        }):Play()
+                    end
+                end
+            end
         end)
         
         -- Show blur and particles
@@ -907,7 +974,7 @@ function Window:ToggleMinimize()
         end
         
         -- Show resize handles
-        task.delay(0.5, function()
+        task.delay(0.4, function()
             self.ResizeHandle.Visible = true
             self.ResizeHandleV.Visible = true
             self.ResizeHandleH.Visible = true
