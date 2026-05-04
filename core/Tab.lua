@@ -328,9 +328,17 @@ function Tab:AddSection(side)
         Layout.Padding = UDim.new(0, 10)
         Layout.Parent = scrollFrame
         
-        -- Auto-update canvas size
+        -- Auto-update canvas size (FIX: hide scrollbar when not needed)
         Layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-            scrollFrame.CanvasSize = UDim2.new(0, 0, 0, Layout.AbsoluteContentSize.Y + 20)
+            local contentHeight = Layout.AbsoluteContentSize.Y
+            local containerHeight = scrollFrame.AbsoluteSize.Y
+            if contentHeight > containerHeight then
+                scrollFrame.CanvasSize = UDim2.new(0, 0, 0, contentHeight + 20)
+                scrollFrame.ScrollBarThickness = 4
+            else
+                scrollFrame.CanvasSize = UDim2.new(0, 0, 0, containerHeight)
+                scrollFrame.ScrollBarThickness = 0
+            end
         end)
         
         local Padding = Instance.new("UIPadding")

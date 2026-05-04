@@ -851,12 +851,24 @@ function Window:SetupMinimize()
                         elseif descendant.Name == "BottomGlow" then
                             targetTransparency = 0.7
                         elseif descendant.Name == "SwitchBg" then
-                            -- Check if switch is active
-                            if descendant.BackgroundColor3 == self.AccentColor or descendant.BackgroundColor3 == Color3.fromRGB(74, 158, 255) then
-                                targetTransparency = 0
-                            else
-                                targetTransparency = 0
+                            -- Check if switch is active by checking parent toggle state
+                            local isActive = false
+                            local parent = descendant.Parent
+                            if parent and parent:FindFirstChild("Title") then
+                                -- Try to find if this toggle is enabled in Settings
+                                local titleText = parent:FindFirstChild("Title").Text
+                                -- Check common toggle names
+                                if titleText == "Fly" and Settings.Fly then isActive = true
+                                elseif titleText == "NoClip" and Settings.NoClip then isActive = true
+                                elseif titleText == "Speed Hack" and Settings.Speed then isActive = true
+                                elseif titleText == "Infinite Jump" and Settings.InfiniteJump then isActive = true
+                                elseif titleText == "Jump Hack" and Settings.JumpHack then isActive = true
+                                elseif titleText == "Enable Autofarm" and Settings.Autofarm then isActive = true
+                                elseif titleText == "Auto Sell Items" and Settings.Autosell then isActive = true
+                                elseif titleText == "Enable ESP" and ESPSettings.Enabled then isActive = true
+                                end
                             end
+                            targetTransparency = 0
                         elseif descendant.Parent and descendant.Parent.Name == "Dropdown" then
                             targetTransparency = 0
                         else
