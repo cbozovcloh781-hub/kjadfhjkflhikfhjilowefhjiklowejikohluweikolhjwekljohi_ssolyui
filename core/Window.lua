@@ -159,19 +159,18 @@ function Window:CreateGUI()
     self.TitleLabel.Size = UDim2.new(1, -100, 1, 0)
     self.TitleLabel.Position = UDim2.fromOffset(12, 0)
     self.TitleLabel.BackgroundTransparency = 1
-    self.TitleLabel.Text = self.Config.Title .. " | " .. os.date("%H:%M") .. " | Online: 0"
+    self.TitleLabel.Text = self.Config.Title .. " | " .. os.date("%H:%M") .. " | Online: --"
     self.TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
     self.TitleLabel.TextSize = 13
     self.TitleLabel.Font = Enum.Font.GothamBold
     self.TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
     self.TitleLabel.Parent = self.TitleBar
     
-    -- Update time and online count every second (ONLY when not minimized)
+    -- Update time only (not online count)
     task.spawn(function()
         while self.TitleLabel and self.TitleLabel.Parent do
             if not self.Minimized then
-                local onlineCount = #game:GetService("Players"):GetPlayers()
-                self.TitleLabel.Text = self.Config.Title .. " | " .. os.date("%H:%M") .. " | Online: " .. onlineCount
+                self.TitleLabel.Text = self.Config.Title .. " | " .. os.date("%H:%M") .. " | Online: --"
             end
             task.wait(1)
         end
@@ -803,44 +802,34 @@ function Window:SetupMinimize()
                 self._wasClosedWithX = false
                 self.ScreenGui.Enabled = true
                 
-                -- Fade in all elements
-                local duration = 0.6
-                
-                TweenService:Create(self.Container, TweenInfo.new(duration, Enum.EasingStyle.Quint), {
-                    BackgroundTransparency = self.Config.Transparency
-                }):Play()
+                -- Reset all transparencies first
+                self.Container.BackgroundTransparency = self.Config.Transparency
                 
                 for _, descendant in pairs(self.Container:GetDescendants()) do
                     if descendant:IsA("TextLabel") or descendant:IsA("TextButton") then
-                        TweenService:Create(descendant, TweenInfo.new(duration, Enum.EasingStyle.Quint), {
-                            TextTransparency = 0
-                        }):Play()
+                        descendant.TextTransparency = 0
                     end
                     if descendant:IsA("ImageLabel") or descendant:IsA("ImageButton") then
-                        TweenService:Create(descendant, TweenInfo.new(duration, Enum.EasingStyle.Quint), {
-                            ImageTransparency = 0
-                        }):Play()
+                        descendant.ImageTransparency = 0
                     end
                     if descendant:IsA("Frame") or descendant:IsA("ScrollingFrame") then
-                        local targetTransparency = 0
                         if descendant == self.ContentContainer then
-                            targetTransparency = 0.3
+                            descendant.BackgroundTransparency = 0.3
                         elseif descendant == self.TabContainer then
-                            targetTransparency = 1
+                            descendant.BackgroundTransparency = 1
+                        elseif descendant.Name == "BottomGlow" then
+                            descendant.BackgroundTransparency = 0.7
+                        else
+                            descendant.BackgroundTransparency = 0
                         end
-                        TweenService:Create(descendant, TweenInfo.new(duration, Enum.EasingStyle.Quint), {
-                            BackgroundTransparency = targetTransparency
-                        }):Play()
                     end
                     if descendant:IsA("UIStroke") then
-                        TweenService:Create(descendant, TweenInfo.new(duration, Enum.EasingStyle.Quint), {
-                            Transparency = 0
-                        }):Play()
+                        descendant.Transparency = 0
                     end
                 end
                 
                 if self.Blur then
-                    TweenService:Create(self.Blur, TweenInfo.new(duration, Enum.EasingStyle.Quint), {Size = self.BlurSize}):Play()
+                    self.Blur.Size = self.BlurSize
                 end
                 
                 if self.ParticleSystem and self.ParticleSystem.Container then
@@ -879,7 +868,7 @@ function Window:ToggleMinimize()
         
         -- Hide blur
         if self.Blur then
-            TweenService:Create(self.Blur, TweenInfo.new(0.5, Enum.EasingStyle.Quint), {Size = 0}):Play()
+            TweenService:Create(self.Blur, TweenInfo.new(0.3, Enum.EasingStyle.Quint), {Size = 0}):Play()
         end
         
         -- Hide particles
@@ -892,8 +881,8 @@ function Window:ToggleMinimize()
         self.ResizeHandleV.Visible = false
         self.ResizeHandleH.Visible = false
         
-        -- Fade out content smoothly BEFORE shrinking
-        local contentFadeDuration = 0.3
+        -- Fade out content smoothly BEFORE shrinking (faster)
+        local contentFadeDuration = 0.2
         TweenService:Create(self.ContentContainer, TweenInfo.new(contentFadeDuration, Enum.EasingStyle.Quint), {
             BackgroundTransparency = 1
         }):Play()
@@ -947,32 +936,32 @@ function Window:ToggleMinimize()
             local currentAbsPos = self.Container.AbsolutePosition
             local minimizedPos = UDim2.fromOffset(currentAbsPos.X, currentAbsPos.Y)
             
-            -- Shrink to title bar only - use SAME position to prevent movement
-            local tween = TweenService:Create(self.Container, TweenInfo.new(0.4, Enum.EasingStyle.Quint), {
+            -- Shrink to title bar only - use SAME position to prevent movement (faster)
+            local tween = TweenService:Create(self.Container, TweenInfo.new(0.25, Enum.EasingStyle.Quint), {
                 Size = UDim2.fromOffset(300, 35)
             })
             tween:Play()
             
-            task.delay(0.4, function()
+            task.delay(0.25, function()
                 self._minimizing = false
             end)
         end)
     else
-        -- Expand container (smooth animation) - restore to saved position
-        TweenService:Create(self.Container, TweenInfo.new(0.4, Enum.EasingStyle.Quint), {
+        -- Expand container (faster animation) - restore to saved position
+        TweenService:Create(self.Container, TweenInfo.new(0.25, Enum.EasingStyle.Quint), {
             Size = self.Config.Size,
             Position = self._savedPosition or self.Config.Position
         }):Play()
         
-        -- Show content after delay and fade in
-        task.delay(0.2, function()
+        -- Show content after delay and fade in (faster)
+        task.delay(0.15, function()
             self.ContentContainer.Visible = true
             self.TabContainer.Visible = true
             self.ProfileContainer.Visible = true
             self.BottomGlow.Visible = true
             
-            -- Fade in content
-            local contentFadeDuration = 0.3
+            -- Fade in content (faster)
+            local contentFadeDuration = 0.2
             TweenService:Create(self.ContentContainer, TweenInfo.new(contentFadeDuration, Enum.EasingStyle.Quint), {
                 BackgroundTransparency = 0.3
             }):Play()
@@ -1016,17 +1005,17 @@ function Window:ToggleMinimize()
             end
         end)
         
-        -- Show blur and particles
+        -- Show blur and particles (faster)
         if self.Blur then
-            TweenService:Create(self.Blur, TweenInfo.new(0.5, Enum.EasingStyle.Quint), {Size = self.BlurSize}):Play()
+            TweenService:Create(self.Blur, TweenInfo.new(0.3, Enum.EasingStyle.Quint), {Size = self.BlurSize}):Play()
         end
         
         if self.ParticleSystem and self.ParticleSystem.Container then
             self.ParticleSystem.Container.Visible = true
         end
         
-        -- Show resize handles
-        task.delay(0.4, function()
+        -- Show resize handles (faster)
+        task.delay(0.25, function()
             self.ResizeHandle.Visible = true
             self.ResizeHandleV.Visible = true
             self.ResizeHandleH.Visible = true
