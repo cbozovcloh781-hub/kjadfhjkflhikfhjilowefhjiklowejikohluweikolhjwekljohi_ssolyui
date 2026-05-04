@@ -166,11 +166,13 @@ function Window:CreateGUI()
     self.TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
     self.TitleLabel.Parent = self.TitleBar
     
-    -- Update time and online count every second
+    -- Update time and online count every second (ONLY when not minimized)
     task.spawn(function()
         while self.TitleLabel and self.TitleLabel.Parent do
-            local onlineCount = #game:GetService("Players"):GetPlayers()
-            self.TitleLabel.Text = self.Config.Title .. " | " .. os.date("%H:%M") .. " | Online: " .. onlineCount
+            if not self.Minimized then
+                local onlineCount = #game:GetService("Players"):GetPlayers()
+                self.TitleLabel.Text = self.Config.Title .. " | " .. os.date("%H:%M") .. " | Online: " .. onlineCount
+            end
             task.wait(1)
         end
     end)
@@ -718,38 +720,46 @@ function Window:SetupMinimize()
         
         local duration = 0.6
         
+        -- Fade all elements simultaneously
+        local tweens = {}
+        
         -- Fade container
-        TweenService:Create(self.Container, TweenInfo.new(duration, Enum.EasingStyle.Quint), {
+        table.insert(tweens, TweenService:Create(self.Container, TweenInfo.new(duration, Enum.EasingStyle.Quint), {
             BackgroundTransparency = 1
-        }):Play()
+        }))
         
         -- Fade all descendants
         for _, descendant in pairs(self.Container:GetDescendants()) do
             if descendant:IsA("TextLabel") or descendant:IsA("TextButton") then
-                TweenService:Create(descendant, TweenInfo.new(duration, Enum.EasingStyle.Quint), {
+                table.insert(tweens, TweenService:Create(descendant, TweenInfo.new(duration, Enum.EasingStyle.Quint), {
                     TextTransparency = 1
-                }):Play()
+                }))
             end
             if descendant:IsA("ImageLabel") or descendant:IsA("ImageButton") then
-                TweenService:Create(descendant, TweenInfo.new(duration, Enum.EasingStyle.Quint), {
+                table.insert(tweens, TweenService:Create(descendant, TweenInfo.new(duration, Enum.EasingStyle.Quint), {
                     ImageTransparency = 1
-                }):Play()
+                }))
             end
             if descendant:IsA("Frame") or descendant:IsA("ScrollingFrame") then
-                TweenService:Create(descendant, TweenInfo.new(duration, Enum.EasingStyle.Quint), {
+                table.insert(tweens, TweenService:Create(descendant, TweenInfo.new(duration, Enum.EasingStyle.Quint), {
                     BackgroundTransparency = 1
-                }):Play()
+                }))
             end
             if descendant:IsA("UIStroke") then
-                TweenService:Create(descendant, TweenInfo.new(duration, Enum.EasingStyle.Quint), {
+                table.insert(tweens, TweenService:Create(descendant, TweenInfo.new(duration, Enum.EasingStyle.Quint), {
                     Transparency = 1
-                }):Play()
+                }))
             end
         end
         
         -- Fade blur
         if self.Blur then
-            TweenService:Create(self.Blur, TweenInfo.new(duration, Enum.EasingStyle.Quint), {Size = 0}):Play()
+            table.insert(tweens, TweenService:Create(self.Blur, TweenInfo.new(duration, Enum.EasingStyle.Quint), {Size = 0}))
+        end
+        
+        -- Play all tweens simultaneously
+        for _, tween in ipairs(tweens) do
+            tween:Play()
         end
         
         -- Stop particles
@@ -865,14 +875,13 @@ function Window:ToggleMinimize()
             Position = minimizedPos
         }):Play()
         
-        -- Update title
+        -- Update title (DON'T change time/online when minimizing)
         task.delay(0.5, function()
-            self.TitleLabel.Text = "Sosalkin Hub | " .. os.date("%a %H:%M") .. " | Online: --"
             self._minimizing = false
         end)
     else
-        -- Restore title
-        self.TitleLabel.Text = self.Config.Title
+        -- Restore title (will be updated by the loop)
+        -- Don't manually set it here, let the update loop handle it
         
         -- Expand container (slower animation) - restore to saved position
         TweenService:Create(self.Container, TweenInfo.new(0.5, Enum.EasingStyle.Quint), {
