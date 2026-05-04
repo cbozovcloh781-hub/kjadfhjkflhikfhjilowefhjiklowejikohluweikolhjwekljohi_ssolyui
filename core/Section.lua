@@ -114,4 +114,13 @@ function Section:AddKeybind(config)
     return keybind
 end
 
+function Section:AddCollapsibleSection(config)
+    local CollapsibleSection = loadstring(game:HttpGet(baseUrl .. "elements/CollapsibleSection.lua"))()
+    local collapsible = CollapsibleSection.new(self, config)
+    collapsible.Container.Visible = false
+    table.insert(self.Elements, collapsible.Container)
+    table.insert(self.Tab.Elements, collapsible.Container)
+    return collapsible
+end
+
 return Section

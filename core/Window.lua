@@ -153,18 +153,27 @@ function Window:CreateGUI()
     Divider.BorderSizePixel = 0
     Divider.Parent = self.TitleBar
     
-    -- Title text
+    -- Title text with time and online
     self.TitleLabel = Instance.new("TextLabel")
     self.TitleLabel.Name = "Title"
     self.TitleLabel.Size = UDim2.new(1, -100, 1, 0)
     self.TitleLabel.Position = UDim2.fromOffset(12, 0)
     self.TitleLabel.BackgroundTransparency = 1
-    self.TitleLabel.Text = self.Config.Title
+    self.TitleLabel.Text = self.Config.Title .. " | " .. os.date("%H:%M") .. " | Online: 0"
     self.TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
     self.TitleLabel.TextSize = 13
     self.TitleLabel.Font = Enum.Font.GothamBold
     self.TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
     self.TitleLabel.Parent = self.TitleBar
+    
+    -- Update time and online count every second
+    task.spawn(function()
+        while self.TitleLabel and self.TitleLabel.Parent do
+            local onlineCount = #game:GetService("Players"):GetPlayers()
+            self.TitleLabel.Text = self.Config.Title .. " | " .. os.date("%H:%M") .. " | Online: " .. onlineCount
+            task.wait(1)
+        end
+    end)
     
     -- Close button (X)
     self.CloseButton = Instance.new("TextButton")
@@ -241,9 +250,16 @@ function Window:CreateGUI()
     ContentLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
     ContentLayout.Parent = self.ContentContainer
     
-    -- Auto-update canvas size
+    -- Auto-update canvas size (FIX: prevent infinite growth)
     ContentLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-        self.ContentContainer.CanvasSize = UDim2.new(0, 0, 0, ContentLayout.AbsoluteContentSize.Y + 20)
+        local contentHeight = ContentLayout.AbsoluteContentSize.Y
+        local containerHeight = self.ContentContainer.AbsoluteSize.Y
+        -- Only update if content is actually larger than container
+        if contentHeight > containerHeight then
+            self.ContentContainer.CanvasSize = UDim2.new(0, 0, 0, contentHeight + 20)
+        else
+            self.ContentContainer.CanvasSize = UDim2.new(0, 0, 0, containerHeight)
+        end
     end)
     
     local ContentPadding = Instance.new("UIPadding")
@@ -695,20 +711,58 @@ function Window:SetupResizing()
 end
 
 function Window:SetupMinimize()
-    -- Close button click - HIDE COMPLETELY
+    -- Close button click - SMOOTH FADE OUT AND DESTROY
     self.CloseButton.MouseButton1Click:Connect(function()
-        -- Hide entire GUI
-        self.ScreenGui.Enabled = false
+        if self._closing then return end
+        self._closing = true
         
-        -- Hide blur
+        local duration = 0.6
+        
+        -- Fade container
+        TweenService:Create(self.Container, TweenInfo.new(duration, Enum.EasingStyle.Quint), {
+            BackgroundTransparency = 1
+        }):Play()
+        
+        -- Fade all descendants
+        for _, descendant in pairs(self.Container:GetDescendants()) do
+            if descendant:IsA("TextLabel") or descendant:IsA("TextButton") then
+                TweenService:Create(descendant, TweenInfo.new(duration, Enum.EasingStyle.Quint), {
+                    TextTransparency = 1
+                }):Play()
+            end
+            if descendant:IsA("ImageLabel") or descendant:IsA("ImageButton") then
+                TweenService:Create(descendant, TweenInfo.new(duration, Enum.EasingStyle.Quint), {
+                    ImageTransparency = 1
+                }):Play()
+            end
+            if descendant:IsA("Frame") or descendant:IsA("ScrollingFrame") then
+                TweenService:Create(descendant, TweenInfo.new(duration, Enum.EasingStyle.Quint), {
+                    BackgroundTransparency = 1
+                }):Play()
+            end
+            if descendant:IsA("UIStroke") then
+                TweenService:Create(descendant, TweenInfo.new(duration, Enum.EasingStyle.Quint), {
+                    Transparency = 1
+                }):Play()
+            end
+        end
+        
+        -- Fade blur
         if self.Blur then
-            TweenService:Create(self.Blur, TweenInfo.new(0.3, Enum.EasingStyle.Quint), {Size = 0}):Play()
+            TweenService:Create(self.Blur, TweenInfo.new(duration, Enum.EasingStyle.Quint), {Size = 0}):Play()
         end
         
         -- Stop particles
         if self.ParticleSystem and self.ParticleSystem.Container then
             self.ParticleSystem.Container.Visible = false
         end
+        
+        -- Destroy after fade
+        task.delay(duration, function()
+            if self.ScreenGui then
+                self.ScreenGui:Destroy()
+            end
+        end)
     end)
     
     -- Close button hover
