@@ -826,6 +826,19 @@ function Window:SetupMinimize()
             self.TabContainer.BackgroundColor3 = Color3.fromRGB(0, 0, 0)  -- Pure black for TabContainer
             self.TabContainer.BackgroundTransparency = 1
             
+            -- Restore tab button colors IMMEDIATELY
+            for _, tab in pairs(self.Tabs) do
+                if tab.Button then
+                    if tab.Selected then
+                        tab.Button.BackgroundColor3 = self.AccentColor
+                        tab.Button.BackgroundTransparency = 0.85
+                    else
+                        tab.Button.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+                        tab.Button.BackgroundTransparency = 0
+                    end
+                end
+            end
+            
             -- Hide GUI
             self.ScreenGui.Enabled = false
             self._wasClosedWithX = true
