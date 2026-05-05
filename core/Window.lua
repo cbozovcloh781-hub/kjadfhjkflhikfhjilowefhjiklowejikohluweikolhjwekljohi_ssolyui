@@ -767,39 +767,46 @@ function Window:SetupMinimize()
             TextTransparency = 1
         }))
         
-        -- Fade ALL descendants at once
+        -- Hide ContentContainer and TabContainer instantly WITHOUT any animation
+        self.ContentContainer.Visible = false
+        self.TabContainer.Visible = false
+        
+        -- Fade ALL descendants EXCEPT ContentContainer and TabContainer children
         for _, descendant in pairs(self.Container:GetDescendants()) do
-            if descendant:IsA("TextLabel") or descendant:IsA("TextButton") then
-                table.insert(activeTweens, TweenService:Create(descendant, fadeInfo, {
-                    TextTransparency = 1
-                }))
+            -- Skip if descendant is inside ContentContainer or TabContainer
+            local isInsideContent = false
+            local parent = descendant.Parent
+            while parent do
+                if parent == self.ContentContainer or parent == self.TabContainer then
+                    isInsideContent = true
+                    break
+                end
+                parent = parent.Parent
             end
-            if descendant:IsA("ImageLabel") or descendant:IsA("ImageButton") then
-                table.insert(activeTweens, TweenService:Create(descendant, fadeInfo, {
-                    ImageTransparency = 1
-                }))
-            end
-            if descendant:IsA("Frame") or descendant:IsA("ScrollingFrame") then
-                -- SKIP ContentContainer and TabContainer completely - don't animate them at all
-                if descendant ~= self.ContentContainer and descendant ~= self.TabContainer then
+            
+            if not isInsideContent and descendant ~= self.ContentContainer and descendant ~= self.TabContainer then
+                if descendant:IsA("TextLabel") or descendant:IsA("TextButton") then
+                    table.insert(activeTweens, TweenService:Create(descendant, fadeInfo, {
+                        TextTransparency = 1
+                    }))
+                end
+                if descendant:IsA("ImageLabel") or descendant:IsA("ImageButton") then
+                    table.insert(activeTweens, TweenService:Create(descendant, fadeInfo, {
+                        ImageTransparency = 1
+                    }))
+                end
+                if descendant:IsA("Frame") or descendant:IsA("ScrollingFrame") then
                     table.insert(activeTweens, TweenService:Create(descendant, fadeInfo, {
                         BackgroundTransparency = 1
                     }))
                 end
-            end
-            if descendant:IsA("UIStroke") then
-                -- SKIP strokes for ContentContainer and TabContainer
-                if descendant.Parent ~= self.ContentContainer and descendant.Parent ~= self.TabContainer then
+                if descendant:IsA("UIStroke") then
                     table.insert(activeTweens, TweenService:Create(descendant, fadeInfo, {
                         Transparency = 1
                     }))
                 end
             end
         end
-        
-        -- Hide ContentContainer and TabContainer instantly WITHOUT changing colors
-        self.ContentContainer.Visible = false
-        self.TabContainer.Visible = false
         
         -- Play all tweens
         for _, tween in ipairs(activeTweens) do
