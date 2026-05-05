@@ -840,18 +840,21 @@ function Window:SetupMinimize()
                     descendant.ImageTransparency = 0
                 end
                 if descendant:IsA("Frame") or descendant:IsA("ScrollingFrame") then
-                    -- Restore original color from attributes
+                    -- CRITICAL: Restore original color from attributes FIRST
                     local r = descendant:GetAttribute("OriginalColorR")
                     local g = descendant:GetAttribute("OriginalColorG")
                     local b = descendant:GetAttribute("OriginalColorB")
                     if r and g and b then
                         descendant.BackgroundColor3 = Color3.new(r, g, b)
+                        -- Clear attributes after restoring
+                        descendant:SetAttribute("OriginalColorR", nil)
+                        descendant:SetAttribute("OriginalColorG", nil)
+                        descendant:SetAttribute("OriginalColorB", nil)
                     end
                     
-                    -- Restore specific transparency for each element type
+                    -- Then restore specific transparency for each element type
                     if descendant == self.ContentContainer then
                         descendant.BackgroundTransparency = 0.3
-                        descendant.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
                     elseif descendant == self.TabContainer then
                         descendant.BackgroundTransparency = 1
                     elseif descendant == self.ProfileContainer then
@@ -909,46 +912,40 @@ function Window:SetupMinimize()
         if not gameProcessed and input.KeyCode == self.Config.MinimizeKey then
             if self._closing then return end
             
-            -- If was closed with X, restore instantly (no animation needed - already restored)
+            -- If was closed with X, restore to MINIMIZED state (title bar only)
             if self._wasClosedWithX and not self.ScreenGui.Enabled then
                 self._wasClosedWithX = false
                 
-                -- Just enable GUI - transparency already restored
+                -- Set to minimized state FIRST
+                self.Minimized = true
+                
+                -- Set Container to title bar size
+                self.Container.Size = UDim2.fromOffset(400, 35)
+                
+                -- Hide content elements
+                self.ContentContainer.Visible = false
+                self.TabContainer.Visible = false
+                self.ProfileContainer.Visible = false
+                self.BottomGlow.Visible = false
+                
+                -- Enable GUI (show title bar)
                 self.ScreenGui.Enabled = true
                 
-                -- CRITICAL: Make sure Container is full size BEFORE showing
-                self.Container.Size = self.Config.Size
-                self.Container.Position = self._savedPosition or self.Config.Position
-                
-                -- Make sure all elements are visible and have correct colors
-                self.ContentContainer.Visible = true
-                self.ContentContainer.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
-                self.ContentContainer.BackgroundTransparency = 0.3
-                
-                self.TabContainer.Visible = true
-                self.TabContainer.BackgroundTransparency = 1
-                
-                self.ProfileContainer.Visible = true
-                self.ProfileContainer.BackgroundTransparency = 0
-                
-                self.BottomGlow.Visible = true
-                self.BottomGlow.BackgroundTransparency = 0.7
-                
-                -- Show blur ONLY if not minimized
-                if self.Blur and not self.Minimized then
-                    self.Blur.Size = self.BlurSize
+                -- Don't show blur when minimized
+                if self.Blur then
+                    self.Blur.Size = 0
                 end
                 
-                -- Show particles
+                -- Don't show particles when minimized
                 if self.ParticleSystem and self.ParticleSystem.Container then
-                    self.ParticleSystem.Container.Visible = true
-                    self.ParticleSystem.Running = true
+                    self.ParticleSystem.Container.Visible = false
+                    self.ParticleSystem.Running = false
                 end
                 
-                -- Show resize handles
-                self.ResizeHandle.Visible = true
-                self.ResizeHandleV.Visible = true
-                self.ResizeHandleH.Visible = true
+                -- Don't show resize handles when minimized
+                self.ResizeHandle.Visible = false
+                self.ResizeHandleV.Visible = false
+                self.ResizeHandleH.Visible = false
             else
                 -- Normal minimize toggle
                 self:ToggleMinimize()
