@@ -736,6 +736,11 @@ function Window:SetupMinimize()
         if self._closing then return end
         self._closing = true
         
+        -- Hide resize handles IMMEDIATELY
+        self.ResizeHandle.Visible = false
+        self.ResizeHandleV.Visible = false
+        self.ResizeHandleH.Visible = false
+        
         -- Stop particles IMMEDIATELY
         if self.ParticleSystem and self.ParticleSystem.Container then
             self.ParticleSystem.Container.Visible = false
@@ -802,10 +807,19 @@ function Window:SetupMinimize()
             self.CloseButton.TextTransparency = 0
             self.MinimizeButton.BackgroundTransparency = 0
             self.MinimizeButton.TextTransparency = 0
+            
+            -- CRITICAL: Restore ContentContainer color and transparency
+            self.ContentContainer.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
             self.ContentContainer.BackgroundTransparency = 0.3
+            
             self.TabContainer.BackgroundTransparency = 1
             self.ProfileContainer.BackgroundTransparency = 0
             self.BottomGlow.BackgroundTransparency = 0.7
+            
+            -- Show resize handles
+            self.ResizeHandle.Visible = true
+            self.ResizeHandleV.Visible = true
+            self.ResizeHandleH.Visible = true
             
             -- Restore ALL descendants transparency
             for _, descendant in pairs(self.Container:GetDescendants()) do
@@ -946,8 +960,9 @@ function Window:ToggleMinimize()
         self.ResizeHandleV.Visible = false
         self.ResizeHandleH.Visible = false
         
-        -- HIDE ProfileContainer IMMEDIATELY to prevent overlap
+        -- HIDE ProfileContainer and TabContainer IMMEDIATELY to prevent overlap
         self.ProfileContainer.Visible = false
+        self.TabContainer.Visible = false
         
         -- Fade out and shrink simultaneously
         local duration = 0.25
@@ -957,33 +972,20 @@ function Window:ToggleMinimize()
         TweenService:Create(self.ContentContainer, fadeInfo, {
             BackgroundTransparency = 1
         }):Play()
-        TweenService:Create(self.TabContainer, fadeInfo, {
-            BackgroundTransparency = 1
-        }):Play()
         TweenService:Create(self.BottomGlow, fadeInfo, {
             BackgroundTransparency = 1
         }):Play()
         
-        -- Fade out ProfileContainer stroke
-        local profileStroke = self.ProfileContainer:FindFirstChildOfClass("UIStroke")
-        if profileStroke then
-            TweenService:Create(profileStroke, fadeInfo, {
-                Transparency = 1
-            }):Play()
-        end
-        
-        -- Fade out all text and images in ContentContainer and TabContainer ONLY
-        for _, container in pairs({self.ContentContainer, self.TabContainer}) do
-            for _, desc in pairs(container:GetDescendants()) do
-                if desc:IsA("TextLabel") or desc:IsA("TextButton") then
-                    TweenService:Create(desc, fadeInfo, {
-                        TextTransparency = 1
-                    }):Play()
-                elseif desc:IsA("ImageLabel") or desc:IsA("ImageButton") then
-                    TweenService:Create(desc, fadeInfo, {
-                        ImageTransparency = 1
-                    }):Play()
-                end
+        -- Fade out all text and images in ContentContainer ONLY
+        for _, desc in pairs(self.ContentContainer:GetDescendants()) do
+            if desc:IsA("TextLabel") or desc:IsA("TextButton") then
+                TweenService:Create(desc, fadeInfo, {
+                    TextTransparency = 1
+                }):Play()
+            elseif desc:IsA("ImageLabel") or desc:IsA("ImageButton") then
+                TweenService:Create(desc, fadeInfo, {
+                    ImageTransparency = 1
+                }):Play()
             end
         end
         
@@ -992,10 +994,9 @@ function Window:ToggleMinimize()
             Size = UDim2.fromOffset(400, 35)  -- Увеличена ширина для полного текста
         }):Play()
         
-        -- Hide elements AFTER animation completes (ProfileContainer already hidden)
+        -- Hide elements AFTER animation completes (ProfileContainer and TabContainer already hidden)
         task.delay(duration, function()
             self.ContentContainer.Visible = false
-            self.TabContainer.Visible = false
             self.BottomGlow.Visible = false
             self._minimizing = false
         end)
