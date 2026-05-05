@@ -729,189 +729,27 @@ function Window:SetupResizing()
 end
 
 function Window:SetupMinimize()
-    -- Close button click - SMOOTH FADE OUT
+    -- Close button click - INSTANT HIDE (no animation to prevent color bugs)
     self.CloseButton.MouseButton1Click:Connect(function()
         if self._closing then return end
         self._closing = true
         
-        -- Hide resize handles IMMEDIATELY
-        self.ResizeHandle.Visible = false
-        self.ResizeHandleV.Visible = false
-        self.ResizeHandleH.Visible = false
+        -- Hide everything instantly
+        self.ScreenGui.Enabled = false
+        self._wasClosedWithX = true
         
-        -- Stop particles IMMEDIATELY
+        -- Stop particles
         if self.ParticleSystem and self.ParticleSystem.Container then
             self.ParticleSystem.Container.Visible = false
             self.ParticleSystem.Running = false
         end
         
-        -- Smooth fade out animation
-        local fadeDuration = 0.3
-        local fadeInfo = TweenInfo.new(fadeDuration, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
-        
-        -- Store all tweens so we can cancel them later
-        local activeTweens = {}
-        
-        -- Fade container
-        table.insert(activeTweens, TweenService:Create(self.Container, fadeInfo, {
-            BackgroundTransparency = 1
-        }))
-        
-        -- Fade title bar buttons (background AND text)
-        table.insert(activeTweens, TweenService:Create(self.CloseButton, fadeInfo, {
-            BackgroundTransparency = 1,
-            TextTransparency = 1
-        }))
-        table.insert(activeTweens, TweenService:Create(self.MinimizeButton, fadeInfo, {
-            BackgroundTransparency = 1,
-            TextTransparency = 1
-        }))
-        
-        -- Hide ContentContainer and TabContainer instantly WITHOUT any animation
-        self.ContentContainer.Visible = false
-        self.TabContainer.Visible = false
-        
-        -- Fade ALL descendants EXCEPT ContentContainer, TabContainer and their children
-        for _, descendant in pairs(self.Container:GetDescendants()) do
-            -- Skip if descendant is inside ContentContainer or TabContainer
-            local isInsideContent = false
-            local parent = descendant.Parent
-            while parent do
-                if parent == self.ContentContainer or parent == self.TabContainer then
-                    isInsideContent = true
-                    break
-                end
-                parent = parent.Parent
-            end
-            
-            -- Also skip tab buttons directly (they are TextButtons in TabContainer)
-            local isTabButton = false
-            if descendant:IsA("TextButton") and descendant.Parent == self.TabContainer then
-                isTabButton = true
-            end
-            
-            if not isInsideContent and not isTabButton and descendant ~= self.ContentContainer and descendant ~= self.TabContainer then
-                if descendant:IsA("TextLabel") or descendant:IsA("TextButton") then
-                    table.insert(activeTweens, TweenService:Create(descendant, fadeInfo, {
-                        TextTransparency = 1
-                    }))
-                end
-                if descendant:IsA("ImageLabel") or descendant:IsA("ImageButton") then
-                    table.insert(activeTweens, TweenService:Create(descendant, fadeInfo, {
-                        ImageTransparency = 1
-                    }))
-                end
-                if descendant:IsA("Frame") or descendant:IsA("ScrollingFrame") then
-                    table.insert(activeTweens, TweenService:Create(descendant, fadeInfo, {
-                        BackgroundTransparency = 1
-                    }))
-                end
-                if descendant:IsA("UIStroke") then
-                    table.insert(activeTweens, TweenService:Create(descendant, fadeInfo, {
-                        Transparency = 1
-                    }))
-                end
-            end
-        end
-        
-        -- Play all tweens
-        for _, tween in ipairs(activeTweens) do
-            tween:Play()
-        end
-        
-        -- Fade blur
+        -- Fade out blur smoothly
         if self.Blur then
-            TweenService:Create(self.Blur, fadeInfo, {Size = 0}):Play()
+            TweenService:Create(self.Blur, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Size = 0}):Play()
         end
         
-        -- Wait for fade to complete
-        task.delay(fadeDuration, function()
-            -- CRITICAL: Restore colors BEFORE hiding GUI
-            self.ContentContainer.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
-            self.ContentContainer.BackgroundTransparency = 0
-            self.TabContainer.BackgroundColor3 = Color3.fromRGB(0, 0, 0)  -- Pure black for TabContainer
-            self.TabContainer.BackgroundTransparency = 1
-            
-            -- Restore tab button colors IMMEDIATELY
-            for _, tab in pairs(self.Tabs) do
-                if tab.Button then
-                    if tab.Selected then
-                        tab.Button.BackgroundColor3 = self.AccentColor
-                        tab.Button.BackgroundTransparency = 0.85
-                    else
-                        tab.Button.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-                        tab.Button.BackgroundTransparency = 0
-                    end
-                end
-            end
-            
-            -- Hide GUI
-            self.ScreenGui.Enabled = false
-            self._wasClosedWithX = true
-            self._closing = false
-            
-            -- Restore transparency for other elements
-            self.Container.BackgroundTransparency = self.Config.Transparency
-            self.CloseButton.BackgroundTransparency = 0
-            self.CloseButton.TextTransparency = 0
-            self.MinimizeButton.BackgroundTransparency = 0
-            self.MinimizeButton.TextTransparency = 0
-            self.ProfileContainer.BackgroundTransparency = 0
-            self.BottomGlow.BackgroundTransparency = 0.7
-            
-            -- Show resize handles
-            self.ResizeHandle.Visible = true
-            self.ResizeHandleV.Visible = true
-            self.ResizeHandleH.Visible = true
-            
-            -- Restore ALL descendants transparency
-            for _, descendant in pairs(self.Container:GetDescendants()) do
-                if descendant:IsA("TextLabel") or descendant:IsA("TextButton") then
-                    descendant.TextTransparency = 0
-                end
-                if descendant:IsA("ImageLabel") or descendant:IsA("ImageButton") then
-                    descendant.ImageTransparency = 0
-                end
-                if descendant:IsA("Frame") or descendant:IsA("ScrollingFrame") then
-                    if descendant.Name == "Toggle" or descendant.Name == "Dropdown" or descendant.Name == "Slider" or descendant.Name == "Button" or descendant.Name == "Input" then
-                        descendant.BackgroundTransparency = 0.5
-                    elseif descendant.Parent and (descendant.Parent.Name == "Toggle" or descendant.Parent.Name == "Dropdown" or descendant.Parent.Name == "Slider" or descendant.Parent.Name == "Button" or descendant.Parent.Name == "Input") then
-                        if descendant.Name == "Button" or descendant.Name == "Options" then
-                            descendant.BackgroundTransparency = 0.3
-                        elseif descendant.Name == "SwitchBg" or descendant.Name == "Check" then
-                            descendant.BackgroundTransparency = 0
-                        else
-                            descendant.BackgroundTransparency = 0
-                        end
-                    elseif descendant.Name ~= "ContentContainer" and descendant.Name ~= "TabContainer" and descendant.Name ~= "BottomGlow" and descendant.Name ~= "Profile" then
-                        descendant.BackgroundTransparency = 0
-                    end
-                end
-                if descendant:IsA("UIStroke") then
-                    if descendant.Parent then
-                        if descendant.Parent.Name == "Toggle" or descendant.Parent.Name == "Dropdown" or descendant.Parent.Name == "Slider" or descendant.Parent.Name == "Button" or descendant.Parent.Name == "Input" or descendant.Parent.Name == "Profile" then
-                            descendant.Transparency = 0.5
-                        else
-                            descendant.Transparency = 0
-                        end
-                    end
-                end
-                -- Restore tab button colors
-                if descendant:IsA("TextButton") and descendant.Parent == self.TabContainer then
-                    -- This is a tab button - restore its color
-                    local isSelected = false
-                    for _, tab in pairs(self.Tabs) do
-                        if tab.Button == descendant and tab.Selected then
-                            isSelected = true
-                            break
-                        end
-                    end
-                    if not isSelected then
-                        descendant.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-                    end
-                end
-            end
-        end)
+        self._closing = false
     end)
     
     -- Close button hover
