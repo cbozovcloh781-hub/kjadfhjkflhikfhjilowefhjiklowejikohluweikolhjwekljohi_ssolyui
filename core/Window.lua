@@ -817,7 +817,17 @@ function Window:SetupMinimize()
                 end
                 if descendant:IsA("Frame") or descendant:IsA("ScrollingFrame") then
                     -- Restore specific transparency for each element type
-                    if descendant.Name == "Toggle" or descendant.Name == "Dropdown" or descendant.Name == "Slider" or descendant.Name == "Button" or descendant.Name == "Input" then
+                    if descendant == self.ContentContainer then
+                        descendant.BackgroundTransparency = 0.3
+                        -- IMPORTANT: Keep ContentContainer color BLACK
+                        descendant.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
+                    elseif descendant == self.TabContainer then
+                        descendant.BackgroundTransparency = 1
+                    elseif descendant == self.ProfileContainer then
+                        descendant.BackgroundTransparency = 0
+                    elseif descendant == self.BottomGlow then
+                        descendant.BackgroundTransparency = 0.7
+                    elseif descendant.Name == "Toggle" or descendant.Name == "Dropdown" or descendant.Name == "Slider" or descendant.Name == "Button" or descendant.Name == "Input" then
                         descendant.BackgroundTransparency = 0.5
                     elseif descendant.Parent and (descendant.Parent.Name == "Toggle" or descendant.Parent.Name == "Dropdown" or descendant.Parent.Name == "Slider" or descendant.Parent.Name == "Button" or descendant.Parent.Name == "Input") then
                         if descendant.Name == "Button" or descendant.Name == "Options" then
@@ -825,14 +835,14 @@ function Window:SetupMinimize()
                         else
                             descendant.BackgroundTransparency = 0
                         end
-                    elseif descendant.Name ~= "ContentContainer" and descendant.Name ~= "TabContainer" and descendant.Name ~= "BottomGlow" then
+                    elseif descendant.Name ~= "ContentContainer" and descendant.Name ~= "TabContainer" and descendant.Name ~= "BottomGlow" and descendant.Name ~= "Profile" then
                         descendant.BackgroundTransparency = 0
                     end
                 end
                 if descendant:IsA("UIStroke") then
                     -- Restore UIStroke transparency
                     if descendant.Parent then
-                        if descendant.Parent.Name == "Toggle" or descendant.Parent.Name == "Dropdown" or descendant.Parent.Name == "Slider" or descendant.Parent.Name == "Button" or descendant.Parent.Name == "Input" then
+                        if descendant.Parent.Name == "Toggle" or descendant.Parent.Name == "Dropdown" or descendant.Parent.Name == "Slider" or descendant.Parent.Name == "Button" or descendant.Parent.Name == "Input" or descendant.Parent.Name == "Profile" then
                             descendant.Transparency = 0.5
                         else
                             descendant.Transparency = 0
@@ -936,7 +946,10 @@ function Window:ToggleMinimize()
         self.ResizeHandleV.Visible = false
         self.ResizeHandleH.Visible = false
         
-        -- Fade out and shrink simultaneously (NO MOРГАНИЕ)
+        -- HIDE ProfileContainer IMMEDIATELY to prevent overlap
+        self.ProfileContainer.Visible = false
+        
+        -- Fade out and shrink simultaneously
         local duration = 0.25
         local fadeInfo = TweenInfo.new(duration, Enum.EasingStyle.Quint)
         
@@ -945,9 +958,6 @@ function Window:ToggleMinimize()
             BackgroundTransparency = 1
         }):Play()
         TweenService:Create(self.TabContainer, fadeInfo, {
-            BackgroundTransparency = 1
-        }):Play()
-        TweenService:Create(self.ProfileContainer, fadeInfo, {
             BackgroundTransparency = 1
         }):Play()
         TweenService:Create(self.BottomGlow, fadeInfo, {
@@ -962,8 +972,8 @@ function Window:ToggleMinimize()
             }):Play()
         end
         
-        -- Fade out all text and images in ALL containers
-        for _, container in pairs({self.ContentContainer, self.TabContainer, self.ProfileContainer}) do
+        -- Fade out all text and images in ContentContainer and TabContainer ONLY
+        for _, container in pairs({self.ContentContainer, self.TabContainer}) do
             for _, desc in pairs(container:GetDescendants()) do
                 if desc:IsA("TextLabel") or desc:IsA("TextButton") then
                     TweenService:Create(desc, fadeInfo, {
@@ -982,11 +992,10 @@ function Window:ToggleMinimize()
             Size = UDim2.fromOffset(400, 35)  -- Увеличена ширина для полного текста
         }):Play()
         
-        -- Hide elements AFTER animation completes
+        -- Hide elements AFTER animation completes (ProfileContainer already hidden)
         task.delay(duration, function()
             self.ContentContainer.Visible = false
             self.TabContainer.Visible = false
-            self.ProfileContainer.Visible = false
             self.BottomGlow.Visible = false
             self._minimizing = false
         end)
