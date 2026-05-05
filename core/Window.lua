@@ -159,18 +159,32 @@ function Window:CreateGUI()
     self.TitleLabel.Size = UDim2.new(1, -100, 1, 0)
     self.TitleLabel.Position = UDim2.fromOffset(12, 0)
     self.TitleLabel.BackgroundTransparency = 1
-    self.TitleLabel.Text = self.Config.Title .. " | " .. os.date("%H:%M") .. " | Online: --"
+    self.TitleLabel.Text = self.Config.Title .. " | " .. os.date("%H:%M") .. " | Online: -- | Loading..."
     self.TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
     self.TitleLabel.TextSize = 13
     self.TitleLabel.Font = Enum.Font.GothamBold
     self.TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
     self.TitleLabel.Parent = self.TitleBar
     
-    -- Update time only (not online count)
+    -- Load version from GitHub
+    self.UIVersion = "..."
+    task.spawn(function()
+        local success, version = pcall(function()
+            local baseUrl = "https://raw.githubusercontent.com/cbozovcloh781-hub/kjadfhjkflhikfhjilowefhjiklowejikohluweikolhjwekljohi_ssolyui/main/"
+            return game:HttpGet(baseUrl .. "version.txt")
+        end)
+        if success and version then
+            self.UIVersion = version:gsub("%s+", "") -- Remove whitespace
+        else
+            self.UIVersion = "?.?.?"
+        end
+    end)
+    
+    -- Update time and version
     task.spawn(function()
         while self.TitleLabel and self.TitleLabel.Parent do
             if not self.Minimized then
-                self.TitleLabel.Text = self.Config.Title .. " | " .. os.date("%H:%M") .. " | Online: --"
+                self.TitleLabel.Text = self.Config.Title .. " | " .. os.date("%H:%M") .. " | Online: -- | v" .. self.UIVersion
             end
             task.wait(1)
         end
@@ -715,72 +729,24 @@ function Window:SetupResizing()
 end
 
 function Window:SetupMinimize()
-    -- Close button click - SMOOTH FADE OUT (all elements at same speed)
+    -- Close button click - INSTANT HIDE (no fade animation)
     self.CloseButton.MouseButton1Click:Connect(function()
         if self._closing then return end
         self._closing = true
         
-        -- Save original transparency values before fading
-        if not self._savedTransparencies then
-            self._savedTransparencies = {}
-            for _, descendant in pairs(self.Container:GetDescendants()) do
-                if descendant:IsA("Frame") or descendant:IsA("ScrollingFrame") then
-                    self._savedTransparencies[descendant] = descendant.BackgroundTransparency
-                elseif descendant:IsA("UIStroke") then
-                    self._savedTransparencies[descendant] = descendant.Transparency
-                end
-            end
-            self._savedTransparencies[self.Container] = self.Container.BackgroundTransparency
-        end
-        
-        -- Smooth fade out animation - ALL elements same duration
-        local fadeDuration = 0.5
-        local fadeInfo = TweenInfo.new(fadeDuration, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
-        
-        -- Fade container
-        TweenService:Create(self.Container, fadeInfo, {
-            BackgroundTransparency = 1
-        }):Play()
-        
-        -- Fade ALL descendants at once
-        for _, descendant in pairs(self.Container:GetDescendants()) do
-            if descendant:IsA("TextLabel") or descendant:IsA("TextButton") then
-                TweenService:Create(descendant, fadeInfo, {
-                    TextTransparency = 1
-                }):Play()
-            end
-            if descendant:IsA("ImageLabel") or descendant:IsA("ImageButton") then
-                TweenService:Create(descendant, fadeInfo, {
-                    ImageTransparency = 1
-                }):Play()
-            end
-            if descendant:IsA("Frame") or descendant:IsA("ScrollingFrame") then
-                TweenService:Create(descendant, fadeInfo, {
-                    BackgroundTransparency = 1
-                }):Play()
-            end
-            if descendant:IsA("UIStroke") then
-                TweenService:Create(descendant, fadeInfo, {
-                    Transparency = 1
-                }):Play()
-            end
-        end
-        
-        -- Hide after fade
-        task.delay(fadeDuration, function()
-            self.ScreenGui.Enabled = false
-            self._wasClosedWithX = true
-            self._closing = false
-        end)
+        -- Instantly hide GUI
+        self.ScreenGui.Enabled = false
+        self._wasClosedWithX = true
+        self._closing = false
         
         -- Stop particles
         if self.ParticleSystem and self.ParticleSystem.Container then
             self.ParticleSystem.Container.Visible = false
         end
         
-        -- Fade blur
+        -- Hide blur
         if self.Blur then
-            TweenService:Create(self.Blur, fadeInfo, {Size = 0}):Play()
+            self.Blur.Size = 0
         end
     end)
     
@@ -807,77 +773,16 @@ function Window:SetupMinimize()
         if not gameProcessed and input.KeyCode == self.Config.MinimizeKey then
             if self._closing then return end
             
-            -- If was closed with X, restore with SMOOTH FADE IN
+            -- If was closed with X, restore instantly
             if self._wasClosedWithX and not self.ScreenGui.Enabled then
                 self._wasClosedWithX = false
                 
-                -- Enable GUI first
+                -- Show GUI instantly
                 self.ScreenGui.Enabled = true
                 
-                -- Smooth fade in animation
-                local fadeDuration = 0.5
-                local fadeInfo = TweenInfo.new(fadeDuration, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
-                
-                -- Fade in container with saved transparency
-                TweenService:Create(self.Container, fadeInfo, {
-                    BackgroundTransparency = self._savedTransparencies and self._savedTransparencies[self.Container] or self.Config.Transparency
-                }):Play()
-                
-                -- Fade in ALL descendants with saved transparency values
-                for _, descendant in pairs(self.Container:GetDescendants()) do
-                    if descendant:IsA("TextLabel") or descendant:IsA("TextButton") then
-                        TweenService:Create(descendant, fadeInfo, {
-                            TextTransparency = 0
-                        }):Play()
-                    end
-                    if descendant:IsA("ImageLabel") or descendant:IsA("ImageButton") then
-                        TweenService:Create(descendant, fadeInfo, {
-                            ImageTransparency = 0
-                        }):Play()
-                    end
-                    if descendant:IsA("Frame") or descendant:IsA("ScrollingFrame") then
-                        -- Use saved transparency or fallback to defaults
-                        local targetTransparency = 0
-                        if self._savedTransparencies and self._savedTransparencies[descendant] then
-                            targetTransparency = self._savedTransparencies[descendant]
-                        else
-                            -- Fallback defaults
-                            if descendant == self.ContentContainer then
-                                targetTransparency = 0.3
-                            elseif descendant == self.TabContainer then
-                                targetTransparency = 1
-                            elseif descendant.Name == "BottomGlow" then
-                                targetTransparency = 0.7
-                            elseif descendant.Name == "Toggle" or descendant.Name == "Dropdown" or descendant.Name == "Slider" or descendant.Name == "Button" or descendant.Name == "Input" then
-                                targetTransparency = 0.5
-                            elseif descendant.Parent and (descendant.Parent.Name == "Toggle" or descendant.Parent.Name == "Dropdown" or descendant.Parent.Name == "Slider" or descendant.Parent.Name == "Button" or descendant.Parent.Name == "Input") then
-                                if descendant.Name == "Button" or descendant.Name == "Options" then
-                                    targetTransparency = 0.3
-                                end
-                            end
-                        end
-                        
-                        TweenService:Create(descendant, fadeInfo, {
-                            BackgroundTransparency = targetTransparency
-                        }):Play()
-                    end
-                    if descendant:IsA("UIStroke") then
-                        -- Use saved transparency or fallback
-                        local targetTransparency = 0
-                        if self._savedTransparencies and self._savedTransparencies[descendant] then
-                            targetTransparency = self._savedTransparencies[descendant]
-                        elseif descendant.Parent and (descendant.Parent.Name == "Toggle" or descendant.Parent.Name == "Dropdown" or descendant.Parent.Name == "Slider" or descendant.Parent.Name == "Button" or descendant.Parent.Name == "Input") then
-                            targetTransparency = 0.5
-                        end
-                        TweenService:Create(descendant, fadeInfo, {
-                            Transparency = targetTransparency
-                        }):Play()
-                    end
-                end
-                
-                -- Fade in blur ONLY if not minimized
+                -- Show blur ONLY if not minimized
                 if self.Blur and not self.Minimized then
-                    TweenService:Create(self.Blur, fadeInfo, {Size = self.BlurSize}):Play()
+                    self.Blur.Size = self.BlurSize
                 end
                 
                 -- Show particles
