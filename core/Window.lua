@@ -729,27 +729,45 @@ function Window:SetupResizing()
 end
 
 function Window:SetupMinimize()
-    -- Close button click - INSTANT HIDE (no animation to prevent color bugs)
+    -- Close button click - FADE OUT with color preservation
     self.CloseButton.MouseButton1Click:Connect(function()
         if self._closing then return end
         self._closing = true
         
-        -- Hide everything instantly
-        self.ScreenGui.Enabled = false
-        self._wasClosedWithX = true
+        -- Hide resize handles IMMEDIATELY
+        self.ResizeHandle.Visible = false
+        self.ResizeHandleV.Visible = false
+        self.ResizeHandleH.Visible = false
         
-        -- Stop particles
+        -- Stop particles IMMEDIATELY
         if self.ParticleSystem and self.ParticleSystem.Container then
             self.ParticleSystem.Container.Visible = false
             self.ParticleSystem.Running = false
         end
         
-        -- Fade out blur smoothly
+        -- Simple fade: only animate Container transparency
+        local fadeDuration = 0.3
+        local fadeInfo = TweenInfo.new(fadeDuration, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+        
+        -- Fade only the main container
+        TweenService:Create(self.Container, fadeInfo, {
+            BackgroundTransparency = 1
+        }):Play()
+        
+        -- Fade blur
         if self.Blur then
-            TweenService:Create(self.Blur, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Size = 0}):Play()
+            TweenService:Create(self.Blur, fadeInfo, {Size = 0}):Play()
         end
         
-        self._closing = false
+        -- Hide after fade completes
+        task.delay(fadeDuration, function()
+            self.ScreenGui.Enabled = false
+            self._wasClosedWithX = true
+            self._closing = false
+            
+            -- Restore container transparency
+            self.Container.BackgroundTransparency = self.Config.Transparency
+        end)
     end)
     
     -- Close button hover
