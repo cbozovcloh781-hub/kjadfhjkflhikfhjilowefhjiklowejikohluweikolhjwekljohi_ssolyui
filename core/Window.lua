@@ -766,7 +766,7 @@ function Window:SetupMinimize()
             TextTransparency = 1
         }):Play()
         
-        -- Fade ALL descendants at once
+        -- Fade ALL descendants at once (but DON'T change colors)
         for _, descendant in pairs(self.Container:GetDescendants()) do
             if descendant:IsA("TextLabel") or descendant:IsA("TextButton") then
                 TweenService:Create(descendant, fadeInfo, {
@@ -779,6 +779,13 @@ function Window:SetupMinimize()
                 }):Play()
             end
             if descendant:IsA("Frame") or descendant:IsA("ScrollingFrame") then
+                -- Store original color before fading
+                if not descendant:GetAttribute("OriginalColor") then
+                    local color = descendant.BackgroundColor3
+                    descendant:SetAttribute("OriginalColorR", color.R)
+                    descendant:SetAttribute("OriginalColorG", color.G)
+                    descendant:SetAttribute("OriginalColorB", color.B)
+                end
                 TweenService:Create(descendant, fadeInfo, {
                     BackgroundTransparency = 1
                 }):Play()
@@ -821,7 +828,7 @@ function Window:SetupMinimize()
             self.ResizeHandleV.Visible = true
             self.ResizeHandleH.Visible = true
             
-            -- Restore ALL descendants transparency (including elements in sections)
+            -- Restore ALL descendants transparency AND colors (including elements in sections)
             for _, descendant in pairs(self.Container:GetDescendants()) do
                 if descendant:IsA("TextLabel") or descendant:IsA("TextButton") then
                     descendant.TextTransparency = 0
@@ -830,6 +837,14 @@ function Window:SetupMinimize()
                     descendant.ImageTransparency = 0
                 end
                 if descendant:IsA("Frame") or descendant:IsA("ScrollingFrame") then
+                    -- Restore original color from attributes
+                    local r = descendant:GetAttribute("OriginalColorR")
+                    local g = descendant:GetAttribute("OriginalColorG")
+                    local b = descendant:GetAttribute("OriginalColorB")
+                    if r and g and b then
+                        descendant.BackgroundColor3 = Color3.new(r, g, b)
+                    end
+                    
                     -- Restore specific transparency for each element type
                     if descendant == self.ContentContainer then
                         descendant.BackgroundTransparency = 0.3
@@ -1662,8 +1677,8 @@ function Window:InitParticles()
     local baseUrl = "https://raw.githubusercontent.com/cbozovcloh781-hub/kjadfhjkflhikfhjilowefhjiklowejikohluweikolhjwekljohi_ssolyui/main/"
     local Particles = loadstring(game:HttpGet(baseUrl .. "utils/Particles.lua"))()
     
-    -- Create particles for window
-    self.ParticleSystem = Particles.new(self.Container, self.AccentColor)
+    -- Create particles for ScreenGui (not Container) so they don't move with window
+    self.ParticleSystem = Particles.new(self.ScreenGui, self.AccentColor, self.Container)
     self.ParticleSystem.Running = true
     self.ParticleSystem:Start()
 end

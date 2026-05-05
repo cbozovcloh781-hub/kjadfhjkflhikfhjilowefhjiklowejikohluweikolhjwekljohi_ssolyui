@@ -9,17 +9,18 @@ local Particles = {}
 Particles.Enabled = true
 Particles.Active = {}
 
-function Particles.new(parent, accentColor)
+function Particles.new(parent, accentColor, clipContainer)
     local self = setmetatable({}, {__index = Particles})
     
     self.Parent = parent
+    self.ClipContainer = clipContainer or parent  -- Container for clipping bounds
     self.AccentColor = accentColor or Color3.fromRGB(74, 158, 255)
     self.Container = Instance.new("Frame")
     self.Container.Name = "ParticlesContainer"
     self.Container.Size = UDim2.fromScale(1, 1)
     self.Container.BackgroundTransparency = 1
     self.Container.ZIndex = 0
-    self.Container.ClipsDescendants = true
+    self.Container.ClipsDescendants = false  -- Don't clip, we'll handle bounds manually
     self.Container.Parent = parent
     
     self.Particles = {}
@@ -37,6 +38,10 @@ function Particles:CreateParticle()
     if not self.Container or not self.Container.Parent then return end
     if #self.Particles >= self.MaxParticles then return end
     
+    -- Get clip container bounds (the actual window)
+    local clipPos = self.ClipContainer.AbsolutePosition
+    local clipSize = self.ClipContainer.AbsoluteSize
+    
     -- Одинаковый размер для круглых частиц
     local size = math.random(2, 5)
     local particle = Instance.new("Frame")
@@ -47,17 +52,20 @@ function Particles:CreateParticle()
     local startPos, endPos
     
     if direction <= 70 then
-        -- Сверху вниз
-        startPos = UDim2.new(math.random(0, 100) / 100, 0, 0, -10)
-        endPos = UDim2.new(startPos.X.Scale + math.random(-10, 10) / 100, 0, 1, 10)
+        -- Сверху вниз (в пределах окна)
+        local xPos = clipPos.X + math.random(0, clipSize.X)
+        startPos = UDim2.fromOffset(xPos, clipPos.Y - 10)
+        endPos = UDim2.fromOffset(xPos + math.random(-50, 50), clipPos.Y + clipSize.Y + 10)
     elseif direction <= 85 then
         -- Слева направо
-        startPos = UDim2.new(0, -10, math.random(0, 100) / 100, 0)
-        endPos = UDim2.new(1, 10, startPos.Y.Scale + math.random(-10, 10) / 100, 0)
+        local yPos = clipPos.Y + math.random(0, clipSize.Y)
+        startPos = UDim2.fromOffset(clipPos.X - 10, yPos)
+        endPos = UDim2.fromOffset(clipPos.X + clipSize.X + 10, yPos + math.random(-50, 50))
     else
         -- Справа налево
-        startPos = UDim2.new(1, 10, math.random(0, 100) / 100, 0)
-        endPos = UDim2.new(0, -10, startPos.Y.Scale + math.random(-10, 10) / 100, 0)
+        local yPos = clipPos.Y + math.random(0, clipSize.Y)
+        startPos = UDim2.fromOffset(clipPos.X + clipSize.X + 10, yPos)
+        endPos = UDim2.fromOffset(clipPos.X - 10, yPos + math.random(-50, 50))
     end
     
     particle.Position = startPos
@@ -102,6 +110,21 @@ function Particles:CreateParticle()
     end)
     
     tween:Play()
+    
+    -- Hide particle if outside clip bounds
+    local connection
+    connection = RunService.Heartbeat:Connect(function()
+        if not particle or not particle.Parent then
+            connection:Disconnect()
+            return
+        end
+        
+        local pos = particle.AbsolutePosition
+        local inBounds = pos.X >= clipPos.X and pos.X <= clipPos.X + clipSize.X and
+                        pos.Y >= clipPos.Y and pos.Y <= clipPos.Y + clipSize.Y
+        
+        particle.Visible = inBounds
+    end)
 end
 
 function Particles:Start()
