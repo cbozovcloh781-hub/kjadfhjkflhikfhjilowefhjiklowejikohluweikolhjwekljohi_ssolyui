@@ -751,43 +751,51 @@ function Window:SetupMinimize()
         local fadeDuration = 0.3
         local fadeInfo = TweenInfo.new(fadeDuration, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
         
+        -- Store all tweens so we can cancel them later
+        local activeTweens = {}
+        
         -- Fade container
-        TweenService:Create(self.Container, fadeInfo, {
+        table.insert(activeTweens, TweenService:Create(self.Container, fadeInfo, {
             BackgroundTransparency = 1
-        }):Play()
+        }))
         
         -- Fade title bar buttons (background AND text)
-        TweenService:Create(self.CloseButton, fadeInfo, {
+        table.insert(activeTweens, TweenService:Create(self.CloseButton, fadeInfo, {
             BackgroundTransparency = 1,
             TextTransparency = 1
-        }):Play()
-        TweenService:Create(self.MinimizeButton, fadeInfo, {
+        }))
+        table.insert(activeTweens, TweenService:Create(self.MinimizeButton, fadeInfo, {
             BackgroundTransparency = 1,
             TextTransparency = 1
-        }):Play()
+        }))
         
         -- Fade ALL descendants at once
         for _, descendant in pairs(self.Container:GetDescendants()) do
             if descendant:IsA("TextLabel") or descendant:IsA("TextButton") then
-                TweenService:Create(descendant, fadeInfo, {
+                table.insert(activeTweens, TweenService:Create(descendant, fadeInfo, {
                     TextTransparency = 1
-                }):Play()
+                }))
             end
             if descendant:IsA("ImageLabel") or descendant:IsA("ImageButton") then
-                TweenService:Create(descendant, fadeInfo, {
+                table.insert(activeTweens, TweenService:Create(descendant, fadeInfo, {
                     ImageTransparency = 1
-                }):Play()
+                }))
             end
             if descendant:IsA("Frame") or descendant:IsA("ScrollingFrame") then
-                TweenService:Create(descendant, fadeInfo, {
+                table.insert(activeTweens, TweenService:Create(descendant, fadeInfo, {
                     BackgroundTransparency = 1
-                }):Play()
+                }))
             end
             if descendant:IsA("UIStroke") then
-                TweenService:Create(descendant, fadeInfo, {
+                table.insert(activeTweens, TweenService:Create(descendant, fadeInfo, {
                     Transparency = 1
-                }):Play()
+                }))
             end
+        end
+        
+        -- Play all tweens
+        for _, tween in ipairs(activeTweens) do
+            tween:Play()
         end
         
         -- Fade blur
@@ -797,6 +805,11 @@ function Window:SetupMinimize()
         
         -- Hide after fade
         task.delay(fadeDuration, function()
+            -- Cancel all tweens to prevent further changes
+            for _, tween in ipairs(activeTweens) do
+                tween:Cancel()
+            end
+            
             self.ScreenGui.Enabled = false
             self._wasClosedWithX = true
             self._closing = false
@@ -823,7 +836,7 @@ function Window:SetupMinimize()
             self.ResizeHandleV.Visible = true
             self.ResizeHandleH.Visible = true
             
-            -- Restore ALL descendants transparency (NO color restoration from attributes)
+            -- Restore ALL descendants transparency
             for _, descendant in pairs(self.Container:GetDescendants()) do
                 if descendant:IsA("TextLabel") or descendant:IsA("TextButton") then
                     descendant.TextTransparency = 0
