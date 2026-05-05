@@ -919,6 +919,10 @@ function Window:SetupMinimize()
             if self._wasClosedWithX and not self.ScreenGui.Enabled then
                 self._wasClosedWithX = false
                 
+                -- CRITICAL: Restore colors BEFORE showing window
+                self.ContentContainer.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
+                self.TabContainer.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+                
                 -- Set to minimized state FIRST
                 self.Minimized = true
                 
