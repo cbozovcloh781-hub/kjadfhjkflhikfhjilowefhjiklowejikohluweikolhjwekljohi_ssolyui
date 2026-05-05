@@ -736,16 +736,6 @@ function Window:SetupMinimize()
         if self._closing then return end
         self._closing = true
         
-        -- CRITICAL: Store original colors BEFORE any fade animation
-        for _, descendant in pairs(self.Container:GetDescendants()) do
-            if descendant:IsA("Frame") or descendant:IsA("ScrollingFrame") then
-                local color = descendant.BackgroundColor3
-                descendant:SetAttribute("OriginalColorR", color.R)
-                descendant:SetAttribute("OriginalColorG", color.G)
-                descendant:SetAttribute("OriginalColorB", color.B)
-            end
-        end
-        
         -- Hide resize handles IMMEDIATELY
         self.ResizeHandle.Visible = false
         self.ResizeHandleV.Visible = false
@@ -776,7 +766,7 @@ function Window:SetupMinimize()
             TextTransparency = 1
         }):Play()
         
-        -- Fade ALL descendants at once (colors already stored)
+        -- Fade ALL descendants at once
         for _, descendant in pairs(self.Container:GetDescendants()) do
             if descendant:IsA("TextLabel") or descendant:IsA("TextButton") then
                 TweenService:Create(descendant, fadeInfo, {
@@ -818,11 +808,13 @@ function Window:SetupMinimize()
             self.MinimizeButton.BackgroundTransparency = 0
             self.MinimizeButton.TextTransparency = 0
             
-            -- CRITICAL: Restore ContentContainer color and transparency
+            -- CRITICAL: Force restore ContentContainer and TabContainer colors
             self.ContentContainer.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
             self.ContentContainer.BackgroundTransparency = 0.3
             
+            self.TabContainer.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
             self.TabContainer.BackgroundTransparency = 1
+            
             self.ProfileContainer.BackgroundTransparency = 0
             self.BottomGlow.BackgroundTransparency = 0.7
             
@@ -831,7 +823,7 @@ function Window:SetupMinimize()
             self.ResizeHandleV.Visible = true
             self.ResizeHandleH.Visible = true
             
-            -- Restore ALL descendants transparency AND colors (including elements in sections)
+            -- Restore ALL descendants transparency (NO color restoration from attributes)
             for _, descendant in pairs(self.Container:GetDescendants()) do
                 if descendant:IsA("TextLabel") or descendant:IsA("TextButton") then
                     descendant.TextTransparency = 0
@@ -840,23 +832,13 @@ function Window:SetupMinimize()
                     descendant.ImageTransparency = 0
                 end
                 if descendant:IsA("Frame") or descendant:IsA("ScrollingFrame") then
-                    -- CRITICAL: Restore original color from attributes FIRST
-                    local r = descendant:GetAttribute("OriginalColorR")
-                    local g = descendant:GetAttribute("OriginalColorG")
-                    local b = descendant:GetAttribute("OriginalColorB")
-                    if r and g and b then
-                        descendant.BackgroundColor3 = Color3.new(r, g, b)
-                        -- Clear attributes after restoring
-                        descendant:SetAttribute("OriginalColorR", nil)
-                        descendant:SetAttribute("OriginalColorG", nil)
-                        descendant:SetAttribute("OriginalColorB", nil)
-                    end
-                    
-                    -- Then restore specific transparency for each element type
+                    -- Restore specific transparency for each element type
                     if descendant == self.ContentContainer then
                         descendant.BackgroundTransparency = 0.3
+                        descendant.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
                     elseif descendant == self.TabContainer then
                         descendant.BackgroundTransparency = 1
+                        descendant.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
                     elseif descendant == self.ProfileContainer then
                         descendant.BackgroundTransparency = 0
                     elseif descendant == self.BottomGlow then
