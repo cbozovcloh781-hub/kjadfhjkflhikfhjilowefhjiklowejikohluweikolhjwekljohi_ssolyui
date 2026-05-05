@@ -736,6 +736,16 @@ function Window:SetupMinimize()
         if self._closing then return end
         self._closing = true
         
+        -- CRITICAL: Store original colors BEFORE any fade animation
+        for _, descendant in pairs(self.Container:GetDescendants()) do
+            if descendant:IsA("Frame") or descendant:IsA("ScrollingFrame") then
+                local color = descendant.BackgroundColor3
+                descendant:SetAttribute("OriginalColorR", color.R)
+                descendant:SetAttribute("OriginalColorG", color.G)
+                descendant:SetAttribute("OriginalColorB", color.B)
+            end
+        end
+        
         -- Hide resize handles IMMEDIATELY
         self.ResizeHandle.Visible = false
         self.ResizeHandleV.Visible = false
@@ -766,7 +776,7 @@ function Window:SetupMinimize()
             TextTransparency = 1
         }):Play()
         
-        -- Fade ALL descendants at once (but DON'T change colors)
+        -- Fade ALL descendants at once (colors already stored)
         for _, descendant in pairs(self.Container:GetDescendants()) do
             if descendant:IsA("TextLabel") or descendant:IsA("TextButton") then
                 TweenService:Create(descendant, fadeInfo, {
@@ -779,13 +789,6 @@ function Window:SetupMinimize()
                 }):Play()
             end
             if descendant:IsA("Frame") or descendant:IsA("ScrollingFrame") then
-                -- Store original color before fading
-                if not descendant:GetAttribute("OriginalColor") then
-                    local color = descendant.BackgroundColor3
-                    descendant:SetAttribute("OriginalColorR", color.R)
-                    descendant:SetAttribute("OriginalColorG", color.G)
-                    descendant:SetAttribute("OriginalColorB", color.B)
-                end
                 TweenService:Create(descendant, fadeInfo, {
                     BackgroundTransparency = 1
                 }):Play()
