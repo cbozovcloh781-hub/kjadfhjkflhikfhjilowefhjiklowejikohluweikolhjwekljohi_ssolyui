@@ -898,11 +898,19 @@ function Window:SetupMinimize()
                 -- Just enable GUI - transparency already restored
                 self.ScreenGui.Enabled = true
                 
-                -- Make sure all elements are visible
+                -- Make sure all elements are visible and have correct colors
                 self.ContentContainer.Visible = true
+                self.ContentContainer.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
+                self.ContentContainer.BackgroundTransparency = 0.3
+                
                 self.TabContainer.Visible = true
+                self.TabContainer.BackgroundTransparency = 1
+                
                 self.ProfileContainer.Visible = true
+                self.ProfileContainer.BackgroundTransparency = 0
+                
                 self.BottomGlow.Visible = true
+                self.BottomGlow.BackgroundTransparency = 0.7
                 
                 -- Show blur ONLY if not minimized
                 if self.Blur and not self.Minimized then
@@ -1617,7 +1625,36 @@ function Window:Show()
         self.ResizeHandle.Visible = true
         self.ResizeHandleV.Visible = true
         self.ResizeHandleH.Visible = true
+        
+        -- IMPORTANT: Refresh all elements after window is shown
+        task.wait(0.1)
+        self:RefreshElements()
     end)
+end
+
+function Window:RefreshElements()
+    -- Force refresh all UI elements transparency
+    for _, descendant in pairs(self.ContentContainer:GetDescendants()) do
+        if descendant:IsA("Frame") or descendant:IsA("ScrollingFrame") then
+            if descendant.Name == "Toggle" or descendant.Name == "Dropdown" or descendant.Name == "Slider" or descendant.Name == "Button" or descendant.Name == "Input" then
+                descendant.BackgroundTransparency = 0.5
+            elseif descendant.Parent and (descendant.Parent.Name == "Toggle" or descendant.Parent.Name == "Dropdown" or descendant.Parent.Name == "Slider" or descendant.Parent.Name == "Button" or descendant.Parent.Name == "Input") then
+                if descendant.Name == "Button" or descendant.Name == "Options" then
+                    descendant.BackgroundTransparency = 0.3
+                elseif descendant.Name == "SwitchBg" or descendant.Name == "Check" then
+                    descendant.BackgroundTransparency = 0
+                end
+            end
+        end
+        if descendant:IsA("TextLabel") or descendant:IsA("TextButton") then
+            descendant.TextTransparency = 0
+        end
+        if descendant:IsA("UIStroke") then
+            if descendant.Parent and (descendant.Parent.Name == "Toggle" or descendant.Parent.Name == "Dropdown" or descendant.Parent.Name == "Slider" or descendant.Parent.Name == "Button" or descendant.Parent.Name == "Input") then
+                descendant.Transparency = 0.5
+            end
+        end
+    end
 end
 
 function Window:InitParticles()
