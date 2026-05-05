@@ -720,6 +720,19 @@ function Window:SetupMinimize()
         if self._closing then return end
         self._closing = true
         
+        -- Save original transparency values before fading
+        if not self._savedTransparencies then
+            self._savedTransparencies = {}
+            for _, descendant in pairs(self.Container:GetDescendants()) do
+                if descendant:IsA("Frame") or descendant:IsA("ScrollingFrame") then
+                    self._savedTransparencies[descendant] = descendant.BackgroundTransparency
+                elseif descendant:IsA("UIStroke") then
+                    self._savedTransparencies[descendant] = descendant.Transparency
+                end
+            end
+            self._savedTransparencies[self.Container] = self.Container.BackgroundTransparency
+        end
+        
         -- Smooth fade out animation - ALL elements same duration
         local fadeDuration = 0.5
         local fadeInfo = TweenInfo.new(fadeDuration, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
@@ -805,12 +818,12 @@ function Window:SetupMinimize()
                 local fadeDuration = 0.5
                 local fadeInfo = TweenInfo.new(fadeDuration, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
                 
-                -- Fade in container
+                -- Fade in container with saved transparency
                 TweenService:Create(self.Container, fadeInfo, {
-                    BackgroundTransparency = self.Config.Transparency
+                    BackgroundTransparency = self._savedTransparencies and self._savedTransparencies[self.Container] or self.Config.Transparency
                 }):Play()
                 
-                -- Fade in ALL descendants with correct target transparency
+                -- Fade in ALL descendants with saved transparency values
                 for _, descendant in pairs(self.Container:GetDescendants()) do
                     if descendant:IsA("TextLabel") or descendant:IsA("TextButton") then
                         TweenService:Create(descendant, fadeInfo, {
@@ -823,31 +836,25 @@ function Window:SetupMinimize()
                         }):Play()
                     end
                     if descendant:IsA("Frame") or descendant:IsA("ScrollingFrame") then
-                        -- Determine correct transparency for each element type
+                        -- Use saved transparency or fallback to defaults
                         local targetTransparency = 0
-                        
-                        -- Special cases
-                        if descendant == self.ContentContainer then
-                            targetTransparency = 0.3
-                        elseif descendant == self.TabContainer then
-                            targetTransparency = 1
-                        elseif descendant.Name == "BottomGlow" then
-                            targetTransparency = 0.7
-                        elseif descendant.Name == "SwitchBg" then
-                            targetTransparency = 0
-                        elseif descendant.Name == "Check" then
-                            targetTransparency = 0
-                        elseif descendant.Name == "Toggle" or descendant.Name == "Dropdown" or descendant.Name == "Slider" or descendant.Name == "Button" or descendant.Name == "Input" then
-                            targetTransparency = 0.5
-                        elseif descendant.Parent and (descendant.Parent.Name == "Toggle" or descendant.Parent.Name == "Dropdown" or descendant.Parent.Name == "Slider" or descendant.Parent.Name == "Button" or descendant.Parent.Name == "Input") then
-                            -- Child elements of main containers
-                            if descendant.Name == "Button" or descendant.Name == "Options" then
-                                targetTransparency = 0.3
-                            else
-                                targetTransparency = 0
-                            end
+                        if self._savedTransparencies and self._savedTransparencies[descendant] then
+                            targetTransparency = self._savedTransparencies[descendant]
                         else
-                            targetTransparency = 0
+                            -- Fallback defaults
+                            if descendant == self.ContentContainer then
+                                targetTransparency = 0.3
+                            elseif descendant == self.TabContainer then
+                                targetTransparency = 1
+                            elseif descendant.Name == "BottomGlow" then
+                                targetTransparency = 0.7
+                            elseif descendant.Name == "Toggle" or descendant.Name == "Dropdown" or descendant.Name == "Slider" or descendant.Name == "Button" or descendant.Name == "Input" then
+                                targetTransparency = 0.5
+                            elseif descendant.Parent and (descendant.Parent.Name == "Toggle" or descendant.Parent.Name == "Dropdown" or descendant.Parent.Name == "Slider" or descendant.Parent.Name == "Button" or descendant.Parent.Name == "Input") then
+                                if descendant.Name == "Button" or descendant.Name == "Options" then
+                                    targetTransparency = 0.3
+                                end
+                            end
                         end
                         
                         TweenService:Create(descendant, fadeInfo, {
@@ -855,9 +862,11 @@ function Window:SetupMinimize()
                         }):Play()
                     end
                     if descendant:IsA("UIStroke") then
-                        -- Restore strokes with proper transparency
+                        -- Use saved transparency or fallback
                         local targetTransparency = 0
-                        if descendant.Parent and (descendant.Parent.Name == "Toggle" or descendant.Parent.Name == "Dropdown" or descendant.Parent.Name == "Slider" or descendant.Parent.Name == "Button" or descendant.Parent.Name == "Input") then
+                        if self._savedTransparencies and self._savedTransparencies[descendant] then
+                            targetTransparency = self._savedTransparencies[descendant]
+                        elseif descendant.Parent and (descendant.Parent.Name == "Toggle" or descendant.Parent.Name == "Dropdown" or descendant.Parent.Name == "Slider" or descendant.Parent.Name == "Button" or descendant.Parent.Name == "Input") then
                             targetTransparency = 0.5
                         end
                         TweenService:Create(descendant, fadeInfo, {
