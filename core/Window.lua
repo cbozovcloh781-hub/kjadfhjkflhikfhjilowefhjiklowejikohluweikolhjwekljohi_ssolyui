@@ -782,7 +782,7 @@ function Window:SetupMinimize()
                 }))
             end
             if descendant:IsA("Frame") or descendant:IsA("ScrollingFrame") then
-                -- DON'T tween ContentContainer or TabContainer - just hide them instantly
+                -- SKIP ContentContainer and TabContainer completely - don't animate them at all
                 if descendant ~= self.ContentContainer and descendant ~= self.TabContainer then
                     table.insert(activeTweens, TweenService:Create(descendant, fadeInfo, {
                         BackgroundTransparency = 1
@@ -790,15 +790,18 @@ function Window:SetupMinimize()
                 end
             end
             if descendant:IsA("UIStroke") then
-                table.insert(activeTweens, TweenService:Create(descendant, fadeInfo, {
-                    Transparency = 1
-                }))
+                -- SKIP strokes for ContentContainer and TabContainer
+                if descendant.Parent ~= self.ContentContainer and descendant.Parent ~= self.TabContainer then
+                    table.insert(activeTweens, TweenService:Create(descendant, fadeInfo, {
+                        Transparency = 1
+                    }))
+                end
             end
         end
         
-        -- Hide ContentContainer and TabContainer instantly (no tween)
-        self.ContentContainer.BackgroundTransparency = 1
-        self.TabContainer.BackgroundTransparency = 1
+        -- Hide ContentContainer and TabContainer instantly WITHOUT changing colors
+        self.ContentContainer.Visible = false
+        self.TabContainer.Visible = false
         
         -- Play all tweens
         for _, tween in ipairs(activeTweens) do
