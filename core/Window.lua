@@ -873,6 +873,12 @@ function Window:SetupMinimize()
                 -- Just enable GUI - transparency already restored
                 self.ScreenGui.Enabled = true
                 
+                -- Make sure all elements are visible
+                self.ContentContainer.Visible = true
+                self.TabContainer.Visible = true
+                self.ProfileContainer.Visible = true
+                self.BottomGlow.Visible = true
+                
                 -- Show blur ONLY if not minimized
                 if self.Blur and not self.Minimized then
                     self.Blur.Size = self.BlurSize
@@ -881,6 +887,7 @@ function Window:SetupMinimize()
                 -- Show particles
                 if self.ParticleSystem and self.ParticleSystem.Container then
                     self.ParticleSystem.Container.Visible = true
+                    self.ParticleSystem.Running = true
                 end
             else
                 -- Normal minimize toggle
@@ -918,9 +925,10 @@ function Window:ToggleMinimize()
             TweenService:Create(self.Blur, TweenInfo.new(0.3, Enum.EasingStyle.Quint), {Size = 0}):Play()
         end
         
-        -- Hide particles
+        -- Hide particles IMMEDIATELY
         if self.ParticleSystem and self.ParticleSystem.Container then
             self.ParticleSystem.Container.Visible = false
+            self.ParticleSystem.Running = false
         end
         
         -- Hide resize handles
@@ -946,28 +954,22 @@ function Window:ToggleMinimize()
             BackgroundTransparency = 1
         }):Play()
         
-        -- Fade out all text in content
-        for _, desc in pairs(self.ContentContainer:GetDescendants()) do
-            if desc:IsA("TextLabel") or desc:IsA("TextButton") then
-                TweenService:Create(desc, fadeInfo, {
-                    TextTransparency = 1
-                }):Play()
-            end
+        -- Fade out ProfileContainer stroke
+        local profileStroke = self.ProfileContainer:FindFirstChildOfClass("UIStroke")
+        if profileStroke then
+            TweenService:Create(profileStroke, fadeInfo, {
+                Transparency = 1
+            }):Play()
         end
-        for _, desc in pairs(self.TabContainer:GetDescendants()) do
-            if desc:IsA("TextLabel") or desc:IsA("TextButton") then
-                TweenService:Create(desc, fadeInfo, {
-                    TextTransparency = 1
-                }):Play()
-            end
-        end
-        for _, desc in pairs(self.ProfileContainer:GetDescendants()) do
-            if desc:IsA("TextLabel") or desc:IsA("ImageLabel") then
-                if desc:IsA("TextLabel") then
+        
+        -- Fade out all text and images in ALL containers
+        for _, container in pairs({self.ContentContainer, self.TabContainer, self.ProfileContainer}) do
+            for _, desc in pairs(container:GetDescendants()) do
+                if desc:IsA("TextLabel") or desc:IsA("TextButton") then
                     TweenService:Create(desc, fadeInfo, {
                         TextTransparency = 1
                     }):Play()
-                else
+                elseif desc:IsA("ImageLabel") or desc:IsA("ImageButton") then
                     TweenService:Create(desc, fadeInfo, {
                         ImageTransparency = 1
                     }):Play()
@@ -1019,28 +1021,22 @@ function Window:ToggleMinimize()
             BackgroundTransparency = 0.7
         }):Play()
         
-        -- Fade in all text
-        for _, desc in pairs(self.ContentContainer:GetDescendants()) do
-            if desc:IsA("TextLabel") or desc:IsA("TextButton") then
-                TweenService:Create(desc, fadeInfo, {
-                    TextTransparency = 0
-                }):Play()
-            end
+        -- Fade in ProfileContainer stroke
+        local profileStroke = self.ProfileContainer:FindFirstChildOfClass("UIStroke")
+        if profileStroke then
+            TweenService:Create(profileStroke, fadeInfo, {
+                Transparency = 0
+            }):Play()
         end
-        for _, desc in pairs(self.TabContainer:GetDescendants()) do
-            if desc:IsA("TextLabel") or desc:IsA("TextButton") then
-                TweenService:Create(desc, fadeInfo, {
-                    TextTransparency = 0
-                }):Play()
-            end
-        end
-        for _, desc in pairs(self.ProfileContainer:GetDescendants()) do
-            if desc:IsA("TextLabel") or desc:IsA("ImageLabel") then
-                if desc:IsA("TextLabel") then
+        
+        -- Fade in all text and images
+        for _, container in pairs({self.ContentContainer, self.TabContainer, self.ProfileContainer}) do
+            for _, desc in pairs(container:GetDescendants()) do
+                if desc:IsA("TextLabel") or desc:IsA("TextButton") then
                     TweenService:Create(desc, fadeInfo, {
                         TextTransparency = 0
                     }):Play()
-                else
+                elseif desc:IsA("ImageLabel") or desc:IsA("ImageButton") then
                     TweenService:Create(desc, fadeInfo, {
                         ImageTransparency = 0
                     }):Play()
@@ -1055,6 +1051,7 @@ function Window:ToggleMinimize()
         
         if self.ParticleSystem and self.ParticleSystem.Container then
             self.ParticleSystem.Container.Visible = true
+            self.ParticleSystem.Running = true
         end
         
         -- Show resize handles
