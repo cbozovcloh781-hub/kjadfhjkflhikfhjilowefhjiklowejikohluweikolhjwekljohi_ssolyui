@@ -823,20 +823,19 @@ function Window:SetupMinimize()
             self._wasClosedWithX = true
             self._closing = false
             
-            -- Restore original transparency values after hiding
+            -- FORCE restore colors IMMEDIATELY (before any other code)
+            self.ContentContainer.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
+            self.TabContainer.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+            
+            -- Then restore transparency
             self.Container.BackgroundTransparency = self.Config.Transparency
             self.CloseButton.BackgroundTransparency = 0
             self.CloseButton.TextTransparency = 0
             self.MinimizeButton.BackgroundTransparency = 0
             self.MinimizeButton.TextTransparency = 0
             
-            -- CRITICAL: Force restore ContentContainer and TabContainer colors
-            self.ContentContainer.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
             self.ContentContainer.BackgroundTransparency = 0.3
-            
-            self.TabContainer.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
             self.TabContainer.BackgroundTransparency = 1
-            
             self.ProfileContainer.BackgroundTransparency = 0
             self.BottomGlow.BackgroundTransparency = 0.7
             
@@ -1300,9 +1299,10 @@ function Window:SetTheme(themeName)
         BackgroundColor3 = titleBg
     }):Play()
     
-    TweenService:Create(self.ContentContainer, TweenInfo.new(duration, easing), {
-        BackgroundColor3 = titleBg
-    }):Play()
+    -- DON'T change ContentContainer color - it should stay at (12, 12, 12)
+    -- TweenService:Create(self.ContentContainer, TweenInfo.new(duration, easing), {
+    --     BackgroundColor3 = titleBg
+    -- }):Play()
     
     local profileBg = Color3.fromRGB(
         math.min(255, theme.bg.R * 255 + 3),
