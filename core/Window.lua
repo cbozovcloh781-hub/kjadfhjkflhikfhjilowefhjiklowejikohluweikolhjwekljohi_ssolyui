@@ -1044,7 +1044,7 @@ function Window:ToggleMinimize()
         
         -- Fade in content
         TweenService:Create(self.ContentContainer, fadeInfo, {
-            BackgroundTransparency = 0.3
+            BackgroundTransparency = 0
         }):Play()
         TweenService:Create(self.TabContainer, fadeInfo, {
             BackgroundTransparency = 1
