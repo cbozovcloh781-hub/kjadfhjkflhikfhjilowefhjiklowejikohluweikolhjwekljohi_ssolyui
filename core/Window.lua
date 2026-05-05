@@ -183,9 +183,7 @@ function Window:CreateGUI()
     -- Update time and version
     task.spawn(function()
         while self.TitleLabel and self.TitleLabel.Parent do
-            if not self.Minimized then
-                self.TitleLabel.Text = self.Config.Title .. " | " .. os.date("%H:%M") .. " | Online: -- | v" .. self.UIVersion
-            end
+            self.TitleLabel.Text = self.Config.Title .. " | " .. os.date("%H:%M") .. " | Online: -- | v" .. self.UIVersion
             task.wait(1)
         end
     end)
