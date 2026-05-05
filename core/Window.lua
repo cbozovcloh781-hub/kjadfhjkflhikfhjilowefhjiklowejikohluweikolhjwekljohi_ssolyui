@@ -811,32 +811,25 @@ function Window:SetupMinimize()
             TweenService:Create(self.Blur, fadeInfo, {Size = 0}):Play()
         end
         
-        -- Hide after fade - but cancel tweens BEFORE they complete
-        task.delay(fadeDuration - 0.05, function()  -- Cancel 0.05s before completion
-            -- Cancel all tweens to prevent final value application
-            for _, tween in ipairs(activeTweens) do
-                tween:Cancel()
-            end
-        end)
-        
+        -- Wait for fade to complete
         task.delay(fadeDuration, function()
+            -- CRITICAL: Restore colors BEFORE hiding GUI
+            self.ContentContainer.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
+            self.ContentContainer.BackgroundTransparency = 0
+            self.TabContainer.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+            self.TabContainer.BackgroundTransparency = 1
+            
+            -- Hide GUI
             self.ScreenGui.Enabled = false
             self._wasClosedWithX = true
             self._closing = false
             
-            -- FORCE restore colors IMMEDIATELY (before any other code)
-            self.ContentContainer.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
-            self.TabContainer.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-            
-            -- Then restore transparency
+            -- Restore transparency for other elements
             self.Container.BackgroundTransparency = self.Config.Transparency
             self.CloseButton.BackgroundTransparency = 0
             self.CloseButton.TextTransparency = 0
             self.MinimizeButton.BackgroundTransparency = 0
             self.MinimizeButton.TextTransparency = 0
-            
-            self.ContentContainer.BackgroundTransparency = 0  -- NO transparency!
-            self.TabContainer.BackgroundTransparency = 1
             self.ProfileContainer.BackgroundTransparency = 0
             self.BottomGlow.BackgroundTransparency = 0.7
             
@@ -854,18 +847,7 @@ function Window:SetupMinimize()
                     descendant.ImageTransparency = 0
                 end
                 if descendant:IsA("Frame") or descendant:IsA("ScrollingFrame") then
-                    -- Restore specific transparency for each element type
-                    if descendant == self.ContentContainer then
-                        descendant.BackgroundTransparency = 0  -- NO transparency!
-                        descendant.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
-                    elseif descendant == self.TabContainer then
-                        descendant.BackgroundTransparency = 1
-                        descendant.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-                    elseif descendant == self.ProfileContainer then
-                        descendant.BackgroundTransparency = 0
-                    elseif descendant == self.BottomGlow then
-                        descendant.BackgroundTransparency = 0.7
-                    elseif descendant.Name == "Toggle" or descendant.Name == "Dropdown" or descendant.Name == "Slider" or descendant.Name == "Button" or descendant.Name == "Input" then
+                    if descendant.Name == "Toggle" or descendant.Name == "Dropdown" or descendant.Name == "Slider" or descendant.Name == "Button" or descendant.Name == "Input" then
                         descendant.BackgroundTransparency = 0.5
                     elseif descendant.Parent and (descendant.Parent.Name == "Toggle" or descendant.Parent.Name == "Dropdown" or descendant.Parent.Name == "Slider" or descendant.Parent.Name == "Button" or descendant.Parent.Name == "Input") then
                         if descendant.Name == "Button" or descendant.Name == "Options" then
@@ -880,7 +862,6 @@ function Window:SetupMinimize()
                     end
                 end
                 if descendant:IsA("UIStroke") then
-                    -- Restore UIStroke transparency
                     if descendant.Parent then
                         if descendant.Parent.Name == "Toggle" or descendant.Parent.Name == "Dropdown" or descendant.Parent.Name == "Slider" or descendant.Parent.Name == "Button" or descendant.Parent.Name == "Input" or descendant.Parent.Name == "Profile" then
                             descendant.Transparency = 0.5
@@ -919,10 +900,6 @@ function Window:SetupMinimize()
             -- If was closed with X, restore to MINIMIZED state (title bar only)
             if self._wasClosedWithX and not self.ScreenGui.Enabled then
                 self._wasClosedWithX = false
-                
-                -- CRITICAL: Restore colors BEFORE showing window
-                self.ContentContainer.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
-                self.TabContainer.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
                 
                 -- Set to minimized state FIRST
                 self.Minimized = true
