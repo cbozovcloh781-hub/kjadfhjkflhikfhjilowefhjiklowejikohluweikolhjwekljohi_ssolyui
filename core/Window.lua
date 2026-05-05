@@ -809,8 +809,16 @@ function Window:SetupMinimize()
                 self.ProfileContainer.Visible = false
                 self.BottomGlow.Visible = false
                 
+                -- Start with transparent container
+                self.Container.BackgroundTransparency = 1
+                
                 -- Enable GUI (show title bar)
                 self.ScreenGui.Enabled = true
+                
+                -- Fade in title bar
+                TweenService:Create(self.Container, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+                    BackgroundTransparency = self.Config.Transparency
+                }):Play()
                 
                 -- Don't show blur when minimized
                 if self.Blur then
