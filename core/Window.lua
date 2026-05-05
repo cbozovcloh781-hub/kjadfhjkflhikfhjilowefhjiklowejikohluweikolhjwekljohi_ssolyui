@@ -823,7 +823,7 @@ function Window:SetupMinimize()
             -- CRITICAL: Restore colors BEFORE hiding GUI
             self.ContentContainer.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
             self.ContentContainer.BackgroundTransparency = 0
-            self.TabContainer.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+            self.TabContainer.BackgroundColor3 = Color3.fromRGB(0, 0, 0)  -- Pure black for TabContainer
             self.TabContainer.BackgroundTransparency = 1
             
             -- Hide GUI
@@ -875,6 +875,20 @@ function Window:SetupMinimize()
                         else
                             descendant.Transparency = 0
                         end
+                    end
+                end
+                -- Restore tab button colors
+                if descendant:IsA("TextButton") and descendant.Parent == self.TabContainer then
+                    -- This is a tab button - restore its color
+                    local isSelected = false
+                    for _, tab in pairs(self.Tabs) do
+                        if tab.Button == descendant and tab.Selected then
+                            isSelected = true
+                            break
+                        end
+                    end
+                    if not isSelected then
+                        descendant.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
                     end
                 end
             end
