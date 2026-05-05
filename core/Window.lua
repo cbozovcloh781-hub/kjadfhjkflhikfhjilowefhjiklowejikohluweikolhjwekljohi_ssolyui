@@ -246,8 +246,8 @@ function Window:CreateGUI()
     self.ContentContainer.Name = "ContentContainer"
     self.ContentContainer.Size = UDim2.new(1, -160, 1, -45)
     self.ContentContainer.Position = UDim2.fromOffset(152, 40)
-    self.ContentContainer.BackgroundColor3 = Color3.fromRGB(18, 18, 18)  -- Slightly lighter to be visible with transparency
-    self.ContentContainer.BackgroundTransparency = 0.3
+    self.ContentContainer.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
+    self.ContentContainer.BackgroundTransparency = 0  -- NO transparency to prevent gray appearance
     self.ContentContainer.BorderSizePixel = 0
     self.ContentContainer.ScrollBarThickness = 4
     self.ContentContainer.ScrollBarImageColor3 = Color3.fromRGB(80, 80, 80)
