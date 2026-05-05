@@ -821,7 +821,7 @@ function Window:SetupMinimize()
             self.ResizeHandleV.Visible = true
             self.ResizeHandleH.Visible = true
             
-            -- Restore ALL descendants transparency
+            -- Restore ALL descendants transparency (including elements in sections)
             for _, descendant in pairs(self.Container:GetDescendants()) do
                 if descendant:IsA("TextLabel") or descendant:IsA("TextButton") then
                     descendant.TextTransparency = 0
@@ -833,7 +833,6 @@ function Window:SetupMinimize()
                     -- Restore specific transparency for each element type
                     if descendant == self.ContentContainer then
                         descendant.BackgroundTransparency = 0.3
-                        -- IMPORTANT: Keep ContentContainer color BLACK
                         descendant.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
                     elseif descendant == self.TabContainer then
                         descendant.BackgroundTransparency = 1
@@ -846,6 +845,8 @@ function Window:SetupMinimize()
                     elseif descendant.Parent and (descendant.Parent.Name == "Toggle" or descendant.Parent.Name == "Dropdown" or descendant.Parent.Name == "Slider" or descendant.Parent.Name == "Button" or descendant.Parent.Name == "Input") then
                         if descendant.Name == "Button" or descendant.Name == "Options" then
                             descendant.BackgroundTransparency = 0.3
+                        elseif descendant.Name == "SwitchBg" or descendant.Name == "Check" then
+                            descendant.BackgroundTransparency = 0
                         else
                             descendant.BackgroundTransparency = 0
                         end
