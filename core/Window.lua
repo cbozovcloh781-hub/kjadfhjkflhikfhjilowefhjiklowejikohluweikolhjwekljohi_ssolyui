@@ -745,6 +745,14 @@ function Window:SetupMinimize()
             BackgroundTransparency = 1
         }):Play()
         
+        -- Fade title bar buttons
+        TweenService:Create(self.CloseButton, fadeInfo, {
+            BackgroundTransparency = 1
+        }):Play()
+        TweenService:Create(self.MinimizeButton, fadeInfo, {
+            BackgroundTransparency = 1
+        }):Play()
+        
         -- Fade ALL descendants at once
         for _, descendant in pairs(self.Container:GetDescendants()) do
             if descendant:IsA("TextLabel") or descendant:IsA("TextButton") then
@@ -784,6 +792,25 @@ function Window:SetupMinimize()
             self.ScreenGui.Enabled = false
             self._wasClosedWithX = true
             self._closing = false
+            
+            -- Restore original transparency values after hiding
+            self.Container.BackgroundTransparency = self.Config.Transparency
+            self.CloseButton.BackgroundTransparency = 0
+            self.MinimizeButton.BackgroundTransparency = 0
+            self.ContentContainer.BackgroundTransparency = 0.3
+            self.TabContainer.BackgroundTransparency = 1
+            self.ProfileContainer.BackgroundTransparency = 0
+            self.BottomGlow.BackgroundTransparency = 0.7
+            
+            -- Restore text transparency
+            for _, descendant in pairs(self.Container:GetDescendants()) do
+                if descendant:IsA("TextLabel") or descendant:IsA("TextButton") then
+                    descendant.TextTransparency = 0
+                end
+                if descendant:IsA("ImageLabel") or descendant:IsA("ImageButton") then
+                    descendant.ImageTransparency = 0
+                end
+            end
         end)
     end)
     
@@ -810,67 +837,16 @@ function Window:SetupMinimize()
         if not gameProcessed and input.KeyCode == self.Config.MinimizeKey then
             if self._closing then return end
             
-            -- If was closed with X, restore with SMOOTH FADE IN
+            -- If was closed with X, restore instantly (no animation needed - already restored)
             if self._wasClosedWithX and not self.ScreenGui.Enabled then
                 self._wasClosedWithX = false
                 
-                -- Enable GUI
+                -- Just enable GUI - transparency already restored
                 self.ScreenGui.Enabled = true
                 
-                -- Smooth fade in animation
-                local fadeDuration = 0.3
-                local fadeInfo = TweenInfo.new(fadeDuration, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
-                
-                -- Fade in container
-                TweenService:Create(self.Container, fadeInfo, {
-                    BackgroundTransparency = self.Config.Transparency
-                }):Play()
-                
-                -- Fade in ALL descendants
-                for _, descendant in pairs(self.Container:GetDescendants()) do
-                    if descendant:IsA("TextLabel") or descendant:IsA("TextButton") then
-                        TweenService:Create(descendant, fadeInfo, {
-                            TextTransparency = 0
-                        }):Play()
-                    end
-                    if descendant:IsA("ImageLabel") or descendant:IsA("ImageButton") then
-                        TweenService:Create(descendant, fadeInfo, {
-                            ImageTransparency = 0
-                        }):Play()
-                    end
-                    if descendant:IsA("Frame") or descendant:IsA("ScrollingFrame") then
-                        local targetTransparency = 0
-                        if descendant == self.ContentContainer then
-                            targetTransparency = 0.3
-                        elseif descendant == self.TabContainer then
-                            targetTransparency = 1
-                        elseif descendant.Name == "BottomGlow" then
-                            targetTransparency = 0.7
-                        elseif descendant.Name == "Toggle" or descendant.Name == "Dropdown" or descendant.Name == "Slider" or descendant.Name == "Button" or descendant.Name == "Input" then
-                            targetTransparency = 0.5
-                        elseif descendant.Parent and (descendant.Parent.Name == "Toggle" or descendant.Parent.Name == "Dropdown" or descendant.Parent.Name == "Slider" or descendant.Parent.Name == "Button" or descendant.Parent.Name == "Input") then
-                            if descendant.Name == "Button" or descendant.Name == "Options" then
-                                targetTransparency = 0.3
-                            end
-                        end
-                        TweenService:Create(descendant, fadeInfo, {
-                            BackgroundTransparency = targetTransparency
-                        }):Play()
-                    end
-                    if descendant:IsA("UIStroke") then
-                        local targetTransparency = 0
-                        if descendant.Parent and (descendant.Parent.Name == "Toggle" or descendant.Parent.Name == "Dropdown" or descendant.Parent.Name == "Slider" or descendant.Parent.Name == "Button" or descendant.Parent.Name == "Input") then
-                            targetTransparency = 0.5
-                        end
-                        TweenService:Create(descendant, fadeInfo, {
-                            Transparency = targetTransparency
-                        }):Play()
-                    end
-                end
-                
-                -- Fade in blur ONLY if not minimized
+                -- Show blur ONLY if not minimized
                 if self.Blur and not self.Minimized then
-                    TweenService:Create(self.Blur, fadeInfo, {Size = self.BlurSize}):Play()
+                    self.Blur.Size = self.BlurSize
                 end
                 
                 -- Show particles
@@ -972,7 +948,7 @@ function Window:ToggleMinimize()
         
         -- Shrink to title bar - START IMMEDIATELY (no delay)
         TweenService:Create(self.Container, fadeInfo, {
-            Size = UDim2.fromOffset(300, 35)
+            Size = UDim2.fromOffset(400, 35)  -- Увеличена ширина для полного текста
         }):Play()
         
         -- Hide elements AFTER animation completes
