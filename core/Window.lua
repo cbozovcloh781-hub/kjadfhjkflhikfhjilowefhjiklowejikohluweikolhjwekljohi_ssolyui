@@ -246,23 +246,14 @@ function Window:CreateGUI()
     self.ContentContainer.Name = "ContentContainer"
     self.ContentContainer.Size = UDim2.new(1, -160, 1, -45)
     self.ContentContainer.Position = UDim2.fromOffset(152, 40)
-    self.ContentContainer.BackgroundColor3 = Color3.fromRGB(255, 0, 255)  -- BRIGHT MAGENTA FOR TESTING
-    self.ContentContainer.BackgroundTransparency = 0.3
+    self.ContentContainer.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
+    self.ContentContainer.BackgroundTransparency = 0
     self.ContentContainer.BorderSizePixel = 0
     self.ContentContainer.ScrollBarThickness = 4
     self.ContentContainer.ScrollBarImageColor3 = Color3.fromRGB(80, 80, 80)
     self.ContentContainer.ScrollBarImageTransparency = 0
     self.ContentContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
     self.ContentContainer.Parent = self.Container
-    
-    -- CRITICAL: Force color lock with RunService (every frame check)
-    RunService.Heartbeat:Connect(function()
-        if self.ContentContainer and self.ContentContainer.Parent then
-            if self.ContentContainer.BackgroundColor3 ~= Color3.fromRGB(255, 0, 255) then
-                self.ContentContainer.BackgroundColor3 = Color3.fromRGB(255, 0, 255)
-            end
-        end
-    end)
     
     local ContentCorner = Instance.new("UICorner")
     ContentCorner.CornerRadius = UDim.new(0, 10)
