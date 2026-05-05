@@ -835,7 +835,7 @@ function Window:SetupMinimize()
             self.MinimizeButton.BackgroundTransparency = 0
             self.MinimizeButton.TextTransparency = 0
             
-            self.ContentContainer.BackgroundTransparency = 0.3
+            self.ContentContainer.BackgroundTransparency = 0  -- NO transparency!
             self.TabContainer.BackgroundTransparency = 1
             self.ProfileContainer.BackgroundTransparency = 0
             self.BottomGlow.BackgroundTransparency = 0.7
@@ -856,7 +856,7 @@ function Window:SetupMinimize()
                 if descendant:IsA("Frame") or descendant:IsA("ScrollingFrame") then
                     -- Restore specific transparency for each element type
                     if descendant == self.ContentContainer then
-                        descendant.BackgroundTransparency = 0.3
+                        descendant.BackgroundTransparency = 0  -- NO transparency!
                         descendant.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
                     elseif descendant == self.TabContainer then
                         descendant.BackgroundTransparency = 1
