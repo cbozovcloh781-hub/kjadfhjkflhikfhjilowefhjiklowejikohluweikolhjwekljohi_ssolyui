@@ -1438,10 +1438,10 @@ function Window:SetColorScheme(scheme)
         BackgroundColor3 = colors.TitleBar
     }):Play()
     
-    -- Update content container
-    TweenService:Create(self.ContentContainer, TweenInfo.new(duration, easing), {
-        BackgroundColor3 = colors.Content
-    }):Play()
+    -- DON'T change ContentContainer color - it should stay at (12, 12, 12)
+    -- TweenService:Create(self.ContentContainer, TweenInfo.new(duration, easing), {
+    --     BackgroundColor3 = colors.Content
+    -- }):Play()
     
     -- Update profile
     TweenService:Create(self.ProfileContainer, TweenInfo.new(duration, easing), {
