@@ -96,8 +96,6 @@ function Window:CreateGUI()
     self.ScreenGui.Enabled = not self._delayShow  -- Hide if delayed
     self.ScreenGui.Parent = coreGui
     
-
-    
     -- Blur effect
     if self.Config.BlurEnabled then
         self.Blur = Instance.new("BlurEffect")
@@ -256,6 +254,13 @@ function Window:CreateGUI()
     self.ContentContainer.ScrollBarImageTransparency = 0
     self.ContentContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
     self.ContentContainer.Parent = self.Container
+    
+    -- CRITICAL: Lock ContentContainer color to prevent changes
+    self.ContentContainer:GetPropertyChangedSignal("BackgroundColor3"):Connect(function()
+        if self.ContentContainer.BackgroundColor3 ~= Color3.fromRGB(12, 12, 12) then
+            self.ContentContainer.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
+        end
+    end)
     
     local ContentCorner = Instance.new("UICorner")
     ContentCorner.CornerRadius = UDim.new(0, 10)
