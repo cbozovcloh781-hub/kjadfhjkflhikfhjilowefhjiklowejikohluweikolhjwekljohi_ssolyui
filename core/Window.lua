@@ -782,9 +782,12 @@ function Window:SetupMinimize()
                 }))
             end
             if descendant:IsA("Frame") or descendant:IsA("ScrollingFrame") then
-                table.insert(activeTweens, TweenService:Create(descendant, fadeInfo, {
-                    BackgroundTransparency = 1
-                }))
+                -- DON'T tween ContentContainer or TabContainer - just hide them instantly
+                if descendant ~= self.ContentContainer and descendant ~= self.TabContainer then
+                    table.insert(activeTweens, TweenService:Create(descendant, fadeInfo, {
+                        BackgroundTransparency = 1
+                    }))
+                end
             end
             if descendant:IsA("UIStroke") then
                 table.insert(activeTweens, TweenService:Create(descendant, fadeInfo, {
@@ -792,6 +795,10 @@ function Window:SetupMinimize()
                 }))
             end
         end
+        
+        -- Hide ContentContainer and TabContainer instantly (no tween)
+        self.ContentContainer.BackgroundTransparency = 1
+        self.TabContainer.BackgroundTransparency = 1
         
         -- Play all tweens
         for _, tween in ipairs(activeTweens) do
@@ -803,13 +810,15 @@ function Window:SetupMinimize()
             TweenService:Create(self.Blur, fadeInfo, {Size = 0}):Play()
         end
         
-        -- Hide after fade
-        task.delay(fadeDuration, function()
-            -- Cancel all tweens to prevent further changes
+        -- Hide after fade - but cancel tweens BEFORE they complete
+        task.delay(fadeDuration - 0.05, function()  -- Cancel 0.05s before completion
+            -- Cancel all tweens to prevent final value application
             for _, tween in ipairs(activeTweens) do
                 tween:Cancel()
             end
-            
+        end)
+        
+        task.delay(fadeDuration, function()
             self.ScreenGui.Enabled = false
             self._wasClosedWithX = true
             self._closing = false
