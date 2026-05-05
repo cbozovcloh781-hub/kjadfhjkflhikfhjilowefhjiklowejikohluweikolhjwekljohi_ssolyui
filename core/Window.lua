@@ -913,6 +913,10 @@ function Window:SetupMinimize()
                 -- Just enable GUI - transparency already restored
                 self.ScreenGui.Enabled = true
                 
+                -- CRITICAL: Make sure Container is full size BEFORE showing
+                self.Container.Size = self.Config.Size
+                self.Container.Position = self._savedPosition or self.Config.Position
+                
                 -- Make sure all elements are visible and have correct colors
                 self.ContentContainer.Visible = true
                 self.ContentContainer.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
@@ -937,6 +941,11 @@ function Window:SetupMinimize()
                     self.ParticleSystem.Container.Visible = true
                     self.ParticleSystem.Running = true
                 end
+                
+                -- Show resize handles
+                self.ResizeHandle.Visible = true
+                self.ResizeHandleV.Visible = true
+                self.ResizeHandleH.Visible = true
             else
                 -- Normal minimize toggle
                 self:ToggleMinimize()
@@ -1677,8 +1686,8 @@ function Window:InitParticles()
     local baseUrl = "https://raw.githubusercontent.com/cbozovcloh781-hub/kjadfhjkflhikfhjilowefhjiklowejikohluweikolhjwekljohi_ssolyui/main/"
     local Particles = loadstring(game:HttpGet(baseUrl .. "utils/Particles.lua"))()
     
-    -- Create particles for ScreenGui (not Container) so they don't move with window
-    self.ParticleSystem = Particles.new(self.ScreenGui, self.AccentColor, self.Container)
+    -- Create particles for window
+    self.ParticleSystem = Particles.new(self.Container, self.AccentColor)
     self.ParticleSystem.Running = true
     self.ParticleSystem:Start()
 end
