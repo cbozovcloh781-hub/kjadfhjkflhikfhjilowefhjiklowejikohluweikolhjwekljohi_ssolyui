@@ -172,8 +172,8 @@ function Window:CreateGUI()
     task.spawn(function()
         local success, version = pcall(function()
             local baseUrl = "https://raw.githubusercontent.com/cbozovcloh781-hub/kjadfhjkflhikfhjilowefhjiklowejikohluweikolhjwekljohi_ssolyui/main/"
-            -- Добавляем timestamp для обхода кэша GitHub
-            return game:HttpGet(baseUrl .. "version.txt?t=" .. tick())
+            -- Добавляем random + timestamp для агрессивного обхода кэша
+            return game:HttpGet(baseUrl .. "version.txt?v=" .. math.random(1, 999999) .. "&t=" .. tick())
         end)
         if success and version then
             self.UIVersion = version:gsub("%s+", "") -- Remove whitespace
