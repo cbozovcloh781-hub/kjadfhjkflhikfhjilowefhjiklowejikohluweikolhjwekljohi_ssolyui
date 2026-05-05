@@ -255,10 +255,12 @@ function Window:CreateGUI()
     self.ContentContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
     self.ContentContainer.Parent = self.Container
     
-    -- CRITICAL: Lock ContentContainer color to prevent changes
-    self.ContentContainer:GetPropertyChangedSignal("BackgroundColor3"):Connect(function()
-        if self.ContentContainer.BackgroundColor3 ~= Color3.fromRGB(12, 12, 12) then
-            self.ContentContainer.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
+    -- CRITICAL: Force color lock with RunService (every frame check)
+    RunService.Heartbeat:Connect(function()
+        if self.ContentContainer and self.ContentContainer.Parent then
+            if self.ContentContainer.BackgroundColor3 ~= Color3.fromRGB(12, 12, 12) then
+                self.ContentContainer.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
+            end
         end
     end)
     
