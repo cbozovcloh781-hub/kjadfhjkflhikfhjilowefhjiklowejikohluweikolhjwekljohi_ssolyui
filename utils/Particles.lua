@@ -37,8 +37,10 @@ function Particles:CreateParticle()
     if not self.Container or not self.Container.Parent then return end
     if #self.Particles >= self.MaxParticles then return end
     
+    -- Одинаковый размер для круглых частиц
+    local size = math.random(2, 5)
     local particle = Instance.new("Frame")
-    particle.Size = UDim2.fromOffset(math.random(2, 5), math.random(2, 5))
+    particle.Size = UDim2.fromOffset(size, size)  -- Квадрат для идеального круга
     
     -- Случайное направление: сверху (70%), слева (15%), справа (15%)
     local direction = math.random(1, 100)
@@ -73,7 +75,7 @@ function Particles:CreateParticle()
     particle.Parent = self.Container
     
     local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(1, 0)
+    corner.CornerRadius = UDim.new(1, 0)  -- Полностью круглый
     corner.Parent = particle
     
     table.insert(self.Particles, particle)

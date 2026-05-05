@@ -736,6 +736,12 @@ function Window:SetupMinimize()
         if self._closing then return end
         self._closing = true
         
+        -- Stop particles IMMEDIATELY
+        if self.ParticleSystem and self.ParticleSystem.Container then
+            self.ParticleSystem.Container.Visible = false
+            self.ParticleSystem.Running = false
+        end
+        
         -- Smooth fade out animation
         local fadeDuration = 0.3
         local fadeInfo = TweenInfo.new(fadeDuration, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
@@ -745,12 +751,14 @@ function Window:SetupMinimize()
             BackgroundTransparency = 1
         }):Play()
         
-        -- Fade title bar buttons
+        -- Fade title bar buttons (background AND text)
         TweenService:Create(self.CloseButton, fadeInfo, {
-            BackgroundTransparency = 1
+            BackgroundTransparency = 1,
+            TextTransparency = 1
         }):Play()
         TweenService:Create(self.MinimizeButton, fadeInfo, {
-            BackgroundTransparency = 1
+            BackgroundTransparency = 1,
+            TextTransparency = 1
         }):Play()
         
         -- Fade ALL descendants at once
@@ -782,11 +790,6 @@ function Window:SetupMinimize()
             TweenService:Create(self.Blur, fadeInfo, {Size = 0}):Play()
         end
         
-        -- Stop particles
-        if self.ParticleSystem and self.ParticleSystem.Container then
-            self.ParticleSystem.Container.Visible = false
-        end
-        
         -- Hide after fade
         task.delay(fadeDuration, function()
             self.ScreenGui.Enabled = false
@@ -796,19 +799,45 @@ function Window:SetupMinimize()
             -- Restore original transparency values after hiding
             self.Container.BackgroundTransparency = self.Config.Transparency
             self.CloseButton.BackgroundTransparency = 0
+            self.CloseButton.TextTransparency = 0
             self.MinimizeButton.BackgroundTransparency = 0
+            self.MinimizeButton.TextTransparency = 0
             self.ContentContainer.BackgroundTransparency = 0.3
             self.TabContainer.BackgroundTransparency = 1
             self.ProfileContainer.BackgroundTransparency = 0
             self.BottomGlow.BackgroundTransparency = 0.7
             
-            -- Restore text transparency
+            -- Restore ALL descendants transparency
             for _, descendant in pairs(self.Container:GetDescendants()) do
                 if descendant:IsA("TextLabel") or descendant:IsA("TextButton") then
                     descendant.TextTransparency = 0
                 end
                 if descendant:IsA("ImageLabel") or descendant:IsA("ImageButton") then
                     descendant.ImageTransparency = 0
+                end
+                if descendant:IsA("Frame") or descendant:IsA("ScrollingFrame") then
+                    -- Restore specific transparency for each element type
+                    if descendant.Name == "Toggle" or descendant.Name == "Dropdown" or descendant.Name == "Slider" or descendant.Name == "Button" or descendant.Name == "Input" then
+                        descendant.BackgroundTransparency = 0.5
+                    elseif descendant.Parent and (descendant.Parent.Name == "Toggle" or descendant.Parent.Name == "Dropdown" or descendant.Parent.Name == "Slider" or descendant.Parent.Name == "Button" or descendant.Parent.Name == "Input") then
+                        if descendant.Name == "Button" or descendant.Name == "Options" then
+                            descendant.BackgroundTransparency = 0.3
+                        else
+                            descendant.BackgroundTransparency = 0
+                        end
+                    elseif descendant.Name ~= "ContentContainer" and descendant.Name ~= "TabContainer" and descendant.Name ~= "BottomGlow" then
+                        descendant.BackgroundTransparency = 0
+                    end
+                end
+                if descendant:IsA("UIStroke") then
+                    -- Restore UIStroke transparency
+                    if descendant.Parent then
+                        if descendant.Parent.Name == "Toggle" or descendant.Parent.Name == "Dropdown" or descendant.Parent.Name == "Slider" or descendant.Parent.Name == "Button" or descendant.Parent.Name == "Input" then
+                            descendant.Transparency = 0.5
+                        else
+                            descendant.Transparency = 0
+                        end
+                    end
                 end
             end
         end)
