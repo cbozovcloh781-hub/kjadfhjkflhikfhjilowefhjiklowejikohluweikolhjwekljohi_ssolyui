@@ -798,28 +798,10 @@ function Window:SetupMinimize()
             if self._wasClosedWithX and not self.ScreenGui.Enabled then
                 self._wasClosedWithX = false
                 
-                -- Reset all transparencies to 1 (invisible) BEFORE enabling
-                self.Container.BackgroundTransparency = 1
-                
-                for _, descendant in pairs(self.Container:GetDescendants()) do
-                    if descendant:IsA("TextLabel") or descendant:IsA("TextButton") then
-                        descendant.TextTransparency = 1
-                    end
-                    if descendant:IsA("ImageLabel") or descendant:IsA("ImageButton") then
-                        descendant.ImageTransparency = 1
-                    end
-                    if descendant:IsA("Frame") or descendant:IsA("ScrollingFrame") then
-                        descendant.BackgroundTransparency = 1
-                    end
-                    if descendant:IsA("UIStroke") then
-                        descendant.Transparency = 1
-                    end
-                end
-                
-                -- Enable GUI
+                -- Enable GUI first
                 self.ScreenGui.Enabled = true
                 
-                -- Smooth fade in animation - ALL elements same duration
+                -- Smooth fade in animation
                 local fadeDuration = 0.5
                 local fadeInfo = TweenInfo.new(fadeDuration, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
                 
@@ -844,6 +826,7 @@ function Window:SetupMinimize()
                         -- Determine correct transparency for each element type
                         local targetTransparency = 0
                         
+                        -- Special cases
                         if descendant == self.ContentContainer then
                             targetTransparency = 0.3
                         elseif descendant == self.TabContainer then
@@ -851,26 +834,18 @@ function Window:SetupMinimize()
                         elseif descendant.Name == "BottomGlow" then
                             targetTransparency = 0.7
                         elseif descendant.Name == "SwitchBg" then
-                            -- Check if switch is active by checking parent toggle state
-                            local isActive = false
-                            local parent = descendant.Parent
-                            if parent and parent:FindFirstChild("Title") then
-                                -- Try to find if this toggle is enabled in Settings
-                                local titleText = parent:FindFirstChild("Title").Text
-                                -- Check common toggle names
-                                if titleText == "Fly" and Settings.Fly then isActive = true
-                                elseif titleText == "NoClip" and Settings.NoClip then isActive = true
-                                elseif titleText == "Speed Hack" and Settings.Speed then isActive = true
-                                elseif titleText == "Infinite Jump" and Settings.InfiniteJump then isActive = true
-                                elseif titleText == "Jump Hack" and Settings.JumpHack then isActive = true
-                                elseif titleText == "Enable Autofarm" and Settings.Autofarm then isActive = true
-                                elseif titleText == "Auto Sell Items" and Settings.Autosell then isActive = true
-                                elseif titleText == "Enable ESP" and ESPSettings.Enabled then isActive = true
-                                end
+                            targetTransparency = 0
+                        elseif descendant.Name == "Check" then
+                            targetTransparency = 0
+                        elseif descendant.Name == "Toggle" or descendant.Name == "Dropdown" or descendant.Name == "Slider" or descendant.Name == "Button" or descendant.Name == "Input" then
+                            targetTransparency = 0.5
+                        elseif descendant.Parent and (descendant.Parent.Name == "Toggle" or descendant.Parent.Name == "Dropdown" or descendant.Parent.Name == "Slider" or descendant.Parent.Name == "Button" or descendant.Parent.Name == "Input") then
+                            -- Child elements of main containers
+                            if descendant.Name == "Button" or descendant.Name == "Options" then
+                                targetTransparency = 0.3
+                            else
+                                targetTransparency = 0
                             end
-                            targetTransparency = 0
-                        elseif descendant.Parent and descendant.Parent.Name == "Dropdown" then
-                            targetTransparency = 0
                         else
                             targetTransparency = 0
                         end
@@ -880,14 +855,19 @@ function Window:SetupMinimize()
                         }):Play()
                     end
                     if descendant:IsA("UIStroke") then
+                        -- Restore strokes with proper transparency
+                        local targetTransparency = 0
+                        if descendant.Parent and (descendant.Parent.Name == "Toggle" or descendant.Parent.Name == "Dropdown" or descendant.Parent.Name == "Slider" or descendant.Parent.Name == "Button" or descendant.Parent.Name == "Input") then
+                            targetTransparency = 0.5
+                        end
                         TweenService:Create(descendant, fadeInfo, {
-                            Transparency = 0
+                            Transparency = targetTransparency
                         }):Play()
                     end
                 end
                 
-                -- Fade in blur
-                if self.Blur then
+                -- Fade in blur ONLY if not minimized
+                if self.Blur and not self.Minimized then
                     TweenService:Create(self.Blur, fadeInfo, {Size = self.BlurSize}):Play()
                 end
                 
