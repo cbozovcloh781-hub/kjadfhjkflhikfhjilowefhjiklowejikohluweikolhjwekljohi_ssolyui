@@ -771,7 +771,7 @@ function Window:SetupMinimize()
         self.ContentContainer.Visible = false
         self.TabContainer.Visible = false
         
-        -- Fade ALL descendants EXCEPT ContentContainer and TabContainer children
+        -- Fade ALL descendants EXCEPT ContentContainer, TabContainer and their children
         for _, descendant in pairs(self.Container:GetDescendants()) do
             -- Skip if descendant is inside ContentContainer or TabContainer
             local isInsideContent = false
@@ -784,7 +784,13 @@ function Window:SetupMinimize()
                 parent = parent.Parent
             end
             
-            if not isInsideContent and descendant ~= self.ContentContainer and descendant ~= self.TabContainer then
+            -- Also skip tab buttons directly (they are TextButtons in TabContainer)
+            local isTabButton = false
+            if descendant:IsA("TextButton") and descendant.Parent == self.TabContainer then
+                isTabButton = true
+            end
+            
+            if not isInsideContent and not isTabButton and descendant ~= self.ContentContainer and descendant ~= self.TabContainer then
                 if descendant:IsA("TextLabel") or descendant:IsA("TextButton") then
                     table.insert(activeTweens, TweenService:Create(descendant, fadeInfo, {
                         TextTransparency = 1
