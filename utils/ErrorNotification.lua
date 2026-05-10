@@ -1,276 +1,322 @@
 ---@diagnostic disable: undefined-global
--- Ssoly UI Library - Error Notification System
--- Roblox-style error notifications (center screen)
+-- Ssoly UI Library - Error Notification (Roblox Style)
+-- Center-screen error display with smooth animations
 
 local TweenService = game:GetService("TweenService")
 
 local ErrorNotification = {}
-ErrorNotification.Container = nil
-ErrorNotification.Active = nil
+ErrorNotification.__index = ErrorNotification
 
-function ErrorNotification:Init(screenGui)
-    if self.Container then return end
-    
-    -- Error container (center screen)
-    self.Container = Instance.new("Frame")
-    self.Container.Name = "ErrorNotifications"
-    self.Container.Size = UDim2.fromScale(1, 1)
-    self.Container.Position = UDim2.fromScale(0, 0)
-    self.Container.BackgroundTransparency = 1
-    self.Container.ZIndex = 1000
-    self.Container.Parent = screenGui
+function ErrorNotification:Init(parent)
+    self.Parent = parent
+    self.Container = nil
+    self.IsShowing = false
+    return self
 end
 
 function ErrorNotification:Show(config)
-    if not self.Container then return end
-    if self.Active then
-        self:Dismiss()
-        task.wait(0.3)
+    if self.IsShowing then
+        self:Hide()
+        task.wait(0.4)
     end
+    
+    self.IsShowing = true
     
     local title = config.Title or "Error"
     local message = config.Message or "An error occurred"
     local duration = config.Duration or 5
     
-    -- Semi-transparent background overlay
-    local overlay = Instance.new("Frame")
-    overlay.Name = "Overlay"
-    overlay.Size = UDim2.fromScale(1, 1)
-    overlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    overlay.BackgroundTransparency = 1
-    overlay.BorderSizePixel = 0
-    overlay.ZIndex = 1000
-    overlay.Parent = self.Container
+    -- Main container (centered)
+    self.Container = Instance.new("Frame")
+    self.Container.Name = "ErrorNotification"
+    self.Container.AnchorPoint = Vector2.new(0.5, 0.5)
+    self.Container.Position = UDim2.new(0.5, 0, 0.5, 0)
+    self.Container.Size = UDim2.new(0, 480, 0, 0)
+    self.Container.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    self.Container.BorderSizePixel = 0
+    self.Container.ZIndex = 10000
+    self.Container.Parent = self.Parent
     
-    -- Error box (Roblox style)
-    local errorBox = Instance.new("Frame")
-    errorBox.Name = "ErrorBox"
-    errorBox.Size = UDim2.fromOffset(0, 0)
-    errorBox.Position = UDim2.fromScale(0.5, 0.5)
-    errorBox.AnchorPoint = Vector2.new(0.5, 0.5)
-    errorBox.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-    errorBox.BackgroundTransparency = 1
-    errorBox.BorderSizePixel = 0
-    errorBox.ZIndex = 1001
-    errorBox.Parent = self.Container
-    
+    -- Smooth corner
     local Corner = Instance.new("UICorner")
     Corner.CornerRadius = UDim.new(0, 8)
-    Corner.Parent = errorBox
+    Corner.Parent = self.Container
     
-    -- Red border (Roblox error style)
+    -- Red border (strict style)
     local Stroke = Instance.new("UIStroke")
     Stroke.Color = Color3.fromRGB(220, 50, 50)
-    Stroke.Thickness = 3
-    Stroke.Transparency = 1
+    Stroke.Thickness = 2.5
     Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-    Stroke.Parent = errorBox
+    Stroke.Transparency = 0
+    Stroke.Parent = self.Container
     
-    -- Error icon (red X)
-    local icon = Instance.new("Frame")
-    icon.Name = "Icon"
-    icon.Size = UDim2.fromOffset(50, 50)
-    icon.Position = UDim2.fromOffset(20, 20)
-    icon.BackgroundColor3 = Color3.fromRGB(220, 50, 50)
-    icon.BackgroundTransparency = 1
-    icon.BorderSizePixel = 0
-    icon.ZIndex = 1002
-    icon.Parent = errorBox
+    -- Shadow effect
+    local Shadow = Instance.new("ImageLabel")
+    Shadow.Name = "Shadow"
+    Shadow.AnchorPoint = Vector2.new(0.5, 0.5)
+    Shadow.Position = UDim2.new(0.5, 0, 0.5, 0)
+    Shadow.Size = UDim2.new(1, 40, 1, 40)
+    Shadow.BackgroundTransparency = 1
+    Shadow.Image = "rbxasset://textures/ui/GuiImagePlaceholder.png"
+    Shadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
+    Shadow.ImageTransparency = 0.7
+    Shadow.ScaleType = Enum.ScaleType.Slice
+    Shadow.SliceCenter = Rect.new(10, 10, 118, 118)
+    Shadow.ZIndex = 9999
+    Shadow.Parent = self.Container
+    
+    -- Content container
+    local Content = Instance.new("Frame")
+    Content.Name = "Content"
+    Content.Size = UDim2.new(1, 0, 1, 0)
+    Content.BackgroundTransparency = 1
+    Content.Parent = self.Container
+    
+    local ContentPadding = Instance.new("UIPadding")
+    ContentPadding.PaddingTop = UDim.new(0, 20)
+    ContentPadding.PaddingBottom = UDim.new(0, 20)
+    ContentPadding.PaddingLeft = UDim.new(0, 24)
+    ContentPadding.PaddingRight = UDim.new(0, 24)
+    ContentPadding.Parent = Content
+    
+    -- Error icon (strict red X)
+    local Icon = Instance.new("Frame")
+    Icon.Name = "Icon"
+    Icon.Size = UDim2.fromOffset(48, 48)
+    Icon.Position = UDim2.new(0.5, -24, 0, 0)
+    Icon.BackgroundColor3 = Color3.fromRGB(220, 50, 50)
+    Icon.BorderSizePixel = 0
+    Icon.Parent = Content
     
     local IconCorner = Instance.new("UICorner")
     IconCorner.CornerRadius = UDim.new(1, 0)
-    IconCorner.Parent = icon
+    IconCorner.Parent = Icon
     
-    local iconLabel = Instance.new("TextLabel")
-    iconLabel.Size = UDim2.fromScale(1, 1)
-    iconLabel.BackgroundTransparency = 1
-    iconLabel.Text = "✕"
-    iconLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    iconLabel.TextSize = 28
-    iconLabel.Font = Enum.Font.GothamBold
-    iconLabel.TextTransparency = 1
-    iconLabel.ZIndex = 1003
-    iconLabel.Parent = icon
+    local IconLabel = Instance.new("TextLabel")
+    IconLabel.Size = UDim2.new(1, 0, 1, 0)
+    IconLabel.BackgroundTransparency = 1
+    IconLabel.Text = "✕"
+    IconLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    IconLabel.TextSize = 28
+    IconLabel.Font = Enum.Font.GothamBold
+    IconLabel.Parent = Icon
     
     -- Title
-    local titleLabel = Instance.new("TextLabel")
-    titleLabel.Name = "Title"
-    titleLabel.Size = UDim2.new(1, -100, 0, 30)
-    titleLabel.Position = UDim2.fromOffset(80, 20)
-    titleLabel.BackgroundTransparency = 1
-    titleLabel.Text = title
-    titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    titleLabel.TextSize = 18
-    titleLabel.Font = Enum.Font.GothamBold
-    titleLabel.TextXAlignment = Enum.TextXAlignment.Left
-    titleLabel.TextTransparency = 1
-    titleLabel.ZIndex = 1002
-    titleLabel.Parent = errorBox
+    local Title = Instance.new("TextLabel")
+    Title.Name = "Title"
+    Title.Size = UDim2.new(1, 0, 0, 24)
+    Title.Position = UDim2.fromOffset(0, 60)
+    Title.BackgroundTransparency = 1
+    Title.Text = title
+    Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Title.TextSize = 16
+    Title.Font = Enum.Font.GothamBold
+    Title.TextWrapped = false
+    Title.Parent = Content
     
     -- Message
-    local messageLabel = Instance.new("TextLabel")
-    messageLabel.Name = "Message"
-    messageLabel.Size = UDim2.new(1, -100, 0, 0)
-    messageLabel.Position = UDim2.fromOffset(80, 55)
-    messageLabel.BackgroundTransparency = 1
-    messageLabel.Text = message
-    messageLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
-    messageLabel.TextSize = 14
-    messageLabel.Font = Enum.Font.Gotham
-    messageLabel.TextXAlignment = Enum.TextXAlignment.Left
-    messageLabel.TextYAlignment = Enum.TextYAlignment.Top
-    messageLabel.TextWrapped = true
-    messageLabel.TextTransparency = 1
-    messageLabel.ZIndex = 1002
-    messageLabel.Parent = errorBox
+    local Message = Instance.new("TextLabel")
+    Message.Name = "Message"
+    Message.Size = UDim2.new(1, 0, 0, 0)
+    Message.Position = UDim2.fromOffset(0, 92)
+    Message.BackgroundTransparency = 1
+    Message.Text = message
+    Message.TextColor3 = Color3.fromRGB(200, 200, 200)
+    Message.TextSize = 13
+    Message.Font = Enum.Font.Gotham
+    Message.TextWrapped = true
+    Message.TextXAlignment = Enum.TextXAlignment.Center
+    Message.TextYAlignment = Enum.TextYAlignment.Top
+    Message.Parent = Content
     
     -- Calculate message height
     local textService = game:GetService("TextService")
     local textBounds = textService:GetTextSize(
         message,
-        14,
+        13,
         Enum.Font.Gotham,
-        Vector2.new(320, math.huge)
+        Vector2.new(432, math.huge)
     )
+    Message.Size = UDim2.new(1, 0, 0, textBounds.Y)
     
-    local messageHeight = math.max(textBounds.Y, 20)
-    messageLabel.Size = UDim2.new(1, -100, 0, messageHeight)
-    
-    -- OK Button
-    local okButton = Instance.new("TextButton")
-    okButton.Name = "OKButton"
-    okButton.Size = UDim2.fromOffset(100, 35)
-    okButton.Position = UDim2.new(0.5, -50, 1, -50)
-    okButton.BackgroundColor3 = Color3.fromRGB(220, 50, 50)
-    okButton.BackgroundTransparency = 1
-    okButton.BorderSizePixel = 0
-    okButton.Text = "OK"
-    okButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    okButton.TextSize = 14
-    okButton.Font = Enum.Font.GothamBold
-    okButton.TextTransparency = 1
-    okButton.AutoButtonColor = false
-    okButton.ZIndex = 1002
-    okButton.Parent = errorBox
+    -- OK Button (strict style)
+    local Button = Instance.new("TextButton")
+    Button.Name = "OKButton"
+    Button.Size = UDim2.new(0, 120, 0, 38)
+    Button.Position = UDim2.new(0.5, -60, 1, -58)
+    Button.BackgroundColor3 = Color3.fromRGB(220, 50, 50)
+    Button.BorderSizePixel = 0
+    Button.Text = ""
+    Button.AutoButtonColor = false
+    Button.Parent = Content
     
     local ButtonCorner = Instance.new("UICorner")
     ButtonCorner.CornerRadius = UDim.new(0, 6)
-    ButtonCorner.Parent = okButton
+    ButtonCorner.Parent = Button
+    
+    local ButtonLabel = Instance.new("TextLabel")
+    ButtonLabel.Size = UDim2.new(1, 0, 1, 0)
+    ButtonLabel.BackgroundTransparency = 1
+    ButtonLabel.Text = "OK"
+    ButtonLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    ButtonLabel.TextSize = 14
+    ButtonLabel.Font = Enum.Font.GothamBold
+    ButtonLabel.Parent = Button
     
     -- Calculate total height
-    local totalHeight = 90 + messageHeight + 60
+    local totalHeight = 92 + textBounds.Y + 78
     
-    -- Animations
-    local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+    -- Smooth entrance animation (scale + fade)
+    self.Container.Size = UDim2.new(0, 480, 0, totalHeight)
+    self.Container.BackgroundTransparency = 1
+    Content.Position = UDim2.new(0, 0, 0, 20)
     
-    -- Fade in overlay
-    TweenService:Create(overlay, TweenInfo.new(0.2), {
-        BackgroundTransparency = 0.5
+    for _, child in pairs(Content:GetDescendants()) do
+        if child:IsA("GuiObject") then
+            child.BackgroundTransparency = 1
+            if child:IsA("TextLabel") or child:IsA("TextButton") then
+                child.TextTransparency = 1
+            end
+        end
+    end
+    
+    Stroke.Transparency = 1
+    Shadow.ImageTransparency = 1
+    
+    -- Smooth scale animation
+    local scaleInfo = TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+    local fadeInfo = TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+    
+    TweenService:Create(self.Container, fadeInfo, {
+        BackgroundTransparency = 0
     }):Play()
     
-    -- Scale in error box
-    task.delay(0.1, function()
-        TweenService:Create(errorBox, tweenInfo, {
-            Size = UDim2.fromOffset(450, totalHeight),
-            BackgroundTransparency = 0
+    TweenService:Create(Content, scaleInfo, {
+        Position = UDim2.new(0, 0, 0, 0)
+    }):Play()
+    
+    TweenService:Create(Stroke, fadeInfo, {
+        Transparency = 0
+    }):Play()
+    
+    TweenService:Create(Shadow, fadeInfo, {
+        ImageTransparency = 0.7
+    }):Play()
+    
+    task.wait(0.15)
+    
+    -- Fade in all elements smoothly
+    for _, child in pairs(Content:GetDescendants()) do
+        if child:IsA("GuiObject") then
+            if child.Name == "Icon" then
+                TweenService:Create(child, fadeInfo, {
+                    BackgroundTransparency = 0
+                }):Play()
+            elseif child ~= Icon and child.Name ~= "OKButton" then
+                TweenService:Create(child, fadeInfo, {
+                    BackgroundTransparency = child.Name == "Shadow" and 0.7 or 0
+                }):Play()
+            end
+            
+            if child:IsA("TextLabel") or child:IsA("TextButton") then
+                TweenService:Create(child, fadeInfo, {
+                    TextTransparency = 0
+                }):Play()
+            end
+        end
+    end
+    
+    TweenService:Create(Button, fadeInfo, {
+        BackgroundTransparency = 0
+    }):Play()
+    
+    -- Button hover effect (smooth)
+    Button.MouseEnter:Connect(function()
+        TweenService:Create(Button, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+            BackgroundColor3 = Color3.fromRGB(240, 70, 70)
         }):Play()
-        
-        TweenService:Create(Stroke, tweenInfo, {
-            Transparency = 0
-        }):Play()
-        
-        -- Fade in icon
-        TweenService:Create(icon, tweenInfo, {
-            BackgroundTransparency = 0
-        }):Play()
-        
-        TweenService:Create(iconLabel, tweenInfo, {
-            TextTransparency = 0
-        }):Play()
-        
-        -- Fade in text
-        TweenService:Create(titleLabel, tweenInfo, {
-            TextTransparency = 0
-        }):Play()
-        
-        TweenService:Create(messageLabel, tweenInfo, {
-            TextTransparency = 0
-        }):Play()
-        
-        -- Fade in button
-        TweenService:Create(okButton, tweenInfo, {
-            BackgroundTransparency = 0,
-            TextTransparency = 0
+        TweenService:Create(Button, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+            Size = UDim2.new(0, 126, 0, 40)
         }):Play()
     end)
     
-    -- Button hover effect
-    okButton.MouseEnter:Connect(function()
-        TweenService:Create(okButton, TweenInfo.new(0.15), {
-            BackgroundColor3 = Color3.fromRGB(255, 70, 70)
-        }):Play()
-    end)
-    
-    okButton.MouseLeave:Connect(function()
-        TweenService:Create(okButton, TweenInfo.new(0.15), {
+    Button.MouseLeave:Connect(function()
+        TweenService:Create(Button, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
             BackgroundColor3 = Color3.fromRGB(220, 50, 50)
         }):Play()
+        TweenService:Create(Button, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+            Size = UDim2.new(0, 120, 0, 38)
+        }):Play()
     end)
     
-    -- Button click
-    okButton.MouseButton1Click:Connect(function()
-        self:Dismiss()
+    -- Close on button click
+    Button.MouseButton1Click:Connect(function()
+        self:Hide()
     end)
     
-    -- Auto-dismiss
+    -- Auto-hide after duration
     if duration > 0 then
         task.delay(duration, function()
-            if self.Active == overlay then
-                self:Dismiss()
+            if self.IsShowing then
+                self:Hide()
             end
         end)
     end
-    
-    self.Active = overlay
 end
 
-function ErrorNotification:Dismiss()
-    if not self.Active then return end
+function ErrorNotification:Hide()
+    if not self.Container or not self.IsShowing then return end
     
-    local overlay = self.Active
-    local errorBox = overlay:FindFirstChild("ErrorBox")
+    self.IsShowing = false
     
-    if errorBox then
-        -- Scale out
-        TweenService:Create(errorBox, TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
-            Size = UDim2.fromOffset(0, 0),
-            BackgroundTransparency = 1
-        }):Play()
-        
-        -- Fade out all elements
-        for _, child in pairs(errorBox:GetDescendants()) do
+    local fadeInfo = TweenInfo.new(0.35, Enum.EasingStyle.Quint, Enum.EasingDirection.In)
+    local scaleInfo = TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.In)
+    
+    -- Fade out all elements
+    local content = self.Container:FindFirstChild("Content")
+    if content then
+        for _, child in pairs(content:GetDescendants()) do
             if child:IsA("GuiObject") then
-                TweenService:Create(child, TweenInfo.new(0.2), {
+                TweenService:Create(child, fadeInfo, {
                     BackgroundTransparency = 1
                 }):Play()
+                
                 if child:IsA("TextLabel") or child:IsA("TextButton") then
-                    TweenService:Create(child, TweenInfo.new(0.2), {
+                    TweenService:Create(child, fadeInfo, {
                         TextTransparency = 1
                     }):Play()
                 end
             end
         end
+        
+        TweenService:Create(content, scaleInfo, {
+            Position = UDim2.new(0, 0, 0, -20)
+        }):Play()
     end
     
-    -- Fade out overlay
-    local tween = TweenService:Create(overlay, TweenInfo.new(0.2), {
-        BackgroundTransparency = 1
-    })
-    tween:Play()
+    local stroke = self.Container:FindFirstChildOfClass("UIStroke")
+    if stroke then
+        TweenService:Create(stroke, fadeInfo, {
+            Transparency = 1
+        }):Play()
+    end
     
-    tween.Completed:Connect(function()
-        overlay:Destroy()
-        self.Active = nil
+    local shadow = self.Container:FindFirstChild("Shadow")
+    if shadow then
+        TweenService:Create(shadow, fadeInfo, {
+            ImageTransparency = 1
+        }):Play()
+    end
+    
+    TweenService:Create(self.Container, fadeInfo, {
+        BackgroundTransparency = 1
+    }):Play()
+    
+    task.delay(0.4, function()
+        if self.Container then
+            self.Container:Destroy()
+            self.Container = nil
+        end
     end)
 end
 
