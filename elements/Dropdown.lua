@@ -627,4 +627,26 @@ function Dropdown:UpdateDisplay()
     end
 end
 
+function Dropdown:SetValues(newValues)
+    -- Clear old options
+    for _, option in pairs(self.OptionButtons) do
+        if option.Button then
+            option.Button:Destroy()
+        end
+    end
+    self.OptionButtons = {}
+    
+    -- Update values
+    self.Values = newValues
+    
+    -- Create new options
+    self:CreateOptions()
+    
+    -- Update canvas size
+    local layout = self.OptionsScroll:FindFirstChildOfClass("UIListLayout")
+    if layout then
+        self.OptionsScroll.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 10)
+    end
+end
+
 return Dropdown
