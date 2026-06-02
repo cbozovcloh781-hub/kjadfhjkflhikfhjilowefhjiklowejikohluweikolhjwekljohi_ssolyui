@@ -4565,4 +4565,13 @@ end
 -- EXPORT
 -- ============================================================================
 
-return Window
+local Ssoly = {}
+Ssoly.Window = Window
+Ssoly.Version = "1.1.0"
+Ssoly.Author = "Sosalkin hub"
+
+function Ssoly:CreateWindow(config)
+    return Window.new(config)
+end
+
+return Ssoly
